@@ -1,0 +1,228 @@
+# Chess Teacher — Concept
+
+A web app that teaches chess **strategy** (not just blunder avoidance) to players who
+know the rules but not how to play well. You play a game against an opponent that is
+pitched at your level; when you make a mistake, the app quietly waits until that
+mistake actually costs you something, then stops the game and helps you work out what
+went wrong, what would have been better, and why.
+
+Status: concept / pre-prototype. This document records the design decisions so far and
+the risks that the first prototype is meant to test.
+
+---
+
+## 1. The problem
+
+Players who know the rules but not the strategy plateau because:
+
+- **They can't tell which move was the mistake.** When something goes wrong (a pawn
+  falls, a piece gets trapped) the cause was often several moves earlier. Working that
+  out — *credit assignment* — is the hard part, and beginners rarely manage it alone.
+- **Existing feedback is about *what*, not *why*.** Game-review tools label moves
+  ("inaccuracy", "blunder") and show the engine's preferred move, but rarely explain the
+  strategic idea in a way a beginner can reuse in a different position.
+- **Strategic mistakes are invisible at the time.** A blunder is obvious one move later.
+  A strategic error (a weakened pawn, a misplaced knight, an uncastled king) only hurts
+  several moves later, by which point the link to the original move has been lost.
+
+## 2. Target user
+
+Someone who knows how the pieces move and has played some games, roughly 600–1400
+rating, and wants to understand *why* good moves are good. They cannot judge the
+correctness of chess explanations themselves, so **the app must never be confidently
+wrong.**
+
+## 3. The core loop
+
+1. **Play** a game against the teaching opponent (§4), which is pitched at your level.
+2. **You make a mistake.** The engine notices immediately, predicts what it will cost
+   you, and records a *pending lesson*. You are not told yet.
+3. **The consequence lands.** The opponent exploits the mistake; you lose the pawn, the
+   piece gets trapped, the file is taken.
+4. **The game pauses: "find the cause".**
+   > *"You just lost your d-pawn. The cause was one of your last 5 moves. Can you find it?"*
+
+   Hints are available (highlight the move, then the piece).
+5. **Compare the two futures.** Two boards side by side — *what you played* and *what was
+   better* — each playable forward a few moves, with the key squares and pieces
+   highlighted and a small evaluation graph for each line.
+6. **Name the principle.** A short explanation tied to one named principle from a fixed
+   curriculum (§6), e.g. *"Knights are strongest on squares where pawns can't kick them
+   away."*
+7. **Rewind and retry** from the mistake, with the lesson fresh — or carry on.
+
+If you spot the weakness yourself and fix it before the punishment lands, the app
+celebrates that instead: *"Nice — you saw your d-pawn was weak and defended it in time."*
+
+Because the rule is simply *"reveal when the consequence lands"*, tactics and strategy
+are handled the same way: a hanging piece is revealed one move later; a weak pawn might
+be revealed eight moves later.
+
+## 4. The teaching opponent
+
+The opponent has two modes:
+
+| Mode | When | How it plays |
+|---|---|---|
+| **Normal** | No pending lesson | At the user's level, with human-like moves (target: [Maia](https://maiachess.com), a network trained on human games at specific ratings) |
+| **Levelled up** | A lesson is pending | Strong engine, **focused on exploiting that lesson** |
+
+Rules for levelling up:
+
+- **Exploit clearly, not ruthlessly.** From the engine's top few moves, choose the one
+  that most directly pursues the lesson (attacks the weak pawn, occupies the open file),
+  even if a different move is fractionally stronger. The user must be able to see cause
+  and effect.
+- **Only level up for the lesson.** Don't play perfect chess everywhere else, or the user
+  is crushed for unrelated reasons and the lesson is lost.
+- **Lessons expire.** If the exploit doesn't land within ~6–8 moves, drop back to normal
+  and move the lesson to the post-game review.
+- **One lesson at a time.** If several become pending, pursue the biggest; the rest go to
+  the review.
+
+Unexploited lessons appear in the **post-game review** as *"you got away with it"*,
+shown with the simulated lines instead of the real game.
+
+### Difficulty ladder
+
+| Level | Behaviour |
+|---|---|
+| Easy | A subtle warning when a lesson becomes pending (*"Your opponent has spotted something…"*). The user tries to find and fix the weakness before it's punished. |
+| Normal | No warning. Lessons are revealed when they land. |
+| Test | Teaching opponent off. A fair game, to check whether the lessons stuck. |
+
+## 5. How the analysis works
+
+**Principle: the engine and deterministic code do all the analysis. The LLM only
+translates facts into plain English.** LLMs are unreliable at reading chess positions
+and will invent plausible-sounding but wrong explanations; a beginner can't catch them.
+
+### 5.1 Detecting a mistake
+
+Before each user move, ask the engine for its top N moves with evaluations (MultiPV).
+A move becomes a lesson candidate only if **both**:
+
+1. it is clearly worse than the best options (evaluation gap above a threshold, roughly
+   0.5 pawns, scaled to the user's level), **and**
+2. the feature comparison (§5.3) finds a concrete difference that explains the gap.
+
+Otherwise the move is treated as fine. Engines often prefer one move over another for
+reasons no human could articulate; nitpicking every move teaches nothing.
+
+### 5.2 Simulating the two futures
+
+For both the user's move and the best move, play the line forward **3–6 moves each**
+(the engine's principal variation, or later, Maia for the opponent's side to show what
+happens against a realistic player).
+
+- Measure features **after every move** along both lines and find the point where they
+  diverge — that divergence is the lesson.
+- Only compare **quiet** positions (no pending captures or checks). If a line stops in
+  the middle of an exchange, extend it until it settles, otherwise a temporary material
+  swing drowns out every strategic signal.
+
+### 5.3 Strategic features (computed in code, not by the LLM)
+
+| Feature | Measured as |
+|---|---|
+| Material | Standard piece values |
+| Development | Minor pieces on starting squares; castled or not |
+| Centre control | Attackers / occupiers of d4, d5, e4, e5 |
+| Piece activity | Legal moves per piece; pieces with almost none ("bad" pieces) |
+| Pawn structure | Isolated, doubled, backward and passed pawns |
+| Outposts | Knights on squares enemy pawns can never attack |
+| Open files | Rooks on open / half-open files |
+| King safety | Pawn shield; enemy pieces bearing on the king zone |
+| Hanging pieces | Pieces attacked more times than defended, or attacked by lower-value pieces |
+
+(Shortcut for prototyping: Stockfish 11 and earlier expose a term-by-term `eval`
+breakdown — mobility, king safety, passed pawns, space, etc. Modern NNUE Stockfish no
+longer does.)
+
+### 5.4 Pending lessons and triggers
+
+When a mistake is detected, a pending lesson records:
+
+- the move and position where it happened;
+- the predicted consequence, as a concrete, checkable condition derived from the
+  feature diff (e.g. *"white loses the d4 pawn"*, *"white's king has no pawn shield and a
+  black piece reaches the king zone"*, *"black's rook occupies the open e-file"*);
+- an expiry (move number).
+
+After every move in the real game, each pending lesson's condition is checked. When it
+becomes true, the lesson **triggers** and the game pauses for the reveal.
+
+### 5.5 The LLM's job
+
+Input: structured facts only — the two moves, the two lines in notation, the feature
+diffs at the divergence point, the triggered consequence, and the named principle.
+Output: a short, plain-English explanation at the user's level, plus the "find the
+cause" prompt and hints.
+
+Guardrails: any move or square the LLM mentions must appear in the facts it was given;
+otherwise fall back to a templated explanation.
+
+## 6. The curriculum
+
+A fixed set of a few dozen named principles, so explanations use consistent language and
+progress can be tracked. Starting list:
+
+- **Safety:** don't leave pieces undefended; check what your opponent's last move
+  threatens; check checks, captures and threats before moving.
+- **Opening:** develop knights and bishops before attacking; control the centre; castle
+  early; don't move the same piece twice without reason; don't bring the queen out early.
+- **Pieces:** knights on outposts; rooks on open files; bishops on long, open diagonals;
+  improve your worst piece; avoid trapping your own pieces.
+- **Pawns:** avoid isolated, doubled and backward pawns; passed pawns must be pushed;
+  don't weaken the pawns in front of your castled king.
+- **Endgame:** activate your king; rooks belong behind passed pawns.
+
+Every lesson maps to exactly one principle.
+
+## 7. Measuring progress
+
+Because the opponent gets stronger whenever you make a mistake, win/loss record is not a
+fair measure of strength. Progress is tracked per principle instead:
+
+- how often you make mistakes of that type (per game);
+- how often you **fix** a weakness before it's punished;
+- how often you **find the cause** yourself in the reveal;
+- results in **Test** mode games.
+
+This gives a "you keep neglecting development" view and drives which principles to
+emphasise next.
+
+## 8. How this differs from existing tools
+
+Chess.com Game Review and Lichess analysis label moves and show engine lines after the
+game, with largely templated explanations. This app differs by:
+
+1. **An opponent that deliberately demonstrates your mistakes**, at an otherwise fair
+   level.
+2. **Delayed reveal**: feedback arrives when the mistake costs you, and you find the
+   cause yourself.
+3. **Strategic explanations grounded in measured features**, tied to a named principle.
+4. **Rewind and retry** from the mistake.
+
+## 9. Risks and open questions
+
+| Risk | Why it matters | How to test |
+|---|---|---|
+| **Explanation quality** | Wrong explanations are worse than none for this user | Run on real beginner games; have a strong (1800+) player grade a sample |
+| **Consequence prediction** | Can we turn a feature diff into a checkable condition that reliably triggers in the real game? | Prototype 1 (below) |
+| **Teaching opponent feel** | Does the levelled-up opponent feel fair, and is the exploit legible? | Playtest |
+| **Strategic signal at low ratings** | Below ~1200, games are decided mostly by tactics; strategic lessons may rarely trigger | Count lesson types across real games |
+| **Small eval gaps** | Engine preferences of <0.5 are often inexplicable | Threshold tuning; only teach when a feature explains the gap |
+| **Cost / latency** | Engine analysis every move plus LLM calls | LLM only at reveals; engine runs in the browser (Stockfish WASM) or on a server |
+
+## 10. Plan
+
+1. **Prototype 1 (command line):** play against a teaching opponent in the terminal.
+   Detect mistakes, record pending lessons with checkable conditions, level the opponent
+   up to exploit them, and reveal when they trigger. Templated explanations; LLM optional.
+   *Tests: consequence prediction and triggering.*
+2. **Explanation evaluation:** run the analysis over a set of real beginner games;
+   generate LLM explanations from the facts; have a strong player grade them.
+3. **Web MVP:** board UI, the find-the-cause reveal, side-by-side futures, rewind.
+4. **Maia** for the normal-mode opponent and the realistic simulated lines.
+5. **Progress tracking** per principle and the difficulty ladder.
