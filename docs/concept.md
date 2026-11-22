@@ -226,3 +226,59 @@ game, with largely templated explanations. This app differs by:
 3. **Web MVP:** board UI, the find-the-cause reveal, side-by-side futures, rewind.
 4. **Maia** for the normal-mode opponent and the realistic simulated lines.
 5. **Progress tracking** per principle and the difficulty ladder.
+
+---
+
+## 11. Prototype 1 findings (Nov 2026)
+
+A command-line prototype (`play.py`, `simulate.py`) implements the core loop: mistake
+detection, feature comparison across the two futures, pending lessons with checkable
+triggers, the teaching opponent, find-the-cause, explanations and rewind. It was tested
+by simulating games between a weak engine "student" (Stockfish skill 0) and the teaching
+opponent (Stockfish skill 3, levelling up to full strength), with a control run where the
+opponent never levels up. Numbers below are from 12 games per configuration; two earlier
+10-game runs gave the same picture.
+
+| | Teaching opponent | Control (no level-up) |
+|---|---|---|
+| Consequence lessons that actually landed in the game | **77%** | 51% |
+| Median delay from mistake to consequence | 2 moves | 1 move |
+| Longest delay | 8 moves | 9 moves |
+| Opponent moves spent levelled up | 14% | 0% |
+
+What we learned:
+
+1. **The teaching opponent works.** Levelling up raises the share of predicted
+   consequences that really happen from about half to about four in five, while staying
+   at normal strength most of the time. Without it, half the lessons would never be
+   demonstrated.
+2. **Predicting a consequence and recognising it later is feasible.** Measured
+   conditions ("material balance drops to −1 after exchanges settle", "the opponent gets a
+   knight outpost") trigger reliably and quickly. Strategic consequences take longer to
+   land than tactical ones, as expected.
+3. **Credit assignment is a real problem.** In the first runs, one loss was blamed on a
+   move from seven moves earlier when a later mistake had caused it. Fix: when a newer
+   mistake affects the same factor, the older lesson is set aside for the review
+   ("superseded"). Weaker players make a lot of overlapping mistakes, so this matters.
+4. **Most lessons are tactical at this level.** Around 55–75% of lessons are about
+   material, which confirms the warning that games below ~1200 are mostly decided by
+   tactics. Strategic lessons still appear in most games.
+5. **Strategic explanations are the weak point.** Judged by eye, material lessons are
+   reliably right. Strategic lessons are right roughly half the time. Good examples:
+   *"Nc6 let their knight settle on an outpost on d5"*, *"Bd6 gave their rook the open
+   d-file"*, *"Bf6 blocked your knight's natural square; develop first"*. Bad examples
+   were rationalisations: the factor that differed wasn't why the engine preferred the
+   other move. Fixes so far: requiring a difference to persist for two plies, treating
+   the king as safe once queens are off, and adding endgame king activity.
+
+Next steps suggested by these results:
+
+- **Validate the factor.** Before teaching a strategic lesson, check that the factor
+  explains the evaluation gap. For example, test whether the engine's evaluation changes
+  when that factor changes, or use the Stockfish 11 term-by-term breakdown. Only teach
+  when it does.
+- **Grade explanations with a strong player** (step 2 of the plan), on real human games
+  rather than engine-vs-engine games.
+- **Run the LLM explanation path** against the live API and compare it with the templates.
+- **Try Maia** as the normal opponent and as the student in simulations, so the
+  mistakes are human-like.
