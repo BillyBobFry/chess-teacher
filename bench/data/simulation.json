@@ -1,0 +1,1267 @@
+{
+  "teaching opponent": [
+    {
+      "game": 0,
+      "level_up": true,
+      "result": "0-1",
+      "user_colour": "white",
+      "plies": 80,
+      "levelled_share": 0.025,
+      "lessons": [
+        {
+          "game": 0,
+          "level_up": true,
+          "colour": "white",
+          "move": "11. Nxc4",
+          "kind": "missed_chance",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 98,
+          "delay_moves": 1.0,
+          "trigger_text": "The chance has gone.",
+          "explanation": "On move 11 you played Nxc4. exd4 was better.\n\n  What you played:  11. Nxc4 dxe3 12. Bxe3 Be7 13. a3 Nd5 14. b4 Nxe3\n  What was better:  11. exd4 Bd6 12. Nxc4 O-O 13. Be3 Bf4 14. Nfe5 Nd5\n\nYour move wasn't a disaster, but exd4 would have improved material.\nAfter the better line: material balance +0. After yours: material balance -1.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 11,
+            "player_colour": "white",
+            "you_played": "Nxc4",
+            "better_was": "exd4",
+            "your_line": "11. Nxc4 dxe3 12. Bxe3 Be7 13. a3 Nd5 14. b4 Nxe3",
+            "better_line": "11. exd4 Bd6 12. Nxc4 O-O 13. Be3 Bf4 14. Nfe5 Nd5",
+            "evaluation_cost_in_pawns": 1.0,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "The chance has gone.",
+            "key_factor": "material",
+            "before_your_move": "material balance -1",
+            "end_of_your_line": "material balance -1",
+            "end_of_better_line": "material balance +0",
+            "lines_diverge_after_ply": 2,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 0,
+          "level_up": true,
+          "colour": "white",
+          "move": "12. Ncd2",
+          "kind": "missed_chance",
+          "feature": "mobility",
+          "principle": "activity",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 86,
+          "delay_moves": 1.0,
+          "trigger_text": "The chance has gone.",
+          "explanation": "On move 12 you played Ncd2. Na3 was better.\n\n  What you played:  12. Ncd2 dxe3 13. fxe3 Rb8 14. Nb3 Bd6 15. Bd2\n  What was better:  12. Na3 dxe3 13. Bxe3 a6 14. Rc1 Rd8 15. Bd3\n\nYour move wasn't a disaster, but Na3 would have improved piece activity.\nAfter the better line: 42 piece moves available vs opponent's 35. After yours: 26 piece moves available vs opponent's 35.\n\nPrinciple: Keep your pieces active. A piece with lots of squares is worth more than one that is stuck. Look for your worst piece and improve it.",
+          "facts": {
+            "move_number": 12,
+            "player_colour": "white",
+            "you_played": "Ncd2",
+            "better_was": "Na3",
+            "your_line": "12. Ncd2 dxe3 13. fxe3 Rb8 14. Nb3 Bd6 15. Bd2",
+            "better_line": "12. Na3 dxe3 13. Bxe3 a6 14. Rc1 Rd8 15. Bd3",
+            "evaluation_cost_in_pawns": 0.9,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "The chance has gone.",
+            "key_factor": "piece activity",
+            "before_your_move": "24 piece moves available vs opponent's 34",
+            "end_of_your_line": "26 piece moves available vs opponent's 35",
+            "end_of_better_line": "42 piece moves available vs opponent's 35",
+            "lines_diverge_after_ply": 2,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Keep your pieces active",
+              "explanation": "A piece with lots of squares is worth more than one that is stuck. Look for your worst piece and improve it."
+            }
+          }
+        },
+        {
+          "game": 0,
+          "level_up": true,
+          "colour": "white",
+          "move": "13. Nxd4",
+          "kind": "missed_chance",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 70,
+          "delay_moves": 1.0,
+          "trigger_text": "The chance has gone.",
+          "explanation": "On move 13 you played Nxd4. Nb3 was better.\n\n  What you played:  13. Nxd4 Nxd4 14. exd4 Bxd4 15. Ne4 Qe5 16. Nxf6+\n  What was better:  13. Nb3 Bb6 14. Nbxd4 Nxd4 15. Nxd4 Qe5 16. b3\n\nYour move wasn't a disaster, but Nb3 would have improved material.\nAfter the better line: material balance +0. After yours: material balance -1.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 13,
+            "player_colour": "white",
+            "you_played": "Nxd4",
+            "better_was": "Nb3",
+            "your_line": "13. Nxd4 Nxd4 14. exd4 Bxd4 15. Ne4 Qe5 16. Nxf6+",
+            "better_line": "13. Nb3 Bb6 14. Nbxd4 Nxd4 15. Nxd4 Qe5 16. b3",
+            "evaluation_cost_in_pawns": 0.7,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "The chance has gone.",
+            "key_factor": "material",
+            "before_your_move": "material balance -1",
+            "end_of_your_line": "material balance -1",
+            "end_of_better_line": "material balance +0",
+            "lines_diverge_after_ply": 2,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 0,
+          "level_up": true,
+          "colour": "white",
+          "move": "17. Bf4",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "hanging",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 492,
+          "delay_moves": 1.0,
+          "trigger_text": "You've lost a bishop: you're 3 pawns worse off than before.",
+          "explanation": "On move 17 you played Bf4. Bxf3 was better.\n\n  What you played:  17. Bf4 Qxf4 18. Bxf3 O-O 19. Bxa8 Rxa8 20. Rad1 Rd8\n  What was better:  17. Bxf3 Rb8 18. Rd1 Bc5 19. Be3 Bxe3 20. Qxe3 O-O\n\nThe difference is material. Before your move: material balance -1.\nAfter your line: material balance -2. After the better line: material balance -1.\nYour move left this undefended: bishop on e2, the piece you moved, now on f4.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+          "facts": {
+            "move_number": 17,
+            "player_colour": "white",
+            "you_played": "Bf4",
+            "better_was": "Bxf3",
+            "your_line": "17. Bf4 Qxf4 18. Bxf3 O-O 19. Bxa8 Rxa8 20. Rad1 Rd8",
+            "better_line": "17. Bxf3 Rb8 18. Rd1 Bc5 19. Be3 Bxe3 20. Qxe3 O-O",
+            "evaluation_cost_in_pawns": 4.9,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You've lost a bishop: you're 3 pawns worse off than before.",
+            "key_factor": "material",
+            "before_your_move": "material balance -1",
+            "end_of_your_line": "material balance -2",
+            "end_of_better_line": "material balance -1",
+            "lines_diverge_after_ply": 1,
+            "pieces_left_undefended_by_your_move": [
+              "bishop on e2",
+              "the piece you moved, now on f4"
+            ],
+            "principle": {
+              "title": "Don't leave pieces undefended",
+              "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "game": 1,
+      "level_up": true,
+      "result": "1-0",
+      "user_colour": "black",
+      "plies": 81,
+      "levelled_share": 0.0975609756097561,
+      "lessons": [
+        {
+          "game": 1,
+          "level_up": true,
+          "colour": "black",
+          "move": "13... Bf6",
+          "kind": "missed_chance",
+          "feature": "own_pawns",
+          "principle": "pawn_weaknesses",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 94,
+          "delay_moves": 1.0,
+          "trigger_text": "The chance has gone.",
+          "explanation": "On move 13 you played Bf6. h5 was better.\n\n  What you played:  13...Bf6 14. h5 O-O 15. e5 Bg7 16. h6\n  What was better:  13...h5 14. dxe5 hxg4 15. Qxg4 Nb4 16. Rd1\n\nYour move wasn't a disaster, but h5 would have improved your pawn structure.\nAfter the better line: no pawn weaknesses. After yours: backward pawn(s) on c6.\n\nPrinciple: Avoid weakening your pawns. Isolated, doubled and backward pawns are hard to defend and give your opponent targets. Don't create them without a good reason.",
+          "facts": {
+            "move_number": 13,
+            "player_colour": "black",
+            "you_played": "Bf6",
+            "better_was": "h5",
+            "your_line": "13...Bf6 14. h5 O-O 15. e5 Bg7 16. h6",
+            "better_line": "13...h5 14. dxe5 hxg4 15. Qxg4 Nb4 16. Rd1",
+            "evaluation_cost_in_pawns": 0.9,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "The chance has gone.",
+            "key_factor": "your pawn structure",
+            "before_your_move": "backward pawn(s) on c6",
+            "end_of_your_line": "backward pawn(s) on c6",
+            "end_of_better_line": "no pawn weaknesses",
+            "lines_diverge_after_ply": 2,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Avoid weakening your pawns",
+              "explanation": "Isolated, doubled and backward pawns are hard to defend and give your opponent targets. Don't create them without a good reason."
+            }
+          }
+        },
+        {
+          "game": 1,
+          "level_up": true,
+          "colour": "black",
+          "move": "17... Qxd5",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 344,
+          "delay_moves": 4.0,
+          "trigger_text": "You're about to lose material.",
+          "explanation": "On move 17 you played Qxd5. Nxd5 was better.\n\n  What you played:  17...Qxd5 18. Bf3 Qd8 19. Bxc6+ Kf8 20. h6 Rc8 21. hxg7+\n  What was better:  17...Nxd5 18. Rxc6 e6 19. Rd6 Qc7 20. Bf3 Bf8 21. Bxd5\n\nThe difference is material. Before your move: material balance +0.\nAfter your line: material balance -3. After the better line: material balance -2.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 17,
+            "player_colour": "black",
+            "you_played": "Qxd5",
+            "better_was": "Nxd5",
+            "your_line": "17...Qxd5 18. Bf3 Qd8 19. Bxc6+ Kf8 20. h6 Rc8 21. hxg7+",
+            "better_line": "17...Nxd5 18. Rxc6 e6 19. Rd6 Qc7 20. Bf3 Bf8 21. Bxd5",
+            "evaluation_cost_in_pawns": 3.4,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You're about to lose material.",
+            "key_factor": "material",
+            "before_your_move": "material balance +0",
+            "end_of_your_line": "material balance -3",
+            "end_of_better_line": "material balance -2",
+            "lines_diverge_after_ply": 5,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "game": 2,
+      "level_up": true,
+      "result": "0-1",
+      "user_colour": "white",
+      "plies": 68,
+      "levelled_share": 0.11764705882352941,
+      "lessons": [
+        {
+          "game": 2,
+          "level_up": true,
+          "colour": "white",
+          "move": "15. b4",
+          "kind": "missed_chance",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 118,
+          "delay_moves": 1.0,
+          "trigger_text": "The chance has gone.",
+          "explanation": "On move 15 you played b4. Nf3 was better.\n\n  What you played:  15. b4 Nc3 16. Qh5+ g6 17. Qh6\n  What was better:  15. Nf3 Rf8 16. Qd3 d5 17. Nxe5\n\nYour move wasn't a disaster, but Nf3 would have improved material.\nAfter the better line: material balance +1. After yours: material balance +0.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 15,
+            "player_colour": "white",
+            "you_played": "b4",
+            "better_was": "Nf3",
+            "your_line": "15. b4 Nc3 16. Qh5+ g6 17. Qh6",
+            "better_line": "15. Nf3 Rf8 16. Qd3 d5 17. Nxe5",
+            "evaluation_cost_in_pawns": 1.2,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "The chance has gone.",
+            "key_factor": "material",
+            "before_your_move": "material balance +0",
+            "end_of_your_line": "material balance +0",
+            "end_of_better_line": "material balance +1",
+            "lines_diverge_after_ply": 4,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 2,
+          "level_up": true,
+          "colour": "white",
+          "move": "16. Bc4",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 118,
+          "delay_moves": 3.0,
+          "trigger_text": "You've lost a rook: you're 5 pawns worse off than before.",
+          "explanation": "On move 16 you played Bc4. Nf3 was better.\n\n  What you played:  16. Bc4 Nf2 17. Nf3 Nxh1\n  What was better:  16. Nf3 Bg4 17. Rf1 Bh3\n\nThe difference is material. Before your move: material balance +0.\nAfter your line: material balance -5. After the better line: material balance +0.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 16,
+            "player_colour": "white",
+            "you_played": "Bc4",
+            "better_was": "Nf3",
+            "your_line": "16. Bc4 Nf2 17. Nf3 Nxh1",
+            "better_line": "16. Nf3 Bg4 17. Rf1 Bh3",
+            "evaluation_cost_in_pawns": 1.2,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You've lost a rook: you're 5 pawns worse off than before.",
+            "key_factor": "material",
+            "before_your_move": "material balance +0",
+            "end_of_your_line": "material balance -5",
+            "end_of_better_line": "material balance +0",
+            "lines_diverge_after_ply": 3,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 2,
+          "level_up": true,
+          "colour": "white",
+          "move": "22. Qxh7",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "hanging",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 309,
+          "delay_moves": 1.0,
+          "trigger_text": "Since that move you've lost a knight and taken a pawn: overall you're 2 pawns down. And more is about to fall.",
+          "explanation": "On move 22 you played Qxh7. Ne6+ was better.\n\n  What you played:  22. Qxh7 Bxg5 23. Qxg7 Bxe3 24. Ke2 Bxc1 25. Rxc1\n  What was better:  22. Ne6+ Bxe6 23. Bxe6 Rf6 24. Bh3 Rbf8 25. Bd2\n\nThe difference is material. Before your move: material balance -2.\nAfter your line: material balance -5. After the better line: material balance -3.\nYour move left this undefended: knight on g5.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+          "facts": {
+            "move_number": 22,
+            "player_colour": "white",
+            "you_played": "Qxh7",
+            "better_was": "Ne6+",
+            "your_line": "22. Qxh7 Bxg5 23. Qxg7 Bxe3 24. Ke2 Bxc1 25. Rxc1",
+            "better_line": "22. Ne6+ Bxe6 23. Bxe6 Rf6 24. Bh3 Rbf8 25. Bd2",
+            "evaluation_cost_in_pawns": 3.1,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "Since that move you've lost a knight and taken a pawn: overall you're 2 pawns down. And more is about to fall.",
+            "key_factor": "material",
+            "before_your_move": "material balance -2",
+            "end_of_your_line": "material balance -5",
+            "end_of_better_line": "material balance -3",
+            "lines_diverge_after_ply": 1,
+            "pieces_left_undefended_by_your_move": [
+              "knight on g5"
+            ],
+            "principle": {
+              "title": "Don't leave pieces undefended",
+              "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "game": 3,
+      "level_up": true,
+      "result": "1-0",
+      "user_colour": "black",
+      "plies": 99,
+      "levelled_share": 0.16,
+      "lessons": [
+        {
+          "game": 3,
+          "level_up": true,
+          "colour": "black",
+          "move": "5... Nf6",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "hanging",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 347,
+          "delay_moves": 1.0,
+          "trigger_text": "You've lost a knight: you're 3 pawns worse off than before.",
+          "explanation": "On move 5 you played Nf6. Na5 was better.\n\n  What you played:  5...Nf6 6. bxc6 e5 7. d3 e4 8. dxe4 Nxe4 9. g3\n  What was better:  5...Na5 6. d3 b6 7. g3 Bb7 8. Bg2 e6 9. e4\n\nThe difference is material. Before your move: material balance +0.\nAfter your line: material balance -2. After the better line: material balance +0.\nYour move left this undefended: knight on c6.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+          "facts": {
+            "move_number": 5,
+            "player_colour": "black",
+            "you_played": "Nf6",
+            "better_was": "Na5",
+            "your_line": "5...Nf6 6. bxc6 e5 7. d3 e4 8. dxe4 Nxe4 9. g3",
+            "better_line": "5...Na5 6. d3 b6 7. g3 Bb7 8. Bg2 e6 9. e4",
+            "evaluation_cost_in_pawns": 3.5,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You've lost a knight: you're 3 pawns worse off than before.",
+            "key_factor": "material",
+            "before_your_move": "material balance +0",
+            "end_of_your_line": "material balance -2",
+            "end_of_better_line": "material balance +0",
+            "lines_diverge_after_ply": 1,
+            "pieces_left_undefended_by_your_move": [
+              "knight on c6"
+            ],
+            "principle": {
+              "title": "Don't leave pieces undefended",
+              "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+            }
+          }
+        },
+        {
+          "game": 3,
+          "level_up": true,
+          "colour": "black",
+          "move": "12... Nd7",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 104,
+          "delay_moves": 5.0,
+          "trigger_text": "You've lost a bishop: you're 3 pawns worse off than before.",
+          "explanation": "On move 12 you played Nd7. Ne4 was better.\n\n  What you played:  12...Nd7 13. Bg2 h5 14. O-O h4 15. gxh4\n  What was better:  12...Ne4 13. Bg2 Qa5+ 14. Bd2 Nxd2 15. Qxd2\n\nThe difference is material. Before your move: material balance -2.\nAfter your line: material balance -3. After the better line: material balance -2.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 12,
+            "player_colour": "black",
+            "you_played": "Nd7",
+            "better_was": "Ne4",
+            "your_line": "12...Nd7 13. Bg2 h5 14. O-O h4 15. gxh4",
+            "better_line": "12...Ne4 13. Bg2 Qa5+ 14. Bd2 Nxd2 15. Qxd2",
+            "evaluation_cost_in_pawns": 1.0,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You've lost a bishop: you're 3 pawns worse off than before.",
+            "key_factor": "material",
+            "before_your_move": "material balance -2",
+            "end_of_your_line": "material balance -3",
+            "end_of_better_line": "material balance -2",
+            "lines_diverge_after_ply": 5,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 3,
+          "level_up": true,
+          "colour": "black",
+          "move": "21... f6",
+          "kind": "missed_chance",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 454,
+          "delay_moves": 1.0,
+          "trigger_text": "The chance has gone.",
+          "explanation": "On move 21 you played f6. Rb2 was better.\n\n  What you played:  21...f6 22. Qc2 Rb3 23. Bxe5\n  What was better:  21...Rb2 22. Qxb2 Rxb2 23. Rab1\n\nYour move wasn't a disaster, but Rb2 would have improved material.\nAfter the better line: material balance +1. After yours: material balance -3.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 21,
+            "player_colour": "black",
+            "you_played": "f6",
+            "better_was": "Rb2",
+            "your_line": "21...f6 22. Qc2 Rb3 23. Bxe5",
+            "better_line": "21...Rb2 22. Qxb2 Rxb2 23. Rab1",
+            "evaluation_cost_in_pawns": 4.5,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "The chance has gone.",
+            "key_factor": "material",
+            "before_your_move": "material balance -3",
+            "end_of_your_line": "material balance -3",
+            "end_of_better_line": "material balance +1",
+            "lines_diverge_after_ply": 2,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 3,
+          "level_up": true,
+          "colour": "black",
+          "move": "23... a6",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "hanging",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 228,
+          "delay_moves": 2.0,
+          "trigger_text": "You've lost a knight, a pawn: you're 4 pawns worse off than before.",
+          "explanation": "On move 23 you played a6. Qd6 was better.\n\n  What you played:  23...a6 24. Qxc5 Qd6 25. Qxe5 Qxe5 26. Bxe5 R8b7\n  What was better:  23...Qd6 24. Qa4 a6 25. Qd1 Rb2 26. e4 dxe3\n\nThe difference is material. Before your move: material balance -3.\nAfter your line: material balance -8. After the better line: material balance -3.\nYour move left this undefended: pawn on c5.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+          "facts": {
+            "move_number": 23,
+            "player_colour": "black",
+            "you_played": "a6",
+            "better_was": "Qd6",
+            "your_line": "23...a6 24. Qxc5 Qd6 25. Qxe5 Qxe5 26. Bxe5 R8b7",
+            "better_line": "23...Qd6 24. Qa4 a6 25. Qd1 Rb2 26. e4 dxe3",
+            "evaluation_cost_in_pawns": 2.3,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You've lost a knight, a pawn: you're 4 pawns worse off than before.",
+            "key_factor": "material",
+            "before_your_move": "material balance -3",
+            "end_of_your_line": "material balance -8",
+            "end_of_better_line": "material balance -3",
+            "lines_diverge_after_ply": 3,
+            "pieces_left_undefended_by_your_move": [
+              "pawn on c5"
+            ],
+            "principle": {
+              "title": "Don't leave pieces undefended",
+              "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "game": 4,
+      "level_up": true,
+      "result": "*",
+      "user_colour": "white",
+      "plies": 100,
+      "levelled_share": 0.16,
+      "lessons": [
+        {
+          "game": 4,
+          "level_up": true,
+          "colour": "white",
+          "move": "6. e3",
+          "kind": "consequence",
+          "feature": "own_pawns",
+          "principle": "pawn_weaknesses",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 77,
+          "delay_moves": 3.0,
+          "trigger_text": "Your pawn structure has been damaged (doubled pawns on the e-file).",
+          "explanation": "On move 6 you played e3. e4 was better.\n\n  What you played:  6. e3 e5 7. dxe5 Nd7 8. e4\n  What was better:  6. e4 Nb6 7. Nbd2 e6 8. Bd3\n\nThe difference is your pawn structure. Before your move: no pawn weaknesses.\nAfter your line: doubled pawns on the e-file. After the better line: no pawn weaknesses.\n\nPrinciple: Avoid weakening your pawns. Isolated, doubled and backward pawns are hard to defend and give your opponent targets. Don't create them without a good reason.",
+          "facts": {
+            "move_number": 6,
+            "player_colour": "white",
+            "you_played": "e3",
+            "better_was": "e4",
+            "your_line": "6. e3 e5 7. dxe5 Nd7 8. e4",
+            "better_line": "6. e4 Nb6 7. Nbd2 e6 8. Bd3",
+            "evaluation_cost_in_pawns": 0.8,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "Your pawn structure has been damaged (doubled pawns on the e-file).",
+            "key_factor": "your pawn structure",
+            "before_your_move": "no pawn weaknesses",
+            "end_of_your_line": "doubled pawns on the e-file",
+            "end_of_better_line": "no pawn weaknesses",
+            "lines_diverge_after_ply": 3,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Avoid weakening your pawns",
+              "explanation": "Isolated, doubled and backward pawns are hard to defend and give your opponent targets. Don't create them without a good reason."
+            }
+          }
+        },
+        {
+          "game": 4,
+          "level_up": true,
+          "colour": "white",
+          "move": "12. Nc3",
+          "kind": "consequence",
+          "feature": "centre",
+          "principle": "centre",
+          "status": "fixed",
+          "deferred": false,
+          "gap_cp": 105,
+          "delay_moves": 1.5,
+          "trigger_text": "",
+          "explanation": "On move 12 you played Nc3. Bg2 was better.\n\n  What you played:  12. Nc3 Qh4 13. Kd2 O-O-O 14. Kc2 Bd4 15. Qe2 Bxc3\n  What was better:  12. Bg2 O-O 13. O-O Ng6 14. f4 Nh4 15. Nc3 Nxg2\n\nThe difference is control of the centre. Before your move: centre control 5 vs 4.\nAfter your line: centre control 5 vs 7. After the better line: centre control 7 vs 3.\n\nPrinciple: Control the centre. Pieces and pawns that control d4, e4, d5 and e5 influence the whole board and make it easier to move pieces from one side to the other.",
+          "facts": {
+            "move_number": 12,
+            "player_colour": "white",
+            "you_played": "Nc3",
+            "better_was": "Bg2",
+            "your_line": "12. Nc3 Qh4 13. Kd2 O-O-O 14. Kc2 Bd4 15. Qe2 Bxc3",
+            "better_line": "12. Bg2 O-O 13. O-O Ng6 14. f4 Nh4 15. Nc3 Nxg2",
+            "evaluation_cost_in_pawns": 1.1,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "",
+            "key_factor": "control of the centre",
+            "before_your_move": "centre control 5 vs 4",
+            "end_of_your_line": "centre control 5 vs 7",
+            "end_of_better_line": "centre control 7 vs 3",
+            "lines_diverge_after_ply": 6,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Control the centre",
+              "explanation": "Pieces and pawns that control d4, e4, d5 and e5 influence the whole board and make it easier to move pieces from one side to the other."
+            }
+          }
+        },
+        {
+          "game": 4,
+          "level_up": true,
+          "colour": "white",
+          "move": "16. Be3",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "hanging",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 299,
+          "delay_moves": 1.0,
+          "trigger_text": "You've lost a queen: you're 9 pawns worse off than before.",
+          "explanation": "On move 16 you played Be3. Qb3 was better.\n\n  What you played:  16. Be3 Rxd1+ 17. Rxd1 Qxb2 18. Bd4 Qxa3 19. Rg1\n  What was better:  16. Qb3 Qxc5 17. O-O O-O 18. f4 Ng6 19. Bf3\n\nThe difference is material. Before your move: material balance +5.\nAfter your line: material balance -1. After the better line: material balance +2.\nYour move left this undefended: pawn on b2, queen on d1.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+          "facts": {
+            "move_number": 16,
+            "player_colour": "white",
+            "you_played": "Be3",
+            "better_was": "Qb3",
+            "your_line": "16. Be3 Rxd1+ 17. Rxd1 Qxb2 18. Bd4 Qxa3 19. Rg1",
+            "better_line": "16. Qb3 Qxc5 17. O-O O-O 18. f4 Ng6 19. Bf3",
+            "evaluation_cost_in_pawns": 3.0,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You've lost a queen: you're 9 pawns worse off than before.",
+            "key_factor": "material",
+            "before_your_move": "material balance +5",
+            "end_of_your_line": "material balance -1",
+            "end_of_better_line": "material balance +2",
+            "lines_diverge_after_ply": 1,
+            "pieces_left_undefended_by_your_move": [
+              "pawn on b2",
+              "queen on d1"
+            ],
+            "principle": {
+              "title": "Don't leave pieces undefended",
+              "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+            }
+          }
+        },
+        {
+          "game": 4,
+          "level_up": true,
+          "colour": "white",
+          "move": "19. f4",
+          "kind": "consequence",
+          "feature": "centre",
+          "principle": "centre",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 278,
+          "delay_moves": 3.0,
+          "trigger_text": "Your opponent has taken over the centre (centre control 3 vs 7).",
+          "explanation": "On move 19 you played f4. Bd4 was better.\n\n  What you played:  19. f4 bxc5 20. fxe5 Qxe5 21. Kf1\n  What was better:  19. Bd4 Qxa3 20. Bxe5 Qxc5 21. f4\n\nThe difference is control of the centre. Before your move: centre control 5 vs 5.\nAfter your line: centre control 3 vs 7. After the better line: centre control 5 vs 5.\n\nPrinciple: Control the centre. Pieces and pawns that control d4, e4, d5 and e5 influence the whole board and make it easier to move pieces from one side to the other.",
+          "facts": {
+            "move_number": 19,
+            "player_colour": "white",
+            "you_played": "f4",
+            "better_was": "Bd4",
+            "your_line": "19. f4 bxc5 20. fxe5 Qxe5 21. Kf1",
+            "better_line": "19. Bd4 Qxa3 20. Bxe5 Qxc5 21. f4",
+            "evaluation_cost_in_pawns": 2.8,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "Your opponent has taken over the centre (centre control 3 vs 7).",
+            "key_factor": "control of the centre",
+            "before_your_move": "centre control 5 vs 5",
+            "end_of_your_line": "centre control 3 vs 7",
+            "end_of_better_line": "centre control 5 vs 5",
+            "lines_diverge_after_ply": 2,
+            "pieces_left_undefended_by_your_move": [
+              "knight on c5",
+              "pawn on a3"
+            ],
+            "principle": {
+              "title": "Control the centre",
+              "explanation": "Pieces and pawns that control d4, e4, d5 and e5 influence the whole board and make it easier to move pieces from one side to the other."
+            }
+          }
+        },
+        {
+          "game": 4,
+          "level_up": true,
+          "colour": "white",
+          "move": "22. Rg5",
+          "kind": "missed_chance",
+          "feature": "material",
+          "principle": "safety",
+          "status": "fixed",
+          "deferred": false,
+          "gap_cp": 98,
+          "delay_moves": 1.5,
+          "trigger_text": "",
+          "explanation": "On move 22 you played Rg5. Rc1 was better.\n\n  What you played:  22. Rg5 h6 23. Rg6 f4 24. Bc1 O-O 25. Rd7 f3\n  What was better:  22. Rc1 g6 23. Bf3 O-O 24. Rxc5 Qd6 25. Kg2 f4\n\nYour move wasn't a disaster, but Rc1 would have improved material.\nAfter the better line: material balance +0. After yours: material balance -1.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 22,
+            "player_colour": "white",
+            "you_played": "Rg5",
+            "better_was": "Rc1",
+            "your_line": "22. Rg5 h6 23. Rg6 f4 24. Bc1 O-O 25. Rd7 f3",
+            "better_line": "22. Rc1 g6 23. Bf3 O-O 24. Rxc5 Qd6 25. Kg2 f4",
+            "evaluation_cost_in_pawns": 1.0,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "",
+            "key_factor": "material",
+            "before_your_move": "material balance -1",
+            "end_of_your_line": "material balance -1",
+            "end_of_better_line": "material balance +0",
+            "lines_diverge_after_ply": 2,
+            "pieces_left_undefended_by_your_move": [
+              "pawn on h2"
+            ],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "game": 5,
+      "level_up": true,
+      "result": "1-0",
+      "user_colour": "black",
+      "plies": 41,
+      "levelled_share": 0.2857142857142857,
+      "lessons": [
+        {
+          "game": 5,
+          "level_up": true,
+          "colour": "black",
+          "move": "5... Nc6",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 182,
+          "delay_moves": 2.0,
+          "trigger_text": "You've lost a rook: you're 5 pawns worse off than before.",
+          "explanation": "On move 5 you played Nc6. Qe7 was better.\n\n  What you played:  5...Nc6 6. Nf7 Qe7 7. Nxh8 Bxe6\n  What was better:  5...Qe7 6. e3 h6 7. Nf7 Rg8\n\nThe difference is material. Before your move: material balance -1.\nAfter your line: material balance -5. After the better line: material balance -1.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 5,
+            "player_colour": "black",
+            "you_played": "Nc6",
+            "better_was": "Qe7",
+            "your_line": "5...Nc6 6. Nf7 Qe7 7. Nxh8 Bxe6",
+            "better_line": "5...Qe7 6. e3 h6 7. Nf7 Rg8",
+            "evaluation_cost_in_pawns": 1.8,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You've lost a rook: you're 5 pawns worse off than before.",
+            "key_factor": "material",
+            "before_your_move": "material balance -1",
+            "end_of_your_line": "material balance -5",
+            "end_of_better_line": "material balance -1",
+            "lines_diverge_after_ply": 3,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 5,
+          "level_up": true,
+          "colour": "black",
+          "move": "10... h6",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 104,
+          "delay_moves": 1.0,
+          "trigger_text": "You've lost a knight: you're 3 pawns worse off than before.",
+          "explanation": "On move 10 you played h6. Qxh8 was better.\n\n  What you played:  10...h6 11. Bxf6 Qxf6 12. Nxg6 Qxg6\n  What was better:  10...Qxh8 11. Bb5 a6 12. Bxc6+ bxc6\n\nThe difference is material. Before your move: material balance -2.\nAfter your line: material balance -3. After the better line: material balance -2.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 10,
+            "player_colour": "black",
+            "you_played": "h6",
+            "better_was": "Qxh8",
+            "your_line": "10...h6 11. Bxf6 Qxf6 12. Nxg6 Qxg6",
+            "better_line": "10...Qxh8 11. Bb5 a6 12. Bxc6+ bxc6",
+            "evaluation_cost_in_pawns": 1.0,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You've lost a knight: you're 3 pawns worse off than before.",
+            "key_factor": "material",
+            "before_your_move": "material balance -2",
+            "end_of_your_line": "material balance -3",
+            "end_of_better_line": "material balance -2",
+            "lines_diverge_after_ply": 1,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 5,
+          "level_up": true,
+          "colour": "black",
+          "move": "12... Qg7",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 121,
+          "delay_moves": 3.0,
+          "trigger_text": "Since that move you've lost a bishop and taken a pawn: overall you're 2 pawns down.",
+          "explanation": "On move 12 you played Qg7. Bxd5 was better.\n\n  What you played:  12...Qg7 13. Bb5 Qxb2 14. Bxc6+ bxc6 15. Nxc7+\n  What was better:  12...Bxd5 13. Qxd5 O-O-O 14. Qb3 d5 15. Nxg6\n\nThe difference is material. Before your move: material balance -3.\nAfter your line: material balance -5. After the better line: material balance -3.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 12,
+            "player_colour": "black",
+            "you_played": "Qg7",
+            "better_was": "Bxd5",
+            "your_line": "12...Qg7 13. Bb5 Qxb2 14. Bxc6+ bxc6 15. Nxc7+",
+            "better_line": "12...Bxd5 13. Qxd5 O-O-O 14. Qb3 d5 15. Nxg6",
+            "evaluation_cost_in_pawns": 1.2,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "Since that move you've lost a bishop and taken a pawn: overall you're 2 pawns down.",
+            "key_factor": "material",
+            "before_your_move": "material balance -3",
+            "end_of_your_line": "material balance -5",
+            "end_of_better_line": "material balance -3",
+            "lines_diverge_after_ply": 1,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 5,
+          "level_up": true,
+          "colour": "black",
+          "move": "13... a6",
+          "kind": "missed_chance",
+          "feature": "their_pawns",
+          "principle": "target_weaknesses",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 85,
+          "delay_moves": 1.0,
+          "trigger_text": "The chance has gone.",
+          "explanation": "On move 13 you played a6. Qxb2 was better.\n\n  What you played:  13...a6 14. Nf4 axb5 15. Nxe6 Qxh8 16. Nxc7+ Kd7 17. Nxa8\n  What was better:  13...Qxb2 14. Rb1 Qg7 15. Nxg6 Qxg6 16. Nxc7+ Kf7 17. Nxa8\n\nYour move wasn't a disaster, but Qxb2 would have improved your opponent's pawn weaknesses.\nAfter the better line: opponent's pawns: isolated pawn(s) on a2, c2. After yours: opponent's pawns: no pawn weaknesses.\n\nPrinciple: Create and attack weaknesses. If you can force your opponent into isolated, doubled or backward pawns, they become long-term targets.",
+          "facts": {
+            "move_number": 13,
+            "player_colour": "black",
+            "you_played": "a6",
+            "better_was": "Qxb2",
+            "your_line": "13...a6 14. Nf4 axb5 15. Nxe6 Qxh8 16. Nxc7+ Kd7 17. Nxa8",
+            "better_line": "13...Qxb2 14. Rb1 Qg7 15. Nxg6 Qxg6 16. Nxc7+ Kf7 17. Nxa8",
+            "evaluation_cost_in_pawns": 0.8,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "The chance has gone.",
+            "key_factor": "your opponent's pawn weaknesses",
+            "before_your_move": "opponent's pawns: no pawn weaknesses",
+            "end_of_your_line": "opponent's pawns: no pawn weaknesses",
+            "end_of_better_line": "opponent's pawns: isolated pawn(s) on a2, c2",
+            "lines_diverge_after_ply": 1,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Create and attack weaknesses",
+              "explanation": "If you can force your opponent into isolated, doubled or backward pawns, they become long-term targets."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "game": 6,
+      "level_up": true,
+      "result": "0-1",
+      "user_colour": "white",
+      "plies": 68,
+      "levelled_share": 0.2647058823529412,
+      "lessons": [
+        {
+          "game": 6,
+          "level_up": true,
+          "colour": "white",
+          "move": "13. Qc2",
+          "kind": "missed_chance",
+          "feature": "open_files",
+          "principle": "open_files",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 83,
+          "delay_moves": 1.0,
+          "trigger_text": "The chance has gone.",
+          "explanation": "On move 13 you played Qc2. Rc1 was better.\n\n  What you played:  13. Qc2 dxc4 14. Qxc4 Be7 15. Rac1 Rc8 16. Qd4\n  What was better:  13. Rc1 Be7 14. cxd5 Bxd5 15. e4 Bb7 16. e5\n\nYour move wasn't a disaster, but Rc1 would have improved rooks on open files.\nAfter the better line: your rooks on open files: c1; theirs: none. After yours: your rooks on open files: c1; theirs: c8.\n\nPrinciple: Rooks belong on open files. Rooks need open lines. Put them on files without your own pawns, where they can reach the enemy position.",
+          "facts": {
+            "move_number": 13,
+            "player_colour": "white",
+            "you_played": "Qc2",
+            "better_was": "Rc1",
+            "your_line": "13. Qc2 dxc4 14. Qxc4 Be7 15. Rac1 Rc8 16. Qd4",
+            "better_line": "13. Rc1 Be7 14. cxd5 Bxd5 15. e4 Bb7 16. e5",
+            "evaluation_cost_in_pawns": 0.8,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "The chance has gone.",
+            "key_factor": "rooks on open files",
+            "before_your_move": "your rooks on open files: none; theirs: none",
+            "end_of_your_line": "your rooks on open files: c1; theirs: c8",
+            "end_of_better_line": "your rooks on open files: c1; theirs: none",
+            "lines_diverge_after_ply": 3,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Rooks belong on open files",
+              "explanation": "Rooks need open lines. Put them on files without your own pawns, where they can reach the enemy position."
+            }
+          }
+        },
+        {
+          "game": 6,
+          "level_up": true,
+          "colour": "white",
+          "move": "14. Rad1",
+          "kind": "consequence",
+          "feature": "own_pawns",
+          "principle": "pawn_weaknesses",
+          "status": "expired",
+          "deferred": false,
+          "gap_cp": 106,
+          "delay_moves": 9.0,
+          "trigger_text": "",
+          "explanation": "On move 14 you played Rad1. Qd1 was better.\n\n  What you played:  14. Rad1 dxc4 15. bxc4 Qc7 16. Bf1 Bc5 17. Nb3\n  What was better:  14. Qd1 dxc4 15. Nxc4 b5 16. Nd6+ Bxd6 17. Qxd6\n\nThe difference is your pawn structure. Before your move: no pawn weaknesses.\nAfter your line: isolated pawn(s) on a3, c4. After the better line: no pawn weaknesses.\n\nPrinciple: Avoid weakening your pawns. Isolated, doubled and backward pawns are hard to defend and give your opponent targets. Don't create them without a good reason.",
+          "facts": {
+            "move_number": 14,
+            "player_colour": "white",
+            "you_played": "Rad1",
+            "better_was": "Qd1",
+            "your_line": "14. Rad1 dxc4 15. bxc4 Qc7 16. Bf1 Bc5 17. Nb3",
+            "better_line": "14. Qd1 dxc4 15. Nxc4 b5 16. Nd6+ Bxd6 17. Qxd6",
+            "evaluation_cost_in_pawns": 1.1,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "",
+            "key_factor": "your pawn structure",
+            "before_your_move": "no pawn weaknesses",
+            "end_of_your_line": "isolated pawn(s) on a3, c4",
+            "end_of_better_line": "no pawn weaknesses",
+            "lines_diverge_after_ply": 3,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Avoid weakening your pawns",
+              "explanation": "Isolated, doubled and backward pawns are hard to defend and give your opponent targets. Don't create them without a good reason."
+            }
+          }
+        },
+        {
+          "game": 6,
+          "level_up": true,
+          "colour": "white",
+          "move": "15. b4",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 88,
+          "delay_moves": 1.0,
+          "trigger_text": "You're about to lose material.",
+          "explanation": "On move 15 you played b4. bxc4 was better.\n\n  What you played:  15. b4 b5 16. Ne5 Nxe5 17. Bxe5 Qb6 18. Bf3\n  What was better:  15. bxc4 Qc7 16. e4 e5 17. Nb3 Bd6 18. Qd3\n\nThe difference is material. Before your move: material balance +0.\nAfter your line: material balance -1. After the better line: material balance +0.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 15,
+            "player_colour": "white",
+            "you_played": "b4",
+            "better_was": "bxc4",
+            "your_line": "15. b4 b5 16. Ne5 Nxe5 17. Bxe5 Qb6 18. Bf3",
+            "better_line": "15. bxc4 Qc7 16. e4 e5 17. Nb3 Bd6 18. Qd3",
+            "evaluation_cost_in_pawns": 0.9,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You're about to lose material.",
+            "key_factor": "material",
+            "before_your_move": "material balance +0",
+            "end_of_your_line": "material balance -1",
+            "end_of_better_line": "material balance +0",
+            "lines_diverge_after_ply": 1,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 6,
+          "level_up": true,
+          "colour": "white",
+          "move": "17. Nxf7",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "hanging",
+          "status": "superseded",
+          "deferred": false,
+          "gap_cp": 254,
+          "delay_moves": 1.5,
+          "trigger_text": "",
+          "explanation": "On move 17 you played Nxf7. Nxd7 was better.\n\n  What you played:  17. Nxf7 cxd2 18. Qxd2 Kxf7 19. e4 Bxe4 20. Bxf6\n  What was better:  17. Nxd7 cxb2 18. Nxf6+ Bxf6 19. Nc4 Qc7 20. Qb1\n\nThe difference is material. Before your move: material balance -1.\nAfter your line: material balance -5. After the better line: material balance -1.\nYour move left this undefended: knight on d2, bishop on b2, the piece you moved, now on f7.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+          "facts": {
+            "move_number": 17,
+            "player_colour": "white",
+            "you_played": "Nxf7",
+            "better_was": "Nxd7",
+            "your_line": "17. Nxf7 cxd2 18. Qxd2 Kxf7 19. e4 Bxe4 20. Bxf6",
+            "better_line": "17. Nxd7 cxb2 18. Nxf6+ Bxf6 19. Nc4 Qc7 20. Qb1",
+            "evaluation_cost_in_pawns": 2.5,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "",
+            "key_factor": "material",
+            "before_your_move": "material balance -1",
+            "end_of_your_line": "material balance -5",
+            "end_of_better_line": "material balance -1",
+            "lines_diverge_after_ply": 2,
+            "pieces_left_undefended_by_your_move": [
+              "knight on d2",
+              "bishop on b2",
+              "the piece you moved, now on f7"
+            ],
+            "principle": {
+              "title": "Don't leave pieces undefended",
+              "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+            }
+          }
+        },
+        {
+          "game": 6,
+          "level_up": true,
+          "colour": "white",
+          "move": "18. Rxd2",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "hanging",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 154,
+          "delay_moves": 1.0,
+          "trigger_text": "Since that move you've lost a queen and taken a pawn: overall you're 8 pawns down.",
+          "explanation": "On move 18 you played Rxd2. Qxd2 was better.\n\n  What you played:  18. Rxd2 Rxc2 19. Nxd8 Rxd2 20. Nxb7 Rxb2\n  What was better:  18. Qxd2 Kxf7 19. e4 Qc7 20. g4 b5\n\nThe difference is material. Before your move: material balance -3.\nAfter your line: material balance -6. After the better line: material balance -5.\nYour move left this undefended: knight on f7, queen on c2.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+          "facts": {
+            "move_number": 18,
+            "player_colour": "white",
+            "you_played": "Rxd2",
+            "better_was": "Qxd2",
+            "your_line": "18. Rxd2 Rxc2 19. Nxd8 Rxd2 20. Nxb7 Rxb2",
+            "better_line": "18. Qxd2 Kxf7 19. e4 Qc7 20. g4 b5",
+            "evaluation_cost_in_pawns": 1.5,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "Since that move you've lost a queen and taken a pawn: overall you're 8 pawns down.",
+            "key_factor": "material",
+            "before_your_move": "material balance -3",
+            "end_of_your_line": "material balance -6",
+            "end_of_better_line": "material balance -5",
+            "lines_diverge_after_ply": 1,
+            "pieces_left_undefended_by_your_move": [
+              "knight on f7",
+              "queen on c2"
+            ],
+            "principle": {
+              "title": "Don't leave pieces undefended",
+              "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "game": 7,
+      "level_up": true,
+      "result": "1-0",
+      "user_colour": "black",
+      "plies": 71,
+      "levelled_share": 0.25,
+      "lessons": [
+        {
+          "game": 7,
+          "level_up": true,
+          "colour": "black",
+          "move": "14... dxc4",
+          "kind": "missed_chance",
+          "feature": "material",
+          "principle": "safety",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 105,
+          "delay_moves": 1.0,
+          "trigger_text": "The chance has gone.",
+          "explanation": "On move 14 you played dxc4. Ne7 was better.\n\n  What you played:  14...dxc4 15. Bf5 Ne7 16. Bxe6 fxe6 17. Ng5\n  What was better:  14...Ne7 15. b3 h6 16. Rxe6 fxe6 17. Bg6+\n\nYour move wasn't a disaster, but Ne7 would have improved material.\nAfter the better line: material balance +2. After yours: material balance +1.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+          "facts": {
+            "move_number": 14,
+            "player_colour": "black",
+            "you_played": "dxc4",
+            "better_was": "Ne7",
+            "your_line": "14...dxc4 15. Bf5 Ne7 16. Bxe6 fxe6 17. Ng5",
+            "better_line": "14...Ne7 15. b3 h6 16. Rxe6 fxe6 17. Bg6+",
+            "evaluation_cost_in_pawns": 1.1,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "The chance has gone.",
+            "key_factor": "material",
+            "before_your_move": "material balance +0",
+            "end_of_your_line": "material balance +1",
+            "end_of_better_line": "material balance +2",
+            "lines_diverge_after_ply": 4,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Check checks, captures and threats",
+              "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+            }
+          }
+        },
+        {
+          "game": 7,
+          "level_up": true,
+          "colour": "black",
+          "move": "15... Qd5",
+          "kind": "missed_chance",
+          "feature": "open_files",
+          "principle": "open_files",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 80,
+          "delay_moves": 2.0,
+          "trigger_text": "The chance has gone.",
+          "explanation": "On move 15 you played Qd5. Ne7 was better.\n\n  What you played:  15...Qd5 16. Ng5 Ne7 17. Nxe6 fxe6 18. Bxe6\n  What was better:  15...Ne7 16. Bxe6 fxe6 17. Ng5 O-O 18. Nxc4\n\nYour move wasn't a disaster, but Ne7 would have improved rooks on open files.\nAfter the better line: your rooks on open files: f8; theirs: e1. After yours: your rooks on open files: none; theirs: e1.\n\nPrinciple: Rooks belong on open files. Rooks need open lines. Put them on files without your own pawns, where they can reach the enemy position.",
+          "facts": {
+            "move_number": 15,
+            "player_colour": "black",
+            "you_played": "Qd5",
+            "better_was": "Ne7",
+            "your_line": "15...Qd5 16. Ng5 Ne7 17. Nxe6 fxe6 18. Bxe6",
+            "better_line": "15...Ne7 16. Bxe6 fxe6 17. Ng5 O-O 18. Nxc4",
+            "evaluation_cost_in_pawns": 0.8,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "The chance has gone.",
+            "key_factor": "rooks on open files",
+            "before_your_move": "your rooks on open files: none; theirs: e1",
+            "end_of_your_line": "your rooks on open files: none; theirs: e1",
+            "end_of_better_line": "your rooks on open files: f8; theirs: e1",
+            "lines_diverge_after_ply": 5,
+            "pieces_left_undefended_by_your_move": [],
+            "principle": {
+              "title": "Rooks belong on open files",
+              "explanation": "Rooks need open lines. Put them on files without your own pawns, where they can reach the enemy position."
+            }
+          }
+        },
+        {
+          "game": 7,
+          "level_up": true,
+          "colour": "black",
+          "move": "18... Qxc4",
+          "kind": "consequence",
+          "feature": "own_pawns",
+          "principle": "pawn_weaknesses",
+          "status": "expired",
+          "deferred": false,
+          "gap_cp": 122,
+          "delay_moves": 9.0,
+          "trigger_text": "",
+          "explanation": "On move 18 you played Qxc4. O-O-O was better.\n\n  What you played:  18...Qxc4 19. Nxc4 Kd7 20. Bxh6 gxh6 21. Re2 Rae8 22. Nfe5+\n  What was better:  18...O-O-O 19. Qc2 Nf5 20. Nb3 h6 21. Bd2 g5 22. Nc5\n\nThe difference is your pawn structure. Before your move: isolated pawn(s) on e6.\nAfter your line: isolated pawn(s) on e6, h6, h7; doubled pawns on the h-file. After the better line: isolated pawn(s) on e6.\n\nPrinciple: Avoid weakening your pawns. Isolated, doubled and backward pawns are hard to defend and give your opponent targets. Don't create them without a good reason.",
+          "facts": {
+            "move_number": 18,
+            "player_colour": "black",
+            "you_played": "Qxc4",
+            "better_was": "O-O-O",
+            "your_line": "18...Qxc4 19. Nxc4 Kd7 20. Bxh6 gxh6 21. Re2 Rae8 22. Nfe5+",
+            "better_line": "18...O-O-O 19. Qc2 Nf5 20. Nb3 h6 21. Bd2 g5 22. Nc5",
+            "evaluation_cost_in_pawns": 1.2,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "",
+            "key_factor": "your pawn structure",
+            "before_your_move": "isolated pawn(s) on e6",
+            "end_of_your_line": "isolated pawn(s) on e6, h6, h7; doubled pawns on the h-file",
+            "end_of_better_line": "isolated pawn(s) on e6",
+            "lines_diverge_after_ply": 5,
+            "pieces_left_undefended_by_your_move": [
+              "the piece you moved, now on c4"
+            ],
+            "principle": {
+              "title": "Avoid weakening your pawns",
+              "explanation": "Isolated, doubled and backward pawns are hard to defend and give your opponent targets. Don't create them without a good reason."
+            }
+          }
+        },
+        {
+          "game": 7,
+          "level_up": true,
+          "colour": "black",
+          "move": "24... Ke7",
+          "kind": "missed_chance",
+          "feature": "open_files",
+          "principle": "open_files",
+          "status": "fixed",
+          "deferred": false,
+          "gap_cp": 187,
+          "delay_moves": 4.5,
+          "trigger_text": "",
+          "explanation": "On move 24 you played Ke7. Nfe7 was better.\n\n  What you played:  24...Ke7 25. g4 Nh6 26. Bg5+ Nf6 27. Rxc6 Nf7\n  What was better:  24...Nfe7 25. Ng5 axb3 26. axb3 O-O 27. Rxe6 Ra2\n\nYour move wasn't a disaster, but Nfe7 would have improved rooks on open files.\nAfter the better line: your rooks on open files: a2, f8; theirs: c1, e6. After yours: your rooks on open files: none; theirs: e1, c6.\n\nPrinciple: Rooks belong on open files. Rooks need open lines. Put them on files without your own pawns, where they can reach the enemy position.",
+          "facts": {
+            "move_number": 24,
+            "player_colour": "black",
+            "you_played": "Ke7",
+            "better_was": "Nfe7",
+            "your_line": "24...Ke7 25. g4 Nh6 26. Bg5+ Nf6 27. Rxc6 Nf7",
+            "better_line": "24...Nfe7 25. Ng5 axb3 26. axb3 O-O 27. Rxe6 Ra2",
+            "evaluation_cost_in_pawns": 1.9,
+            "lesson_type": "a better opportunity was missed",
+            "what_happened_in_the_game": "",
+            "key_factor": "rooks on open files",
+            "before_your_move": "your rooks on open files: none; theirs: c1, e1",
+            "end_of_your_line": "your rooks on open files: none; theirs: e1, c6",
+            "end_of_better_line": "your rooks on open files: a2, f8; theirs: c1, e6",
+            "lines_diverge_after_ply": 3,
+            "pieces_left_undefended_by_your_move": [
+              "pawn on c6"
+            ],
+            "principle": {
+              "title": "Rooks belong on open files",
+              "explanation": "Rooks need open lines. Put them on files without your own pawns, where they can reach the enemy position."
+            }
+          }
+        },
+        {
+          "game": 7,
+          "level_up": true,
+          "colour": "black",
+          "move": "26... g6",
+          "kind": "consequence",
+          "feature": "material",
+          "principle": "hanging",
+          "status": "triggered",
+          "deferred": false,
+          "gap_cp": 230,
+          "delay_moves": 1.0,
+          "trigger_text": "You've lost a knight: you're 3 pawns worse off than before.",
+          "explanation": "On move 26 you played g6. Nh6 was better.\n\n  What you played:  26...g6 27. gxf5 gxf5 28. Bg5+ Ke8 29. Rxc6 Nb4 30. Rxe6+\n  What was better:  26...Nh6 27. Bg5+ Nf6 28. Rxc6 Rhc8 29. Rxc8 Rxc8 30. d5\n\nThe difference is material. Before your move: material balance +0.\nAfter your line: material balance -4. After the better line: material balance -1.\nYour move left this undefended: pawn on c6, knight on f5.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+          "facts": {
+            "move_number": 26,
+            "player_colour": "black",
+            "you_played": "g6",
+            "better_was": "Nh6",
+            "your_line": "26...g6 27. gxf5 gxf5 28. Bg5+ Ke8 29. Rxc6 Nb4 30. Rxe6+",
+            "better_line": "26...Nh6 27. Bg5+ Nf6 28. Rxc6 Rhc8 29. Rxc8 Rxc8 30. d5",
+            "evaluation_cost_in_pawns": 2.3,
+            "lesson_type": "something went wrong because of this move",
+            "what_happened_in_the_game": "You've lost a knight: you're 3 pawns worse off than before.",
+            "key_factor": "material",
+            "before_your_move": "material balance +0",
+            "end_of_your_line": "material balance -4",
+            "end_of_better_line": "material balance -1",
+            "lines_diverge_after_ply": 1,
+            "pieces_left_undefended_by_your_move": [
+              "pawn on c6",
+              "knight on f5"
+            ],
+            "principle": {
+              "title": "Don't leave pieces undefended",
+              "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

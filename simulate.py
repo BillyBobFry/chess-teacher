@@ -22,7 +22,7 @@ from pathlib import Path
 import chess
 
 from teacher.engine import Engine
-from teacher.explain import explain
+from teacher.explain import explain, facts
 from teacher.lessons import CONSEQUENCE, MISSED_CHANCE, Config
 from teacher.opponent import TeachingOpponent
 from teacher.principles import PRINCIPLES
@@ -50,7 +50,7 @@ def play_game(game_no: int, level_up: bool, args, analyst: Engine, weak: Engine,
             "move": l.label(), "kind": l.kind, "feature": l.feature, "principle": l.principle,
             "status": l.status, "deferred": l.deferred, "gap_cp": l.gap,
             "delay_moves": None if l.resolved_ply is None else (l.resolved_ply - l.ply) / 2,
-            "trigger_text": l.trigger_text, "explanation": text,
+            "trigger_text": l.trigger_text, "explanation": text, "facts": facts(l),
         })
     return {
         "game": game_no, "level_up": level_up, "result": session.board.result(claim_draw=True),
