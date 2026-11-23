@@ -9,7 +9,8 @@ function outcome(l: Lesson): string {
   if (l.status === "triggered" && l.deferred) return "Happened at the same time as another lesson";
   if (l.status === "triggered" && l.foundCause === true) return "Found it yourself ✓";
   if (l.status === "triggered" && l.foundCause === false) return "Revealed during the game";
-  if (l.status === "triggered") return "Not shown during the game";
+  if (l.status === "triggered")
+    return l.kind === "missed_chance" ? "Shown during the game" : "Not shown during the game";
   if (l.status === "superseded") return "Overtaken by a later mistake of the same kind";
   if (l.kind === "consequence") return "You got away with it: a stronger player would have punished it";
   return "Missed chance";

@@ -7,11 +7,20 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { LessonFacts } from "@chess-teacher/core";
 
-export const PROMPT_VERSION = 1;
+export const PROMPT_VERSION = 2;
 
 export const SYSTEM_PROMPT = `You are a friendly chess coach. Your student knows how the pieces move but \
-not the strategy. You will receive facts about one of their mistakes. A chess engine and \
+not the strategy. You will receive facts about one of their moves. A chess engine and \
 measuring code produced every fact, and they are correct.
+
+Two kinds of fact need care:
+- "move_played" is the only move from the real game. Everything in \
+"predicted_continuation_after_your_move" and "predicted_continuation_after_better_move" is \
+the engine's prediction of how play could go. Those moves have NOT happened. Describe them \
+conditionally ("if your opponent then plays…", "after the better move, you could…"), never \
+as events in the game, and don't refer to "moves later" as if time has passed.
+- Factor values ("before_your_move", "end_of_your_line", "end_of_better_line") describe the \
+position before the move and at the end of each prediction.
 
 Write a short explanation (under 120 words) in plain English:
 1. what their move allowed, or what it missed,
@@ -59,12 +68,29 @@ export function createLlmClient(apiKey: string): LlmClient {
   return new Anthropic({ apiKey, baseURL: "https://api.anthropic.com" }) as unknown as LlmClient;
 }
 
+/**
+ * The facts as the model sees them: the predicted lines are labelled as predictions, so the
+ * model doesn't describe them as moves that happened (they haven't: explanations are
+ * written when a lesson is created, before the game moves on).
+ */
+export function promptFacts(f: LessonFacts) {
+  const { your_line, better_line, you_played, ...rest } = f;
+  delete (rest as Partial<LessonFacts>).lines_diverge_after_ply;
+  delete (rest as Partial<LessonFacts>).what_happened_in_the_game;
+  return {
+    move_played: you_played,
+    ...rest,
+    predicted_continuation_after_your_move: your_line,
+    predicted_continuation_after_better_move: better_line,
+  };
+}
+
 export async function explainLesson(
   client: LlmClient,
   model: string,
   facts: LessonFacts,
 ): Promise<ExplanationResult> {
-  const factJson = JSON.stringify(facts, null, 2);
+  const factJson = JSON.stringify(promptFacts(facts), null, 2);
   const body = {
     model,
     max_tokens: 2000,
@@ -120,13 +146,13 @@ export function createFakeLlmClient(): LlmClient {
       messages: {
         create: (async (body: { messages: { content: string }[] }) => {
           const json = body.messages[0]!.content.replace(/^[^{]*/, "");
-          const f = JSON.parse(json) as LessonFacts;
+          const f = JSON.parse(json) as ReturnType<typeof promptFacts>;
           return {
             content: [
               {
                 type: "text",
                 text:
-                  `(Sample explanation, written without an AI model.) You played ${f.you_played}, ` +
+                  `(Sample explanation, written without an AI model.) You played ${f.move_played}, ` +
                   `but ${f.better_was} was better: the difference is ${f.key_factor}. ` +
                   `Remember: ${f.principle.title.toLowerCase()}.`,
               },

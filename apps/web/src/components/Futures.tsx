@@ -52,9 +52,12 @@ export function Futures({ lesson }: { lesson: Lesson }) {
 
   return (
     <div className="futures">
+      <p className="futures-note muted small">
+        How each could have gone: the engine's prediction, not moves from your game.
+      </p>
       <div className="futures-boards">
         <figure>
-          <figcaption>What you played</figcaption>
+          <figcaption>Your move, then…</figcaption>
           <Board
             id={`yours-${lesson.id}`}
             fen={a.fen}
@@ -66,7 +69,7 @@ export function Futures({ lesson }: { lesson: Lesson }) {
           {sanLine(mine.sans)}
         </figure>
         <figure>
-          <figcaption>What was better</figcaption>
+          <figcaption>The better move, then…</figcaption>
           <Board
             id={`better-${lesson.id}`}
             fen={b.fen}
@@ -85,7 +88,9 @@ export function Futures({ lesson }: { lesson: Lesson }) {
         <button onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0} aria-label="Back">
           ◀
         </button>
-        <span className="step-label">{step === 0 ? "Before the move" : `Move ${step} of ${plies}`}</span>
+        <span className="step-label">
+          {step === 0 ? "Before the move" : `Predicted move ${step} of ${plies}`}
+        </span>
         <button
           onClick={() => setStep((s) => Math.min(plies, s + 1))}
           disabled={step === plies}

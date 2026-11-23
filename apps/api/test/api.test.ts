@@ -371,3 +371,17 @@ describe("progress", () => {
     expect((await call("/api/me/progress")).status).toBe(401);
   });
 });
+
+describe("AI prompt facts", () => {
+  it("labels the engine's lines as predictions, not moves from the game", async () => {
+    const { promptFacts, SYSTEM_PROMPT } = await import("../src/explain.ts");
+    const { facts } = await import("@chess-teacher/core");
+    const f = promptFacts(facts(recorded.lessons[0]!));
+    expect(Object.keys(f)).toEqual(
+      expect.arrayContaining(["move_played", "predicted_continuation_after_your_move"]),
+    );
+    expect(f).not.toHaveProperty("your_line");
+    expect(f).not.toHaveProperty("what_happened_in_the_game");
+    expect(SYSTEM_PROMPT).toMatch(/have NOT happened/);
+  });
+});

@@ -298,3 +298,8 @@ export function recentUserMoves(s: SessionState, lesson: Lesson): [number, strin
   }
   return window;
 }
+
+/** How many of the user's own moves ago the lesson's move was (1 = their last move). */
+export function userMovesAgo(s: SessionState, lesson: Lesson): number {
+  return Math.max(1, Math.ceil((gameOf(s).ply - lesson.ply) / 2));
+}
