@@ -1,6 +1,6 @@
 # Chess Teacher — Architecture
 
-Status: **agreed** (Milestone 1 complete). Records the decisions made so far, why they
+Status: **agreed** (Milestones 1 and 2 complete). Records the decisions made so far, why they
 were made, and what is still open. The product concept is in [`concept.md`](concept.md);
 the measurements behind several decisions are in [`../bench/README.md`](../bench/README.md).
 
@@ -258,7 +258,31 @@ generation to a dedicated capture generator: 20.7 → 0.3 ms per position.
 Known gaps carried forward: no checkmate or endgame king-activity *lessons* occur in the
 recorded games (those features are still covered by the per-position parity test).
 
-## 12. Open questions
+## 12. Milestone 2 (done)
+
+A playable web app (`apps/web`), deployable to Vercel from `vercel.json`:
+
+- Vite + React SPA under `/app/`; Stockfish 19 WASM lite (single-threaded, 1.8 MB) in two
+  Web Workers: full strength for analysis, weakened for the opponent's normal moves.
+  Analysis depth 12, dropping to 10 if a start-up benchmark is slow.
+- The engine adapter is now transport-agnostic (`UciEngine` over a `UciTransport`): the
+  Node child process and the browser Web Worker share all UCI logic.
+- Game screen: click or drag to move (promotions are always to a queen for now), move
+  list, status, easy-mode warnings and "you fixed it" toasts.
+- The reveal: find the cause (wrong guesses give hints), the explanation built from the
+  lesson's facts, the two futures side by side with a shared stepper, rewind or carry on.
+- Post-game review of every lesson with its outcome.
+- Games are saved to `localStorage` after every step and resume on reload (D10 in
+  practice); this moves to the server in MS3.
+- Licences page with the Stockfish GPL text and source links; the licence file ships
+  next to the engine.
+- Browser smoke test in headless Chromium covering all of the above, including the phone
+  layout and a zero-console-errors check.
+
+Not yet verified: the actual Vercel deployment (needs the repository connected to your
+Vercel account), and speed on real phones.
+
+## 13. Open questions
 
 1. ~~Engine on the device (D2)~~: confirmed.
 2. ~~Next.js vs Vite SPA + Vercel functions (D8)~~: SPA + Hono.

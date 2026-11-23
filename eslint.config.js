@@ -1,16 +1,17 @@
 import js from "@eslint/js";
 import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 import { builtinModules } from "node:module";
 
 const nodeBuiltins = [...builtinModules, ...builtinModules.map((m) => `node:${m}`)];
 
 export default tseslint.config(
-  { ignores: ["**/node_modules/**", "prototype/**", "**/dist/**"] },
+  { ignores: ["**/node_modules/**", "prototype/**", "**/dist/**", "apps/web/public/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["**/*.ts"],
+    files: ["**/*.{ts,tsx}"],
     rules: {
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
@@ -41,7 +42,19 @@ export default tseslint.config(
     },
   },
   {
-    files: ["packages/engine/src/node.ts", "tools/**/*.ts", "packages/*/test/**/*.ts", "*.config.*"],
+    files: ["apps/web/src/**/*.{ts,tsx}"],
+    plugins: { "react-hooks": reactHooks },
+    languageOptions: { globals: globals.browser },
+    rules: reactHooks.configs.recommended.rules,
+  },
+  {
+    files: [
+      "packages/engine/src/node.ts",
+      "tools/**/*.ts",
+      "packages/*/test/**/*.ts",
+      "apps/web/scripts/**",
+      "**/*.config.*",
+    ],
     languageOptions: { globals: globals.node },
   },
 );

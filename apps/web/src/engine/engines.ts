@@ -1,0 +1,55 @@
+/**
+ * Stockfish in the browser: the WASM "lite, single-threaded" build, each instance in its
+ * own Web Worker so analysis never blocks the UI. Two instances: one at full strength
+ * for analysis, one weakened for the opponent's normal moves.
+ */
+
+import type { Engines } from "@chess-teacher/core";
+import { UciEngine, type UciTransport } from "@chess-teacher/engine";
+
+const SCRIPT = `${import.meta.env.BASE_URL}stockfish/stockfish-19-lite-single.js`;
+
+function workerTransport(): UciTransport {
+  const worker = new Worker(SCRIPT);
+  return {
+    send: (command) => worker.postMessage(command),
+    onLine: (handler) => {
+      worker.onmessage = (e: MessageEvent) => {
+        for (const line of String(e.data).split("\n")) if (line) handler(line);
+      };
+    },
+    close: () => worker.terminate(),
+  };
+}
+
+/** A middlegame position used to measure how fast this device analyses. */
+const BENCH_FEN = "r1bq1rk1/pp2bppp/2n1pn2/3p4/2PP4/2N1PN2/PP3PPP/R2QKB1R w KQ - 0 9";
+
+let analyst: Promise<{ engine: UciEngine; depth: number }> | null = null;
+let weak: { skill: number; engine: Promise<UciEngine> } | null = null;
+
+/**
+ * Analysis depth for this device: 12 normally, 10 if a depth-12 analysis is slow
+ * (older phones). Measured once, when the engine first starts.
+ */
+async function startAnalyst(): Promise<{ engine: UciEngine; depth: number }> {
+  const engine = await UciEngine.start(workerTransport(), { hashMb: 16 });
+  const t = performance.now();
+  await engine.analyse(BENCH_FEN, { depth: 12, multipv: 3 });
+  const ms = performance.now() - t;
+  return { engine, depth: ms > 1500 ? 10 : 12 };
+}
+
+export async function getEngines(opponentSkill: number): Promise<{ engines: Engines; depth: number }> {
+  analyst ??= startAnalyst();
+  if (!weak || weak.skill !== opponentSkill) {
+    const previous = weak;
+    weak = {
+      skill: opponentSkill,
+      engine: UciEngine.start(workerTransport(), { skill: opponentSkill, hashMb: 8 }),
+    };
+    if (previous) void previous.engine.then((e) => e.close());
+  }
+  const [{ engine, depth }, weakEngine] = await Promise.all([analyst, weak.engine]);
+  return { engines: { analyst: engine, weak: weakEngine }, depth };
+}
