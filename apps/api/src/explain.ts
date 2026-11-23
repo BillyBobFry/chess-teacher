@@ -7,20 +7,54 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { LessonFacts } from "@chess-teacher/core";
 
-export const PROMPT_VERSION = 1;
+export const PROMPT_VERSION = 3;
 
 export const SYSTEM_PROMPT = `You are a friendly chess coach. Your student knows how the pieces move but \
-not the strategy. You will receive facts about one of their mistakes. A chess engine and \
+not the strategy. You will receive facts about one of their moves. A chess engine and \
 measuring code produced every fact, and they are correct.
 
-Write a short explanation (under 120 words) in plain English:
-1. what their move allowed, or what it missed,
-2. why the better move was better, using the measured factor,
-3. the principle to remember, in one sentence.
+Two kinds of fact need care:
+- "move_played" is the only move from the real game. Everything in \
+"predicted_continuation_after_your_move" and "predicted_continuation_after_better_move" is \
+the engine's prediction of how play could go. Those moves have NOT happened. Describe them \
+conditionally ("if Black then plays…", "after the better move, you could…"), never as \
+events in the game.
+- Factor values ("before_your_move", "end_of_your_line", "end_of_better_line") describe the \
+position before the move and at the end of each prediction.
+
+Fill in three short parts. The student sees them as a headline and two short paragraphs, \
+above two boards that already show both predicted lines move by move, and above a card \
+with the principle. So:
+- "headline": what went wrong, or what was missed, in at most 10 words. No move sequences.
+- "what_it_allowed": what their move allowed (or, for a missed chance, what it missed), in \
+1–2 sentences and at most 40 words.
+- "why_better": why the better move was better, naming it and the measured factor, in 1–2 \
+sentences and at most 40 words.
+Mention at most one short sequence of up to three moves in total; don't recite the lines, \
+the boards show them. Don't restate the principle. Avoid engine numbers unless material \
+is the point.
 
 Use only the facts given. Do not analyse the position yourself, and do not mention any \
 move or square that does not appear in the facts. If the facts don't say why something \
-happened, don't guess. Write plain prose: no headings, lists or markdown.`;
+happened, don't guess. Plain text in each part: no markdown.`;
+
+/** The explanation's structure, enforced by the API's structured outputs. */
+export interface ExplanationParts {
+  headline: string;
+  what_it_allowed: string;
+  why_better: string;
+}
+
+const PARTS_SCHEMA = {
+  type: "object",
+  properties: {
+    headline: { type: "string" },
+    what_it_allowed: { type: "string" },
+    why_better: { type: "string" },
+  },
+  required: ["headline", "what_it_allowed", "why_better"],
+  additionalProperties: false,
+};
 
 /** USD per million tokens (input, output). Thinking tokens are billed as output. */
 const PRICES: Record<string, [number, number]> = {
@@ -35,7 +69,9 @@ const SQUARE = /\b[a-h][1-8]\b/g;
 
 export interface ExplanationResult {
   status: "ready" | "rejected" | "error";
+  /** The parts as JSON (what's stored). */
   text?: string;
+  parts?: ExplanationParts;
   error?: string;
   model: string;
   inputTokens?: number;
@@ -59,16 +95,45 @@ export function createLlmClient(apiKey: string): LlmClient {
   return new Anthropic({ apiKey, baseURL: "https://api.anthropic.com" }) as unknown as LlmClient;
 }
 
+/** Parse stored or returned parts; null if it isn't the expected JSON. */
+export function parseParts(raw: string | null | undefined): ExplanationParts | null {
+  if (!raw) return null;
+  try {
+    const p = JSON.parse(raw) as Partial<ExplanationParts>;
+    const ok = [p.headline, p.what_it_allowed, p.why_better].every((x) => typeof x === "string" && x.trim());
+    return ok ? (p as ExplanationParts) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The facts as the model sees them: the predicted lines are labelled as predictions, so the
+ * model doesn't describe them as moves that happened (they haven't: explanations are
+ * written when a lesson is created, before the game moves on).
+ */
+export function promptFacts(f: LessonFacts) {
+  const { your_line, better_line, you_played, ...rest } = f;
+  delete (rest as Partial<LessonFacts>).lines_diverge_after_ply;
+  delete (rest as Partial<LessonFacts>).what_happened_in_the_game;
+  return {
+    move_played: you_played,
+    ...rest,
+    predicted_continuation_after_your_move: your_line,
+    predicted_continuation_after_better_move: better_line,
+  };
+}
+
 export async function explainLesson(
   client: LlmClient,
   model: string,
   facts: LessonFacts,
 ): Promise<ExplanationResult> {
-  const factJson = JSON.stringify(facts, null, 2);
+  const factJson = JSON.stringify(promptFacts(facts), null, 2);
   const body = {
     model,
     max_tokens: 2000,
-    output_config: { effort: "low" },
+    output_config: { effort: "low", format: { type: "json_schema", schema: PARTS_SCHEMA } },
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: `Facts about the mistake:\n${factJson}` }],
     ...(FALLBACK_MODELS.has(model)
@@ -95,19 +160,23 @@ export async function explainLesson(
     costUsd: (response.usage.input_tokens * pin + response.usage.output_tokens * pout) / 1e6,
   };
   if (response.stop_reason === "refusal") return { status: "error", error: "model declined", ...usage };
-  const text = response.content
+  if (response.stop_reason === "max_tokens") return { status: "error", error: "cut off", ...usage };
+  const raw = response.content
     .filter((b) => b.type === "text")
     .map((b) => b.text ?? "")
     .join("")
     .trim();
-  if (!text) return { status: "error", error: "empty response", ...usage };
+  const parts = parseParts(raw);
+  if (!parts) return { status: "error", error: "malformed response", ...usage };
+  const text = JSON.stringify(parts);
 
   // Guardrail: every square mentioned must appear in the facts.
   const allowed = new Set(factJson.match(SQUARE) ?? []);
-  const invented = [...new Set(text.match(SQUARE) ?? [])].filter((s) => !allowed.has(s));
+  const said = [parts.headline, parts.what_it_allowed, parts.why_better].join(" ");
+  const invented = [...new Set(said.match(SQUARE) ?? [])].filter((s) => !allowed.has(s));
   if (invented.length)
     return { status: "rejected", text, error: `invented squares: ${invented.join(", ")}`, ...usage };
-  return { status: "ready", text, ...usage };
+  return { status: "ready", text, parts, ...usage };
 }
 
 /**
@@ -120,15 +189,16 @@ export function createFakeLlmClient(): LlmClient {
       messages: {
         create: (async (body: { messages: { content: string }[] }) => {
           const json = body.messages[0]!.content.replace(/^[^{]*/, "");
-          const f = JSON.parse(json) as LessonFacts;
+          const f = JSON.parse(json) as ReturnType<typeof promptFacts>;
           return {
             content: [
               {
                 type: "text",
-                text:
-                  `(Sample explanation, written without an AI model.) You played ${f.you_played}, ` +
-                  `but ${f.better_was} was better: the difference is ${f.key_factor}. ` +
-                  `Remember: ${f.principle.title.toLowerCase()}.`,
+                text: JSON.stringify({
+                  headline: `(Sample) ${f.move_played} missed something`,
+                  what_it_allowed: `This sample explanation was written without an AI model. The difference is ${f.key_factor}.`,
+                  why_better: `${f.better_was} was better for ${f.key_factor}.`,
+                } satisfies ExplanationParts),
               },
             ],
             stop_reason: "end_turn",

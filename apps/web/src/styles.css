@@ -744,3 +744,30 @@ header.top nav {
   flex-wrap: wrap;
   gap: 0.25rem 1rem;
 }
+
+.futures-note {
+  margin: 0.5rem 0 0.4rem;
+}
+
+.ai-headline {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0.25rem 0 0.5rem;
+}
+.ai-parts {
+  margin: 0 0 0.5rem;
+}
+.ai-parts dt {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+.ai-parts dd {
+  margin: 0.1rem 0 0;
+}
+.move {
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}

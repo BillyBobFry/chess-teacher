@@ -298,3 +298,18 @@ export function recentUserMoves(s: SessionState, lesson: Lesson): [number, strin
   }
   return window;
 }
+
+/** How many of the user's own moves ago the lesson's move was (1 = their last move). */
+export function userMovesAgo(s: SessionState, lesson: Lesson): number {
+  return Math.max(1, Math.ceil((gameOf(s).ply - lesson.ply) / 2));
+}
+
+/**
+ * The moves actually played from a lesson's mistake (included) up to when it was resolved
+ * (revealed, fixed or expired), or up to now if it's still pending. Capped at `maxPlies`.
+ */
+export function playedLine(s: SessionState, lesson: Lesson, maxPlies = 16): string[] {
+  const start = lesson.ply - plyOf(s.startFen);
+  const end = (lesson.resolvedPly ?? gameOf(s).ply) - plyOf(s.startFen);
+  return s.moves.slice(start, Math.min(end, start + maxPlies, s.moves.length));
+}

@@ -20,6 +20,7 @@ import {
   rewind,
   startUserTurn,
   userMove,
+  userMovesAgo,
   type Colour,
   type GameEvent,
 } from "@chess-teacher/core";
@@ -145,7 +146,9 @@ export function useGame(opts: { llmEnabled: boolean }) {
         if (e.kind === "created") {
           wantExplanation.current.add(lesson.id);
         } else if ((e.kind === "triggered" || e.kind === "chanceGone") && !lesson.deferred && !reveal) {
-          reveal = { lessonId: e.lessonId, step: "find", attempts: 0, wrong: [] };
+          // Asking "which move caused it?" is pointless when it was obviously the last one.
+          const obvious = e.kind === "chanceGone" && userMovesAgo(g.state, lesson) === 1;
+          reveal = { lessonId: e.lessonId, step: obvious ? "explain" : "find", attempts: 0, wrong: [] };
         } else if (e.kind === "fixed") {
           toast(
             lesson.kind === "consequence"

@@ -23,7 +23,7 @@ import type { Auth } from "./auth.ts";
 import type { Db } from "./db/client.ts";
 import { explanations, games, lessonFeedback, usage } from "./db/schema.ts";
 import type { Env } from "./env.ts";
-import { PROMPT_VERSION, explainLesson, type LlmClient } from "./explain.ts";
+import { PROMPT_VERSION, explainLesson, parseParts, type LlmClient } from "./explain.ts";
 
 export interface AppDeps {
   db: Db;
@@ -267,7 +267,12 @@ export function createApp(deps: AppDeps) {
 
   const respond = (row: typeof explanations.$inferSelect | null, used: number): ExplanationResponse => {
     if (!row) return { status: llm ? "pending" : "unavailable", remaining: remaining(used) };
-    if (row.status === "ready") return { status: "ready", text: row.text ?? "", remaining: remaining(used) };
+    if (row.status === "ready") {
+      const parts = parseParts(row.text);
+      return parts
+        ? { status: "ready", parts, remaining: remaining(used) }
+        : { status: "ready", text: row.text ?? "", remaining: remaining(used) };
+    }
     return { status: row.status as ExplanationResponse["status"], remaining: remaining(used) };
   };
 
@@ -385,7 +390,11 @@ export function createApp(deps: AppDeps) {
           set: { explanationsUsed: sql`${usage.explanationsUsed} + 1` },
         });
       used += 1;
-      return c.json<ExplanationResponse>({ status: "ready", text: result.text!, remaining: remaining(used) });
+      return c.json<ExplanationResponse>({
+        status: "ready",
+        parts: result.parts!,
+        remaining: remaining(used),
+      });
     }
     return c.json<ExplanationResponse>({ status: result.status, remaining: remaining(used) });
   });

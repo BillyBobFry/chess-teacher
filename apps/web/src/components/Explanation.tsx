@@ -16,9 +16,9 @@ export function Explanation({ lesson }: { lesson: Lesson }) {
         <dl className="facts">
           <dt>Before your move</dt>
           <dd>{f.before_your_move}</dd>
-          <dt>After what you played</dt>
+          <dt>Where your move leads</dt>
           <dd>{f.end_of_your_line}</dd>
-          <dt>After the better move</dt>
+          <dt>Where the better move leads</dt>
           <dd>{f.end_of_better_line}</dd>
         </dl>
       ) : (
@@ -31,9 +31,9 @@ export function Explanation({ lesson }: { lesson: Lesson }) {
             .
           </p>
           <dl className="facts">
-            <dt>After the better move</dt>
+            <dt>Where the better move leads</dt>
             <dd>{f.end_of_better_line}</dd>
-            <dt>After what you played</dt>
+            <dt>Where your move leads</dt>
             <dd>{f.end_of_your_line}</dd>
           </dl>
         </>

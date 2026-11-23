@@ -81,8 +81,18 @@ export type ExplanationStatus =
   | "rejected"
   | "error";
 
+/** A coach explanation in three parts (shown as a headline and two short paragraphs). */
+export interface ExplanationParts {
+  headline: string;
+  what_it_allowed: string;
+  why_better: string;
+}
+
 export interface ExplanationResponse {
   status: ExplanationStatus;
+  /** Structured explanation (current prompt). */
+  parts?: ExplanationParts;
+  /** Plain-text explanation (stored before structured explanations). */
   text?: string;
   /** AI explanations left this month. */
   remaining: number;

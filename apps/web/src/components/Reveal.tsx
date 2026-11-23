@@ -1,4 +1,12 @@
-import { lessonLabel, recentUserMoves, type Lesson, type SessionState } from "@chess-teacher/core";
+import {
+  lessonBestSan,
+  playedLine,
+  lessonLabel,
+  recentUserMoves,
+  userMovesAgo,
+  type Lesson,
+  type SessionState,
+} from "@chess-teacher/core";
 import type { ExplanationResponse } from "@chess-teacher/contract";
 import type { RevealState } from "../game/storage.ts";
 import { AiExplanation } from "./AiExplanation.tsx";
@@ -32,11 +40,19 @@ export function Reveal({
   onRewind,
   onContinue,
 }: Props) {
-  const headline = lesson.kind === "consequence" ? lesson.triggerText : "The chance has gone.";
+  const ago = userMovesAgo(state, lesson);
+  const headline =
+    lesson.kind === "consequence"
+      ? lesson.triggerText
+      : ago === 1
+        ? "Your last move missed a better option."
+        : "The chance has gone.";
   const sub =
     lesson.kind === "consequence"
       ? "The cause was one of your recent moves."
-      : "A few moves ago you had a clearly better option.";
+      : ago === 1
+        ? `Instead of ${lessonLabel(lesson)}, there was a clearly better move.`
+        : `${ago} moves ago, with ${lessonLabel(lesson)}, you had a clearly better option.`;
 
   return (
     <section className="reveal" aria-live="polite">
@@ -74,9 +90,13 @@ export function Reveal({
       ) : (
         <div className="explain">
           {lesson.foundCause && <p className="found">✓ Yes, that's the one.</p>}
-          <AiExplanation load={loadExplanation} />
+          <AiExplanation
+            load={loadExplanation}
+            betterMove={lessonBestSan(lesson)}
+            missedChance={lesson.kind === "missed_chance"}
+          />
           <Explanation lesson={lesson} />
-          <Futures lesson={lesson} />
+          <Futures lesson={lesson} played={playedLine(state, lesson)} />
           <LessonFeedback gameId={gameId} lessonId={lesson.id} />
           <div className="actions">
             <button className="primary" onClick={onRewind}>

@@ -226,7 +226,9 @@ try {
       await page.getByRole("button", { name: "Show me the answer" }).click();
     }
     await page.getByText("Your coach", { exact: true }).waitFor({ timeout: 30_000 });
-    await page.getByText(/Sample explanation/).waitFor();
+    await page.locator(".ai-headline").filter({ hasText: "(Sample)" }).waitFor();
+    await page.getByText(/What it (allowed|missed)/).waitFor();
+    await page.locator("figcaption").filter({ hasText: "What happened" }).waitFor();
     await page.getByRole("button", { name: "Forward" }).click();
     await page.getByRole("button", { name: "Forward" }).click();
     await shot("4-reveal-explain", true);
@@ -306,7 +308,7 @@ try {
       gameBody(atTrigger.state, { lessonId: lesson.id, step: "explain", attempts: 1, wrong: [] }),
     );
     await mobile.reload();
-    await mobile.getByText("What was better").first().waitFor({ timeout: 30_000 });
+    await mobile.getByText("The better move, then…").first().waitFor({ timeout: 30_000 });
     await mobile.getByText("Your coach", { exact: true }).waitFor({ timeout: 30_000 });
     await mobile.screenshot({ path: join(outDir, "7-phone-reveal.png"), fullPage: true });
     if (await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)) {

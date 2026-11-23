@@ -1,4 +1,4 @@
-import { PRINCIPLES, lessonLabel, type Lesson, type SessionState } from "@chess-teacher/core";
+import { PRINCIPLES, lessonLabel, playedLine, type Lesson, type SessionState } from "@chess-teacher/core";
 import { useState } from "react";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
@@ -9,7 +9,8 @@ function outcome(l: Lesson): string {
   if (l.status === "triggered" && l.deferred) return "Happened at the same time as another lesson";
   if (l.status === "triggered" && l.foundCause === true) return "Found it yourself ✓";
   if (l.status === "triggered" && l.foundCause === false) return "Revealed during the game";
-  if (l.status === "triggered") return "Not shown during the game";
+  if (l.status === "triggered")
+    return l.kind === "missed_chance" ? "Shown during the game" : "Not shown during the game";
   if (l.status === "superseded") return "Overtaken by a later mistake of the same kind";
   if (l.kind === "consequence") return "You got away with it: a stronger player would have punished it";
   return "Missed chance";
@@ -53,7 +54,7 @@ export function Review({
               {open === l.id && (
                 <div className="review-detail">
                   <Explanation lesson={l} />
-                  <Futures lesson={l} />
+                  <Futures lesson={l} played={playedLine(state, l)} />
                   <LessonFeedback gameId={gameId} lessonId={l.id} />
                 </div>
               )}
