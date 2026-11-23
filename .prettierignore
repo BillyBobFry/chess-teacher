@@ -1,0 +1,5 @@
+node_modules/
+prototype/
+pnpm-lock.yaml
+tools/sim/fixtures/
+**/reports/

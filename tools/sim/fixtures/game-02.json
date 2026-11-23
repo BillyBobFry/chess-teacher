@@ -1,0 +1,4307 @@
+{
+ "game": 1,
+ "userColour": "b",
+ "depth": 10,
+ "config": {
+  "threshold": 70,
+  "stillWinning": 300,
+  "hopeless": -500,
+  "linePlies": 8,
+  "expiryMoves": 8,
+  "causeWindow": 5,
+  "levelUp": true,
+  "easy": false
+ },
+ "steps": [
+  {
+   "type": "opponentMove",
+   "move": "e2e4",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "g7g6",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "g1f3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "d7d6",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "d2d4",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "f8g7",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "b1c3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "a7a5",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "c1e3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "c8g4",
+   "events": [
+    {
+     "kind": "created",
+     "lessonId": 1,
+     "text": ""
+    }
+   ]
+  },
+  {
+   "type": "opponentMove",
+   "move": "f1d3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "e7e6",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "h2h3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "g4f3",
+   "events": [
+    {
+     "kind": "fixed",
+     "lessonId": 1,
+     "text": ""
+    }
+   ]
+  },
+  {
+   "type": "opponentMove",
+   "move": "g2f3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "a5a4",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "d3b5",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "c7c6",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "b5a4",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "b8d7",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "h3h4",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "d6d5",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "a4b3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "h7h5",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "c3e2",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "d8b6",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "a2a4",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "b6b4",
+   "events": [
+    {
+     "kind": "created",
+     "lessonId": 2,
+     "text": ""
+    }
+   ]
+  },
+  {
+   "type": "opponentMove",
+   "move": "e1f1",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": [
+    {
+     "kind": "chance_gone",
+     "lessonId": 2,
+     "text": "The chance has gone."
+    }
+   ]
+  },
+  {
+   "type": "userMove",
+   "move": "g8e7",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "c2c3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "b4a5",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "e3g5",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "a5a6",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "f1g1",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "b7b5",
+   "events": [
+    {
+     "kind": "created",
+     "lessonId": 3,
+     "text": ""
+    }
+   ]
+  },
+  {
+   "type": "opponentMove",
+   "move": "e2f4",
+   "mode": "levelled",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "e8g8",
+   "events": [
+    {
+     "kind": "created",
+     "lessonId": 4,
+     "text": ""
+    }
+   ]
+  },
+  {
+   "type": "opponentMove",
+   "move": "g5e7",
+   "mode": "levelled",
+   "events": [
+    {
+     "kind": "triggered",
+     "lessonId": 4,
+     "text": "You've lost a knight: you're 3 pawns worse off than before."
+    }
+   ]
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "d5e4",
+   "events": [
+    {
+     "kind": "created",
+     "lessonId": 5,
+     "text": ""
+    }
+   ]
+  },
+  {
+   "type": "opponentMove",
+   "move": "e7f8",
+   "mode": "levelled",
+   "events": [
+    {
+     "kind": "triggered",
+     "lessonId": 5,
+     "text": "Since that move you've lost a rook and taken a pawn: overall you're 4 pawns down."
+    }
+   ]
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "d7f8",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "b3c2",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "g7h6",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "f4h3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "e6e5",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "f3e4",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "f8e6",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "d1d3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "e6d4",
+   "events": [
+    {
+     "kind": "created",
+     "lessonId": 6,
+     "text": ""
+    }
+   ]
+  },
+  {
+   "type": "opponentMove",
+   "move": "c3d4",
+   "mode": "levelled",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "a6c8",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "g1h2",
+   "mode": "levelled",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "c8e8",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "h1g1",
+   "mode": "levelled",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "e8d8",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "a4b5",
+   "mode": "levelled",
+   "events": [
+    {
+     "kind": "triggered",
+     "lessonId": 6,
+     "text": "Since that move you've lost a knight, a pawn and taken a pawn: overall you're 3 pawns down."
+    }
+   ]
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "a8b8",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "d3b3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "d8h4",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "g1g6",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "h6g7",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "a1g1",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "h4h3",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "h2h3",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "c6b5",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "g6g7",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "g8h8",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "b3f7",
+   "mode": "normal",
+   "events": []
+  },
+  {
+   "type": "startUserTurn",
+   "events": []
+  },
+  {
+   "type": "userMove",
+   "move": "b8b6",
+   "events": []
+  },
+  {
+   "type": "opponentMove",
+   "move": "f7f8",
+   "mode": "normal",
+   "events": []
+  }
+ ],
+ "engineCalls": {
+  "analyst": [
+   {
+    "op": "analyse",
+    "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "e7e6",
+      "score": -35,
+      "pv": [
+       "e7e6",
+       "d2d4",
+       "d7d5",
+       "b1c3",
+       "f8b4",
+       "e4e5",
+       "c7c5",
+       "g1f3",
+       "c5d4"
+      ]
+     },
+     {
+      "move": "e7e5",
+      "score": -44,
+      "pv": [
+       "e7e5",
+       "g1f3",
+       "g8f6",
+       "f3e5",
+       "f6e4",
+       "d2d4",
+       "d7d5",
+       "f1d3"
+      ]
+     },
+     {
+      "move": "c7c6",
+      "score": -47,
+      "pv": [
+       "c7c6",
+       "d2d4",
+       "d7d5",
+       "e4e5",
+       "e7e6",
+       "c2c4",
+       "c6c5",
+       "c4d5",
+       "d8d5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rnbqkbnr/pppppp1p/6p1/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g1f3",
+      "score": 64,
+      "pv": [
+       "g1f3",
+       "d7d6",
+       "d2d4",
+       "f8g7",
+       "f1d3",
+       "g8f6",
+       "e1g1",
+       "e8g8",
+       "c1e3"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rnbqkbnr/pppppp1p/6p1/8/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "d7d6",
+      "score": -66,
+      "pv": [
+       "d7d6",
+       "d2d4",
+       "f8g7",
+       "b1c3",
+       "g8f6",
+       "f1e2",
+       "e8g8",
+       "c1e3",
+       "f6g4",
+       "e3f4",
+       "e7e5"
+      ]
+     },
+     {
+      "move": "c7c5",
+      "score": -69,
+      "pv": [
+       "c7c5",
+       "d2d4",
+       "c5d4",
+       "d1d4",
+       "g8f6",
+       "e4e5",
+       "b8c6"
+      ]
+     },
+     {
+      "move": "f8g7",
+      "score": -70,
+      "pv": [
+       "f8g7",
+       "d2d4",
+       "d7d6",
+       "b1c3",
+       "c7c6",
+       "h2h3",
+       "g8f6",
+       "f1d3",
+       "e8g8"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rnbqkbnr/ppp1pp1p/3p2p1/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "d2d4",
+      "score": 66,
+      "pv": [
+       "d2d4",
+       "g8f6",
+       "b1c3",
+       "f8g7",
+       "f1e2",
+       "e8g8",
+       "c1e3",
+       "e7e5",
+       "d4e5",
+       "d6e5",
+       "f3e5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rnbqkbnr/ppp1pp1p/3p2p1/8/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq - 0 3",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "f8g7",
+      "score": -64,
+      "pv": [
+       "f8g7",
+       "b1c3",
+       "g8f6",
+       "h2h3",
+       "e8g8",
+       "c1e3",
+       "e7e5",
+       "d4e5",
+       "d6e5"
+      ]
+     },
+     {
+      "move": "g8f6",
+      "score": -67,
+      "pv": [
+       "g8f6",
+       "f1d3",
+       "f8g7",
+       "e1g1",
+       "e8g8",
+       "f1e1"
+      ]
+     },
+     {
+      "move": "c7c6",
+      "score": -71,
+      "pv": [
+       "c7c6",
+       "f1d3",
+       "f8g7",
+       "b1c3",
+       "g8f6",
+       "h2h3",
+       "e8g8",
+       "c1e3",
+       "b8d7"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rnbqk1nr/ppp1ppbp/3p2p1/8/3PP3/5N2/PPP2PPP/RNBQKB1R w KQkq - 1 4",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "b1c3",
+      "score": 62,
+      "pv": [
+       "b1c3",
+       "g8f6",
+       "h2h3",
+       "e8g8",
+       "f1c4",
+       "f6d7"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rnbqk1nr/ppp1ppbp/3p2p1/8/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 2 4",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g8f6",
+      "score": -63,
+      "pv": [
+       "g8f6",
+       "c1e3",
+       "e8g8",
+       "d1d2",
+       "a7a6",
+       "a2a4",
+       "f6g4"
+      ]
+     },
+     {
+      "move": "c7c6",
+      "score": -65,
+      "pv": [
+       "c7c6",
+       "h2h3",
+       "g8f6",
+       "f1d3",
+       "e8g8",
+       "c1e3",
+       "b8d7",
+       "e1g1",
+       "e7e5",
+       "d4e5",
+       "d7e5"
+      ]
+     },
+     {
+      "move": "a7a6",
+      "score": -68,
+      "pv": [
+       "a7a6",
+       "a2a4",
+       "g8f6",
+       "f1c4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rnbqk1nr/1pp1ppbp/3p2p1/p7/3PP3/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 0 5",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c1e3",
+      "score": 71,
+      "pv": [
+       "c1e3",
+       "c7c6",
+       "f1d3",
+       "b8d7",
+       "e1g1",
+       "g8f6",
+       "h2h3",
+       "e8g8",
+       "e4e5",
+       "d6e5",
+       "d4e5",
+       "f6d5",
+       "c3d5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rnbqk1nr/1pp1ppbp/3p2p1/p7/3PP3/2N1BN2/PPP2PPP/R2QKB1R b KQkq - 1 5",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c7c6",
+      "score": -86,
+      "pv": [
+       "c7c6",
+       "f1d3",
+       "g8f6",
+       "d1d2",
+       "b8d7",
+       "e3h6",
+       "e8g8",
+       "h6g7",
+       "g8g7"
+      ]
+     },
+     {
+      "move": "g8f6",
+      "score": -86,
+      "pv": [
+       "g8f6",
+       "d1d2",
+       "e8g8",
+       "e3h6",
+       "c7c6",
+       "f1d3",
+       "b8d7",
+       "h6g7",
+       "g8g7"
+      ]
+     },
+     {
+      "move": "b8a6",
+      "score": -102,
+      "pv": [
+       "b8a6",
+       "h2h3",
+       "c7c6",
+       "a2a3",
+       "g8f6",
+       "d1d2",
+       "a6c7",
+       "e3h6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rn1qk1nr/1pp1ppbp/3p2p1/p7/3PP1b1/2N1BN2/PPP2PPP/R2QKB1R w KQkq - 2 6",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "h2h3",
+      "score": 160,
+      "pv": [
+       "h2h3",
+       "g4f3",
+       "d1f3",
+       "e7e6",
+       "e1c1",
+       "c7c6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rn1qk1nr/1pp1ppbp/3p2p1/p7/3PP1b1/2NBBN2/PPP2PPP/R2QK2R b KQkq - 3 6",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "b8c6",
+      "score": -115,
+      "pv": [
+       "b8c6",
+       "d3b5",
+       "e8f8",
+       "b5c6",
+       "b7c6",
+       "h2h3"
+      ]
+     },
+     {
+      "move": "g8f6",
+      "score": -121,
+      "pv": [
+       "g8f6",
+       "h2h3",
+       "g4f3",
+       "d1f3",
+       "b8c6",
+       "d3b5",
+       "e8g8",
+       "e1c1",
+       "e7e5",
+       "b5c6",
+       "e5d4",
+       "e3d4",
+       "b7c6"
+      ]
+     },
+     {
+      "move": "b8d7",
+      "score": -126,
+      "pv": [
+       "b8d7",
+       "h2h3",
+       "g4f3",
+       "d1f3",
+       "e7e5",
+       "d3c4",
+       "g8f6",
+       "d4d5",
+       "f6h5",
+       "e1c1",
+       "h5f4",
+       "h3h4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rn1qk1nr/1pp2pbp/3pp1p1/p7/3PP1b1/2NBBN2/PPP2PPP/R2QK2R w KQkq - 0 7",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "h2h3",
+      "score": 159,
+      "pv": [
+       "h2h3",
+       "g4f3",
+       "d1f3",
+       "g8e7",
+       "e1c1",
+       "b8c6",
+       "d3b5",
+       "e8g8"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rn1qk1nr/1pp2pbp/3pp1p1/p7/3PP1b1/2NBBN1P/PPP2PP1/R2QK2R b KQkq - 0 7",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g4f3",
+      "score": -162,
+      "pv": [
+       "g4f3",
+       "d1f3",
+       "g8e7",
+       "e1c1",
+       "b8c6",
+       "d3b5",
+       "e8g8",
+       "h3h4",
+       "e6e5",
+       "d4e5",
+       "c6e5",
+       "f3h3",
+       "d8c8"
+      ]
+     },
+     {
+      "move": "h7h5",
+      "score": -526,
+      "pv": [
+       "h7h5",
+       "h3g4",
+       "h5g4",
+       "h1h8",
+       "g7h8",
+       "f3g5",
+       "e6e5"
+      ]
+     },
+     {
+      "move": "g4h5",
+      "score": -528,
+      "pv": [
+       "g4h5",
+       "g2g4",
+       "g8f6",
+       "g4h5",
+       "f6h5",
+       "h3h4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rn1qk1nr/1pp2pbp/3pp1p1/p7/3PP3/2NBBb1P/PPP2PP1/R2QK2R w KQkq - 0 8",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "d1f3",
+      "score": 158,
+      "pv": [
+       "d1f3",
+       "g8e7",
+       "e1c1",
+       "b8c6",
+       "h3h4",
+       "a5a4",
+       "d3b5",
+       "h7h5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rn1qk1nr/1pp2pbp/3pp1p1/p7/3PP3/2NBBP1P/PPP2P2/R2QK2R b KQkq - 0 8",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g8e7",
+      "score": -65,
+      "pv": [
+       "g8e7",
+       "h3h4",
+       "h7h5",
+       "d1e2",
+       "c7c6",
+       "e1c1",
+       "b8d7",
+       "f3f4",
+       "d6d5"
+      ]
+     },
+     {
+      "move": "b8a6",
+      "score": -69,
+      "pv": [
+       "b8a6",
+       "d1d2",
+       "c7c6",
+       "e1c1",
+       "b7b5"
+      ]
+     },
+     {
+      "move": "c7c6",
+      "score": -83,
+      "pv": [
+       "c7c6",
+       "h3h4",
+       "h7h5",
+       "d1e2",
+       "b8d7",
+       "e1c1",
+       "g8e7",
+       "f3f4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rn1qk1nr/1pp2pbp/3pp1p1/8/p2PP3/2NBBP1P/PPP2P2/R2QK2R w KQkq - 0 9",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "d3b5",
+      "score": 85,
+      "pv": [
+       "d3b5",
+       "c7c6",
+       "b5a4",
+       "b8d7",
+       "a4b3",
+       "g8e7",
+       "d1d2"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rn1qk1nr/1pp2pbp/3pp1p1/1B6/p2PP3/2N1BP1P/PPP2P2/R2QK2R b KQkq - 1 9",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "b8d7",
+      "score": -101,
+      "pv": [
+       "b8d7",
+       "b5a4",
+       "g8f6",
+       "h3h4",
+       "c7c6",
+       "a4b3",
+       "h7h5"
+      ]
+     },
+     {
+      "move": "c7c6",
+      "score": -101,
+      "pv": [
+       "c7c6",
+       "b5a4",
+       "b8d7",
+       "a4b3",
+       "g8e7",
+       "d1d2",
+       "d6d5",
+       "e1c1",
+       "b7b5",
+       "e3h6"
+      ]
+     },
+     {
+      "move": "e8f8",
+      "score": -128,
+      "pv": [
+       "e8f8",
+       "b5a4",
+       "b8c6",
+       "d1d3",
+       "g8e7",
+       "a4c6",
+       "e7c6",
+       "e1c1"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rn1qk1nr/1p3pbp/2ppp1p1/1B6/p2PP3/2N1BP1P/PPP2P2/R2QK2R w KQkq - 0 10",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "b5a4",
+      "score": 98,
+      "pv": [
+       "b5a4",
+       "b7b5",
+       "a4b3",
+       "g8e7",
+       "d1d2",
+       "e8g8",
+       "e1f1",
+       "b8d7"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "rn1qk1nr/1p3pbp/2ppp1p1/8/B2PP3/2N1BP1P/PPP2P2/R2QK2R b KQkq - 0 10",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g8f6",
+      "score": -88,
+      "pv": [
+       "g8f6",
+       "a4b3",
+       "b8d7",
+       "f3f4",
+       "e8g8",
+       "e4e5",
+       "f6h5",
+       "e5d6"
+      ]
+     },
+     {
+      "move": "b8d7",
+      "score": -89,
+      "pv": [
+       "b8d7",
+       "a4b3",
+       "g8f6",
+       "h3h4",
+       "f6h5",
+       "a2a4",
+       "d6d5",
+       "e1f1",
+       "e8g8",
+       "c3e2"
+      ]
+     },
+     {
+      "move": "b7b5",
+      "score": -94,
+      "pv": [
+       "b7b5",
+       "a4b3",
+       "b8d7",
+       "h3h4",
+       "h7h5",
+       "e1f1",
+       "g8e7",
+       "a2a4",
+       "b5a4",
+       "a1a4",
+       "a8a4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r2qk1nr/1p1n1pbp/2ppp1p1/8/B2PP3/2N1BP1P/PPP2P2/R2QK2R w KQkq - 1 11",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "a4b3",
+      "score": 85,
+      "pv": [
+       "a4b3",
+       "g8f6",
+       "h3h4",
+       "f6h5",
+       "d1d2",
+       "b7b5",
+       "e1c1",
+       "d6d5",
+       "c3e2",
+       "e8g8",
+       "e3h6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r2qk1nr/1p1n1pbp/2ppp1p1/8/B2PP2P/2N1BP2/PPP2P2/R2QK2R b KQkq - 0 11",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g8f6",
+      "score": -77,
+      "pv": [
+       "g8f6",
+       "a4b3",
+       "e8g8",
+       "f3f4",
+       "c6c5",
+       "d1f3",
+       "d8c7"
+      ]
+     },
+     {
+      "move": "h7h5",
+      "score": -82,
+      "pv": [
+       "h7h5",
+       "d1d2",
+       "d6d5",
+       "a4b3",
+       "g8e7",
+       "e1f1",
+       "b7b5",
+       "f1g2"
+      ]
+     },
+     {
+      "move": "b7b5",
+      "score": -83,
+      "pv": [
+       "b7b5",
+       "a4b3",
+       "g8f6",
+       "e1f1",
+       "e8g8",
+       "a2a4",
+       "b5a4",
+       "a1a4",
+       "a8a4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r2qk1nr/1p1n1pbp/2p1p1p1/3p4/B2PP2P/2N1BP2/PPP2P2/R2QK2R w KQkq - 0 12",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "h4h5",
+      "score": 126,
+      "pv": [
+       "h4h5",
+       "d8a5",
+       "h5h6",
+       "g7f8",
+       "a2a3",
+       "b7b5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r2qk1nr/1p1n1pbp/2p1p1p1/3p4/3PP2P/1BN1BP2/PPP2P2/R2QK2R b KQkq - 1 12",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "h7h5",
+      "score": -92,
+      "pv": [
+       "h7h5",
+       "a2a4",
+       "g7f6",
+       "e1f1",
+       "f6h4"
+      ]
+     },
+     {
+      "move": "d7f6",
+      "score": -95,
+      "pv": [
+       "d7f6",
+       "d1d2",
+       "b7b5",
+       "a2a3",
+       "g8e7",
+       "e1f1",
+       "b5b4"
+      ]
+     },
+     {
+      "move": "g8f6",
+      "score": -103,
+      "pv": [
+       "g8f6",
+       "e4e5",
+       "f6h5",
+       "c3e2",
+       "b7b5",
+       "e2g3",
+       "h5g3",
+       "f2g3"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r2qk1nr/1p1n1pb1/2p1p1p1/3p3p/3PP2P/1BN1BP2/PPP2P2/R2QK2R w KQkq - 0 13",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c3e2",
+      "score": 93,
+      "pv": [
+       "c3e2",
+       "b7b5",
+       "e1f1",
+       "d7b6",
+       "c2c3",
+       "g8e7",
+       "b3c2"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r2qk1nr/1p1n1pb1/2p1p1p1/3p3p/3PP2P/1B2BP2/PPP1NP2/R2QK2R b KQkq - 1 13",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g8f6",
+      "score": -78,
+      "pv": [
+       "g8f6",
+       "e4e5",
+       "f6g8",
+       "c2c3",
+       "g8e7",
+       "a2a4"
+      ]
+     },
+     {
+      "move": "g8e7",
+      "score": -84,
+      "pv": [
+       "g8e7",
+       "d1d2",
+       "b7b5",
+       "e1f1",
+       "d7b6",
+       "c2c3",
+       "b6c4",
+       "b3c4",
+       "b5c4"
+      ]
+     },
+     {
+      "move": "b7b5",
+      "score": -91,
+      "pv": [
+       "b7b5",
+       "c2c3",
+       "d7b6",
+       "e1f1",
+       "g7h6",
+       "d1d2"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k1nr/1p1n1pb1/1qp1p1p1/3p3p/3PP2P/1B2BP2/PPP1NP2/R2QK2R w KQkq - 2 14",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c2c3",
+      "score": 100,
+      "pv": [
+       "c2c3",
+       "g8e7",
+       "d1c2",
+       "e8g8",
+       "e2f4",
+       "d5e4",
+       "f3e4",
+       "c6c5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k1nr/1p1n1pb1/1qp1p1p1/3p3p/P2PP2P/1B2BP2/1PP1NP2/R2QK2R b KQkq - 0 14",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g8e7",
+      "score": -86,
+      "pv": [
+       "g8e7",
+       "e1f1",
+       "e8g8",
+       "f1g2",
+       "c6c5",
+       "e4d5",
+       "e6d5",
+       "d4c5"
+      ]
+     },
+     {
+      "move": "d5e4",
+      "score": -92,
+      "pv": [
+       "d5e4",
+       "d4d5",
+       "c6c5",
+       "h1h3",
+       "d7e5",
+       "e2f4",
+       "g8e7",
+       "f3e4"
+      ]
+     },
+     {
+      "move": "g8f6",
+      "score": -121,
+      "pv": [
+       "g8f6",
+       "e4e5",
+       "f6g8",
+       "c2c3",
+       "g8e7",
+       "b3c2",
+       "c6c5",
+       "a1b1",
+       "c5d4",
+       "c3d4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k1nr/1p1n1pb1/2p1p1p1/3p3p/Pq1PP2P/1B2BP2/1PP1NP2/R2QK2R w KQkq - 1 15",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c2c3",
+      "score": 163,
+      "pv": [
+       "c2c3",
+       "b4e7",
+       "e1f1",
+       "g7h6",
+       "d1d2",
+       "e7d6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k1nr/1p1n1pb1/2p1p1p1/3p3p/Pq1PP2P/1B2BP2/1PP1NP2/R2Q1K1R b kq - 2 15",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g7h6",
+      "score": -126,
+      "pv": [
+       "g7h6",
+       "e3h6",
+       "g8h6",
+       "c2c3",
+       "b4b6",
+       "b3c2",
+       "d5e4",
+       "f3e4",
+       "h6g4"
+      ]
+     },
+     {
+      "move": "b4b6",
+      "score": -135,
+      "pv": [
+       "b4b6",
+       "e3g5",
+       "g7f6",
+       "d1d2",
+       "g8e7",
+       "g5f6",
+       "d7f6",
+       "d2g5"
+      ]
+     },
+     {
+      "move": "g8e7",
+      "score": -137,
+      "pv": [
+       "g8e7",
+       "c2c3",
+       "b4d6",
+       "e4e5",
+       "d6c7",
+       "b3c2",
+       "c6c5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k2r/1p1nnpb1/2p1p1p1/3p3p/Pq1PP2P/1B2BP2/1PP1NP2/R2Q1K1R w kq - 3 16",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c2c3",
+      "score": 158,
+      "pv": [
+       "c2c3",
+       "b4d6",
+       "e4e5",
+       "d6c7",
+       "b3c2",
+       "e8g8",
+       "b2b4",
+       "f7f6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k2r/1p1nnpb1/2p1p1p1/3p3p/Pq1PP2P/1BP1BP2/1P2NP2/R2Q1K1R b kq - 0 16",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "b4a5",
+      "score": -144,
+      "pv": [
+       "b4a5",
+       "b3c2",
+       "a5c7",
+       "d1d2",
+       "e6e5",
+       "f1g2",
+       "e8g8",
+       "b2b4",
+       "f8d8"
+      ]
+     },
+     {
+      "move": "b4b6",
+      "score": -156,
+      "pv": [
+       "b4b6",
+       "f1g2",
+       "e8g8",
+       "b3c2",
+       "b6c7",
+       "e4e5",
+       "c6c5",
+       "f3f4"
+      ]
+     },
+     {
+      "move": "b4d6",
+      "score": -158,
+      "pv": [
+       "b4d6",
+       "f1g2",
+       "e8g8",
+       "e4e5",
+       "d6c7",
+       "b3c2",
+       "c6c5",
+       "f3f4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k2r/1p1nnpb1/2p1p1p1/q2p3p/P2PP2P/1BP1BP2/1P2NP2/R2Q1K1R w kq - 1 17",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "b3c2",
+      "score": 149,
+      "pv": [
+       "b3c2",
+       "e6e5",
+       "b2b4",
+       "a5c7",
+       "f1g2",
+       "e8g8",
+       "a4a5",
+       "f8d8",
+       "d1b1"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k2r/1p1nnpb1/2p1p1p1/q2p2Bp/P2PP2P/1BP2P2/1P2NP2/R2Q1K1R b kq - 2 17",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g7f6",
+      "score": -144,
+      "pv": [
+       "g7f6",
+       "g5e3",
+       "e8g8",
+       "e4e5",
+       "f6g7",
+       "f1g2",
+       "f7f6",
+       "f3f4",
+       "e7f5",
+       "e2g3"
+      ]
+     },
+     {
+      "move": "a5b6",
+      "score": -162,
+      "pv": [
+       "a5b6",
+       "f1g2",
+       "g7f6",
+       "g5e3",
+       "e8g8",
+       "e4e5",
+       "f6g7",
+       "b3c2"
+      ]
+     },
+     {
+      "move": "a5c7",
+      "score": -164,
+      "pv": [
+       "a5c7",
+       "d1c1",
+       "d5e4",
+       "f3e4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k2r/1p1nnpb1/q1p1p1p1/3p2Bp/P2PP2P/1BP2P2/1P2NP2/R2Q1K1R w kq - 3 18",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "f1g2",
+      "score": 177,
+      "pv": [
+       "f1g2",
+       "a6b6",
+       "b3c2",
+       "b6b2",
+       "a1b1"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k2r/1p1nnpb1/q1p1p1p1/3p2Bp/P2PP2P/1BP2P2/1P2NP2/R2Q2KR b kq - 4 18",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g7f6",
+      "score": -141,
+      "pv": [
+       "g7f6",
+       "g1g2",
+       "e8g8",
+       "b3c2"
+      ]
+     },
+     {
+      "move": "c6c5",
+      "score": -143,
+      "pv": [
+       "c6c5",
+       "e4d5",
+       "e7d5",
+       "b3d5",
+       "e6d5",
+       "d4c5",
+       "d7c5"
+      ]
+     },
+     {
+      "move": "a6b6",
+      "score": -148,
+      "pv": [
+       "a6b6",
+       "g1g2",
+       "g7f6",
+       "b3c2",
+       "f6g5",
+       "h4g5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k2r/3nnpb1/q1p1p1p1/1p1p2Bp/P2PP2P/1BP2P2/1P2NP2/R2Q2KR w kq - 0 19",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g1g2",
+      "score": 217,
+      "pv": [
+       "g1g2",
+       "d7b6",
+       "a4b5",
+       "a6b5",
+       "d1c2",
+       "f7f6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k2r/3nnpb1/q1p1p1p1/1p1p2Bp/P2PP2P/1BP2P2/1P2NP2/R2Q2KR w kq - 0 19",
+    "multipv": 5,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g1g2",
+      "score": 203,
+      "pv": [
+       "g1g2",
+       "a6b7",
+       "d1c2",
+       "b5a4",
+       "a1a4",
+       "a8a4",
+       "b3a4"
+      ]
+     },
+     {
+      "move": "a4a5",
+      "score": 181,
+      "pv": [
+       "a4a5",
+       "a6b7",
+       "b3c2",
+       "c6c5",
+       "g1g2",
+       "b5b4",
+       "d4c5",
+       "d7c5",
+       "c2a4",
+       "e8f8"
+      ]
+     },
+     {
+      "move": "e2f4",
+      "score": 171,
+      "pv": [
+       "e2f4",
+       "a6b7",
+       "a4b5",
+       "a8a1",
+       "d1a1"
+      ]
+     },
+     {
+      "move": "b3c2",
+      "score": 169,
+      "pv": [
+       "b3c2",
+       "g7f6",
+       "d1d2",
+       "f6g5",
+       "h4g5",
+       "b5a4",
+       "a1a4",
+       "a6b7",
+       "a4a8",
+       "b7a8",
+       "g1g2",
+       "a8a2"
+      ]
+     },
+     {
+      "move": "e2c1",
+      "score": 152,
+      "pv": [
+       "e2c1",
+       "g7f6",
+       "c1d3",
+       "f6g5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3k2r/3nnpb1/q1p1p1p1/1p1p2Bp/P2PPN1P/1BP2P2/1P3P2/R2Q2KR b kq - 1 19",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "d7b6",
+      "score": -149,
+      "pv": [
+       "d7b6",
+       "a4a5",
+       "b6c4",
+       "f4d3",
+       "c4a5",
+       "b3c2",
+       "a6c8",
+       "e4e5",
+       "c8c7"
+      ]
+     },
+     {
+      "move": "g7f6",
+      "score": -167,
+      "pv": [
+       "g7f6",
+       "g1g2",
+       "f6g5",
+       "h4g5",
+       "e8g8",
+       "d1d2",
+       "a6b7",
+       "a4b5",
+       "b7b5"
+      ]
+     },
+     {
+      "move": "b5a4",
+      "score": -172,
+      "pv": [
+       "b5a4",
+       "b3a4",
+       "a6b7",
+       "f4d3",
+       "f7f6",
+       "g5e3",
+       "e8g8",
+       "g1g2"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4rk1/3nnpb1/q1p1p1p1/1p1p2Bp/P2PPN1P/1BP2P2/1P3P2/R2Q2KR w - - 2 20",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g5e7",
+      "score": 367,
+      "pv": [
+       "g5e7",
+       "f8e8",
+       "e7d6",
+       "b5a4",
+       "a1a4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4rk1/3nnpb1/q1p1p1p1/1p1p2Bp/P2PPN1P/1BP2P2/1P3P2/R2Q2KR w - - 2 20",
+    "multipv": 5,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g5e7",
+      "score": 364,
+      "pv": [
+       "g5e7",
+       "f8e8",
+       "e7g5",
+       "f7f6",
+       "e4d5",
+       "c6d5",
+       "b3c2",
+       "f6g5",
+       "h4g5"
+      ]
+     },
+     {
+      "move": "f4h5",
+      "score": 243,
+      "pv": [
+       "f4h5",
+       "g6h5",
+       "g5e7",
+       "f8e8",
+       "e7g5",
+       "e6e5",
+       "g1g2",
+       "e5d4",
+       "c3d4"
+      ]
+     },
+     {
+      "move": "f4e6",
+      "score": 208,
+      "pv": [
+       "f4e6",
+       "f7e6",
+       "g5e7",
+       "f8f7",
+       "e7d6",
+       "e6e5"
+      ]
+     },
+     {
+      "move": "g1g2",
+      "score": 171,
+      "pv": [
+       "g1g2",
+       "g7f6",
+       "d1d2",
+       "a6b6"
+      ]
+     },
+     {
+      "move": "f4d3",
+      "score": 163,
+      "pv": [
+       "f4d3",
+       "f8e8",
+       "g1g2",
+       "a6b7",
+       "a4a5",
+       "e6e5",
+       "d4e5",
+       "d7e5",
+       "d3e5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4rk1/3nBpb1/q1p1p1p1/1p1p3p/P2PPN1P/1BP2P2/1P3P2/R2Q2KR b - - 0 20",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "f8e8",
+      "score": -380,
+      "pv": [
+       "f8e8",
+       "e7d6",
+       "e6e5",
+       "d4e5",
+       "d7e5",
+       "d6e5",
+       "g7e5"
+      ]
+     },
+     {
+      "move": "f8c8",
+      "score": -414,
+      "pv": [
+       "f8c8",
+       "g1g2",
+       "b5a4",
+       "b3c2",
+       "a6b7",
+       "e7a3",
+       "c6c5"
+      ]
+     },
+     {
+      "move": "f8b8",
+      "score": -414,
+      "pv": [
+       "f8b8",
+       "e4d5",
+       "b5a4",
+       "a1a4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4rk1/3nBpb1/q1p1p1p1/1p5p/P2PpN1P/1BP2P2/1P3P2/R2Q2KR w - - 0 21",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "e7f8",
+      "score": 546,
+      "pv": [
+       "e7f8",
+       "g7f8",
+       "f3e4",
+       "c6c5",
+       "h1h3",
+       "c5d4",
+       "c3d4",
+       "f8g7"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4rk1/3nBpb1/q1p1p1p1/1p5p/P2PpN1P/1BP2P2/1P3P2/R2Q2KR w - - 0 21",
+    "multipv": 5,
+    "depth": 10,
+    "result": [
+     {
+      "move": "e7f8",
+      "score": 506,
+      "pv": [
+       "e7f8",
+       "d7f8",
+       "f3e4",
+       "c6c5",
+       "e4e5",
+       "c5d4",
+       "c3d4",
+       "b5a4"
+      ]
+     },
+     {
+      "move": "f3e4",
+      "score": 504,
+      "pv": [
+       "f3e4",
+       "c6c5",
+       "d4c5"
+      ]
+     },
+     {
+      "move": "a4a5",
+      "score": 439,
+      "pv": [
+       "a4a5",
+       "c6c5",
+       "f3e4",
+       "c5d4"
+      ]
+     },
+     {
+      "move": "b3c2",
+      "score": 385,
+      "pv": [
+       "b3c2",
+       "f8e8",
+       "e7g5",
+       "e6e5",
+       "d4e5",
+       "b5a4",
+       "d1d7"
+      ]
+     },
+     {
+      "move": "g1g2",
+      "score": 376,
+      "pv": [
+       "g1g2",
+       "f8e8",
+       "e7g5",
+       "b5a4",
+       "a1a4",
+       "a6b5",
+       "a4a8"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4Bk1/3n1pb1/q1p1p1p1/1p5p/P2PpN1P/1BP2P2/1P3P2/R2Q2KR b - - 0 21",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "a8f8",
+      "score": -495,
+      "pv": [
+       "a8f8",
+       "f3e4",
+       "c6c5",
+       "e4e5",
+       "c5d4"
+      ]
+     },
+     {
+      "move": "g7f8",
+      "score": -512,
+      "pv": [
+       "g7f8",
+       "f3e4",
+       "c6c5",
+       "b3c2",
+       "e6e5",
+       "f4e2",
+       "c5d4",
+       "c3d4",
+       "b5a4"
+      ]
+     },
+     {
+      "move": "d7f8",
+      "score": -531,
+      "pv": [
+       "d7f8",
+       "f3e4",
+       "c6c5",
+       "e4e5",
+       "a6b7",
+       "b3c2"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4nk1/5pb1/q1p1p1p1/1p5p/P2PpN1P/1BP2P2/1P3P2/R2Q2KR w - - 0 22",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "f3e4",
+      "score": 500,
+      "pv": [
+       "f3e4",
+       "c6c5",
+       "h1h2",
+       "c5d4",
+       "c3d4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4nk1/5pb1/q1p1p1p1/1p5p/P2PpN1P/2P2P2/1PB2P2/R2Q2KR b - - 1 22",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "e6e5",
+      "score": -480,
+      "pv": [
+       "e6e5",
+       "d4e5",
+       "g7e5",
+       "f4g2"
+      ]
+     },
+     {
+      "move": "a8d8",
+      "score": -492,
+      "pv": [
+       "a8d8",
+       "a4b5",
+       "a6b5",
+       "c2e4",
+       "e6e5",
+       "f4d3"
+      ]
+     },
+     {
+      "move": "g7h6",
+      "score": -511,
+      "pv": [
+       "g7h6",
+       "f4h3",
+       "e4e3",
+       "f2e3",
+       "h6e3",
+       "g1g2"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4nk1/5p2/q1p1p1pb/1p5p/P2PpN1P/2P2P2/1PB2P2/R2Q2KR w - - 2 23",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "f4h3",
+      "score": 499,
+      "pv": [
+       "f4h3",
+       "e6e5",
+       "d4e5",
+       "f8e6",
+       "c2e4",
+       "a8d8"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4nk1/5p2/q1p1p1pb/1p5p/P2Pp2P/2P2P1N/1PB2P2/R2Q2KR b - - 3 23",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "e6e5",
+      "score": -487,
+      "pv": [
+       "e6e5",
+       "c2e4",
+       "e5d4",
+       "c3d4",
+       "a8d8"
+      ]
+     },
+     {
+      "move": "a8d8",
+      "score": -528,
+      "pv": [
+       "a8d8",
+       "c2e4",
+       "e6e5",
+       "a4b5",
+       "a6b5"
+      ]
+     },
+     {
+      "move": "e4e3",
+      "score": -531,
+      "pv": [
+       "e4e3",
+       "d1e2",
+       "e6e5",
+       "f2e3",
+       "e5d4",
+       "c3d4",
+       "f8e6",
+       "f3f4",
+       "a8d8"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4nk1/5p2/q1p3pb/1p2p2p/P2Pp2P/2P2P1N/1PB2P2/R2Q2KR w - - 0 24",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "d4e5",
+      "score": 475,
+      "pv": [
+       "d4e5",
+       "e4e3",
+       "d1e2",
+       "a6b6",
+       "b2b4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r4nk1/5p2/q1p3pb/1p2p2p/P2PP2P/2P4N/1PB2P2/R2Q2KR b - - 0 24",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "e5d4",
+      "score": -484,
+      "pv": [
+       "e5d4",
+       "c3d4",
+       "f8e6",
+       "c2b3",
+       "c6c5",
+       "b3d5"
+      ]
+     },
+     {
+      "move": "a8d8",
+      "score": -490,
+      "pv": [
+       "a8d8",
+       "d1f3",
+       "e5d4",
+       "c2b3",
+       "a6b7",
+       "c3d4",
+       "d8d4",
+       "a1d1"
+      ]
+     },
+     {
+      "move": "f8e6",
+      "score": -528,
+      "pv": [
+       "f8e6",
+       "c2b3",
+       "a8d8",
+       "b3e6",
+       "f7e6",
+       "d1f3",
+       "e5d4",
+       "c3d4",
+       "c6c5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r5k1/5p2/q1p1n1pb/1p2p2p/P2PP2P/2P4N/1PB2P2/R2Q2KR w - - 1 25",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c2b3",
+      "score": 495,
+      "pv": [
+       "c2b3",
+       "a6c8",
+       "d4e5",
+       "b5a4",
+       "b3e6",
+       "c8e6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r5k1/5p2/q1p1n1pb/1p2p2p/P2PP2P/2PQ3N/1PB2P2/R5KR b - - 2 25",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "e5d4",
+      "score": -421,
+      "pv": [
+       "e5d4",
+       "a1d1",
+       "c6c5",
+       "a4b5",
+       "a6b7",
+       "d3f3"
+      ]
+     },
+     {
+      "move": "a8d8",
+      "score": -459,
+      "pv": [
+       "a8d8",
+       "d4d5",
+       "c6d5",
+       "e4d5",
+       "a6b7",
+       "d3e2"
+      ]
+     },
+     {
+      "move": "a6c8",
+      "score": -464,
+      "pv": [
+       "a6c8",
+       "d4e5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r5k1/5p2/q1p3pb/1p2p2p/P2nP2P/2PQ3N/1PB2P2/R5KR w - - 0 26",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c3d4",
+      "score": 573,
+      "pv": [
+       "c3d4",
+       "c6c5",
+       "g1h2",
+       "a8d8"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r5k1/5p2/q1p3pb/1p2p2p/P2nP2P/2PQ3N/1PB2P2/R5KR w - - 0 26",
+    "multipv": 5,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c3d4",
+      "score": 571,
+      "pv": [
+       "c3d4",
+       "c6c5",
+       "d3g3"
+      ]
+     },
+     {
+      "move": "h1h2",
+      "score": 500,
+      "pv": [
+       "h1h2",
+       "d4c2",
+       "d3c2",
+       "a8d8"
+      ]
+     },
+     {
+      "move": "c2d1",
+      "score": 488,
+      "pv": [
+       "c2d1",
+       "d4e6",
+       "d3f3",
+       "a8a7",
+       "d1c2"
+      ]
+     },
+     {
+      "move": "b2b4",
+      "score": 486,
+      "pv": [
+       "b2b4",
+       "d4c2",
+       "d3c2"
+      ]
+     },
+     {
+      "move": "a4a5",
+      "score": 470,
+      "pv": [
+       "a4a5",
+       "d4c2",
+       "d3c2",
+       "a6c8",
+       "c2e2"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r5k1/5p2/q1p3pb/1p2p2p/P2PP2P/3Q3N/1PB2P2/R5KR b - - 0 26",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "a6b7",
+      "score": -589,
+      "pv": [
+       "a6b7",
+       "d4d5",
+       "c6c5",
+       "g1h2",
+       "c5c4",
+       "d3g3",
+       "h6g7",
+       "a4a5",
+       "a8a6"
+      ]
+     },
+     {
+      "move": "a6c8",
+      "score": -596,
+      "pv": [
+       "a6c8",
+       "d4d5",
+       "c6d5",
+       "c2d1",
+       "h6f4",
+       "h3f4",
+       "e5f4",
+       "d3d5",
+       "b5a4",
+       "a1a4"
+      ]
+     },
+     {
+      "move": "a6a5",
+      "score": -610,
+      "pv": [
+       "a6a5",
+       "d4d5",
+       "a5d2",
+       "d3d2",
+       "h6d2",
+       "d5c6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r1q3k1/5p2/2p3pb/1p2p2p/P2PP2P/3Q3N/1PB2P2/R5KR w - - 1 27",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "a4a5",
+      "score": 574,
+      "pv": [
+       "a4a5",
+       "c8g4",
+       "g1f1",
+       "g4h4",
+       "d4d5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r1q3k1/5p2/2p3pb/1p2p2p/P2PP2P/3Q3N/1PB2P2/R5KR w - - 1 27",
+    "multipv": 5,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g1h2",
+      "score": 615,
+      "pv": [
+       "g1h2",
+       "a8a7",
+       "a4b5",
+       "a7a1",
+       "h1a1",
+       "c6b5",
+       "d4d5"
+      ]
+     },
+     {
+      "move": "d4d5",
+      "score": 592,
+      "pv": [
+       "d4d5",
+       "c8g4",
+       "g1h2",
+       "h6f4",
+       "h3f4",
+       "e5f4",
+       "d5c6",
+       "f4f3"
+      ]
+     },
+     {
+      "move": "a4a5",
+      "score": 591,
+      "pv": [
+       "a4a5",
+       "h6f8",
+       "h3g5",
+       "c8g4",
+       "g1f1"
+      ]
+     },
+     {
+      "move": "c2d1",
+      "score": 587,
+      "pv": [
+       "c2d1",
+       "c6c5",
+       "d4d5",
+       "c5c4",
+       "d3f3",
+       "c8g4",
+       "g1h2"
+      ]
+     },
+     {
+      "move": "h3g5",
+      "score": 578,
+      "pv": [
+       "h3g5",
+       "a8a7",
+       "c2b3",
+       "h6g5",
+       "h4g5",
+       "c8g4",
+       "g1f1",
+       "g4g5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r1q3k1/5p2/2p3pb/1p2p2p/P2PP2P/3Q3N/1PB2P1K/R6R b - - 2 27",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "e5d4",
+      "score": -577,
+      "pv": [
+       "e5d4",
+       "h1g1",
+       "c6c5",
+       "d3f3",
+       "c5c4",
+       "a4a5"
+      ]
+     },
+     {
+      "move": "c8d8",
+      "score": -614,
+      "pv": [
+       "c8d8",
+       "d4d5",
+       "c6d5",
+       "a4a5"
+      ]
+     },
+     {
+      "move": "c8g4",
+      "score": -615,
+      "pv": [
+       "c8g4",
+       "a4b5",
+       "a8d8",
+       "b5c6",
+       "g4h4",
+       "c6c7"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3q1k1/5p2/2p3pb/1p2p2p/P2PP2P/3Q3N/1PB2P1K/R6R w - - 3 28",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "h1g1",
+      "score": 665,
+      "pv": [
+       "h1g1",
+       "e8e7",
+       "h2h1",
+       "e7h4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3q1k1/5p2/2p3pb/1p2p2p/P2PP2P/3Q3N/1PB2P1K/R6R w - - 3 28",
+    "multipv": 5,
+    "depth": 10,
+    "result": [
+     {
+      "move": "h1g1",
+      "score": 662,
+      "pv": [
+       "h1g1",
+       "e8d8",
+       "h2h1",
+       "h6f4",
+       "c2b3",
+       "d8h4",
+       "g1g6",
+       "g8f8"
+      ]
+     },
+     {
+      "move": "a4a5",
+      "score": 660,
+      "pv": [
+       "a4a5",
+       "a8a6",
+       "d4d5",
+       "e8e7",
+       "h1g1"
+      ]
+     },
+     {
+      "move": "d3f3",
+      "score": 633,
+      "pv": [
+       "d3f3",
+       "e5d4",
+       "h1g1",
+       "b5a4",
+       "h2h1"
+      ]
+     },
+     {
+      "move": "h1d1",
+      "score": 633,
+      "pv": [
+       "h1d1",
+       "c6c5",
+       "d4c5",
+       "b5a4",
+       "d3f3",
+       "a4a3",
+       "a1a3"
+      ]
+     },
+     {
+      "move": "h3g5",
+      "score": 633,
+      "pv": [
+       "h3g5",
+       "h6g5",
+       "h4g5",
+       "e5d4",
+       "d3d4",
+       "b5a4",
+       "c2a4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r3q1k1/5p2/2p3pb/1p2p2p/P2PP2P/3Q3N/1PB2P1K/R5R1 b - - 4 28",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "b5a4",
+      "score": -638,
+      "pv": [
+       "b5a4",
+       "d4d5",
+       "a4a3",
+       "b2b3"
+      ]
+     },
+     {
+      "move": "g8g7",
+      "score": -670,
+      "pv": [
+       "g8g7",
+       "a4a5",
+       "e8e7",
+       "h3g5",
+       "a8d8",
+       "d3f3"
+      ]
+     },
+     {
+      "move": "e5d4",
+      "score": -674,
+      "pv": [
+       "e5d4",
+       "a4a5",
+       "e8e7",
+       "c2b3"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r2q2k1/5p2/2p3pb/1p2p2p/P2PP2P/3Q3N/1PB2P1K/R5R1 w - - 5 29",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c2b3",
+      "score": 685,
+      "pv": [
+       "c2b3",
+       "d8d6",
+       "h2h1",
+       "b5a4",
+       "b3c4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r2q2k1/5p2/2p3pb/1p2p2p/P2PP2P/3Q3N/1PB2P1K/R5R1 w - - 5 29",
+    "multipv": 5,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c2b3",
+      "score": 691,
+      "pv": [
+       "c2b3",
+       "d8f6",
+       "a4a5",
+       "h6f4",
+       "h3f4",
+       "e5f4",
+       "h2h3"
+      ]
+     },
+     {
+      "move": "h2h1",
+      "score": 683,
+      "pv": [
+       "h2h1",
+       "d8h4",
+       "d3g3",
+       "h4g3",
+       "g1g3"
+      ]
+     },
+     {
+      "move": "d3g3",
+      "score": 673,
+      "pv": [
+       "d3g3",
+       "b5a4",
+       "d4d5",
+       "a4a3"
+      ]
+     },
+     {
+      "move": "d3f3",
+      "score": 647,
+      "pv": [
+       "d3f3",
+       "b5a4",
+       "d4d5",
+       "a4a3",
+       "b2a3",
+       "d8d6",
+       "h3g5",
+       "h6g5",
+       "h4g5"
+      ]
+     },
+     {
+      "move": "a4b5",
+      "score": 642,
+      "pv": [
+       "a4b5",
+       "a8a1",
+       "g1a1",
+       "e5d4",
+       "b5c6",
+       "d8c7",
+       "h2g1"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "r2q2k1/5p2/2p3pb/1P2p2p/3PP2P/3Q3N/1PB2P1K/R5R1 b - - 0 29",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "e5d4",
+      "score": -624,
+      "pv": [
+       "e5d4",
+       "h3g5",
+       "a8a1",
+       "g1a1",
+       "c6c5",
+       "d3f3",
+       "h6g5",
+       "h4g5"
+      ]
+     },
+     {
+      "move": "a8a1",
+      "score": -628,
+      "pv": [
+       "a8a1",
+       "g1a1",
+       "c6b5",
+       "d3b5",
+       "h6f8",
+       "a1a7",
+       "e5d4",
+       "c2b3"
+      ]
+     },
+     {
+      "move": "g8h8",
+      "score": -706,
+      "pv": [
+       "g8h8",
+       "h3g5",
+       "h6g5",
+       "h4g5",
+       "a8a1",
+       "g1a1",
+       "c6b5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r1q2k1/5p2/2p3pb/1P2p2p/3PP2P/3Q3N/1PB2P1K/R5R1 w - - 1 30",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "c2b3",
+      "score": 698,
+      "pv": [
+       "c2b3",
+       "d8d6",
+       "a1a7",
+       "e5d4",
+       "h2h1"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r1q2k1/5p2/2p3pb/1P2p2p/3PP2P/1Q5N/1PB2P1K/R5R1 b - - 2 30",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "d8f6",
+      "score": -666,
+      "pv": [
+       "d8f6",
+       "b3g3",
+       "h6f8",
+       "c2b3",
+       "b8b5",
+       "g3g6",
+       "f6g6",
+       "g1g6",
+       "g8h7"
+      ]
+     },
+     {
+      "move": "g8g7",
+      "score": -687,
+      "pv": [
+       "g8g7",
+       "a1a7",
+       "d8f6",
+       "b5b6",
+       "e5d4",
+       "a7d7",
+       "h6f4",
+       "h2g2"
+      ]
+     },
+     {
+      "move": "d8d6",
+      "score": -758,
+      "pv": [
+       "d8d6",
+       "d4e5",
+       "d6e5",
+       "h2h1",
+       "g8g7",
+       "a1a7",
+       "b8f8",
+       "b5c6",
+       "e5f6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r4k1/5p2/2p3pb/1P2p2p/3PP2q/1Q5N/1PB2P1K/R5R1 w - - 0 31",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g1g6",
+      "score": 884,
+      "pv": [
+       "g1g6",
+       "h6g7",
+       "h2g2",
+       "e5d4",
+       "a1a7",
+       "b8f8",
+       "b5b6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r4k1/5p2/2p3Rb/1P2p2p/3PP2q/1Q5N/1PB2P1K/R7 b - - 0 31",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "h6g7",
+      "score": -875,
+      "pv": [
+       "h6g7",
+       "a1a7",
+       "b8f8",
+       "h2g2",
+       "e5d4",
+       "b5b6"
+      ]
+     },
+     {
+      "move": "g8f8",
+      "score": -1057,
+      "pv": [
+       "g8f8",
+       "g6h6",
+       "f8g7",
+       "h6c6",
+       "h4h3",
+       "b3h3",
+       "b8f8",
+       "d4e5"
+      ]
+     },
+     {
+      "move": "g8h8",
+      "score": -1129,
+      "pv": [
+       "g8h8",
+       "g6h6",
+       "h8g7",
+       "a1g1",
+       "g7h6",
+       "b3f7",
+       "h4f4",
+       "h3f4"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r4k1/5pb1/2p3R1/1P2p2p/3PP2q/1Q5N/1PB2P1K/R7 w - - 1 32",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "a1g1",
+      "score": 1221,
+      "pv": [
+       "a1g1",
+       "g8h8",
+       "g6g7",
+       "h4f4",
+       "h2h1",
+       "h5h4",
+       "g7f7",
+       "b8a8"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r4k1/5pb1/2p3R1/1P2p2p/3PP2q/1Q5N/1PB2P1K/6R1 b - - 2 32",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "h4g4",
+      "score": -1074,
+      "pv": [
+       "h4g4",
+       "g1g4",
+       "h5g4",
+       "h3g5",
+       "b8b7"
+      ]
+     },
+     {
+      "move": "g8h8",
+      "score": -1115,
+      "pv": [
+       "g8h8",
+       "g6g7",
+       "h4f4",
+       "h2h1",
+       "b8f8",
+       "b5b6",
+       "f4f6"
+      ]
+     },
+     {
+      "move": "h4h3",
+      "score": -1150,
+      "pv": [
+       "h4h3",
+       "h2h3",
+       "g8f8",
+       "g6g2",
+       "b8b7"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r4k1/5pb1/2p3R1/1P2p2p/3PP3/1Q5q/1PB2P1K/6R1 w - - 0 33",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "h2h3",
+      "score": 1155,
+      "pv": [
+       "h2h3",
+       "g8f8",
+       "g6g5",
+       "f8e8",
+       "g5f5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r4k1/5pb1/2p3R1/1P2p2p/3PP3/1Q5K/1PB2P2/6R1 b - - 0 33",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g8f8",
+      "score": -1157,
+      "pv": [
+       "g8f8",
+       "g6g5",
+       "b8b5",
+       "b3a3",
+       "f8e8",
+       "a3a8",
+       "e8e7",
+       "a8c6",
+       "b5b2",
+       "c6c7",
+       "e7f8",
+       "c7c5",
+       "f8e8"
+      ]
+     },
+     {
+      "move": "h5h4",
+      "score": -1270,
+      "pv": [
+       "h5h4",
+       "g6c6",
+       "e5d4",
+       "b5b6"
+      ]
+     },
+     {
+      "move": "b8c8",
+      "score": -1286,
+      "pv": [
+       "b8c8",
+       "b5b6"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r4k1/5pb1/6R1/1p2p2p/3PP3/1Q5K/1PB2P2/6R1 w - - 0 34",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g6g7",
+      "score": 9997,
+      "pv": [
+       "g6g7",
+       "g8h8",
+       "b3f7",
+       "e5d4",
+       "f7h5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r4k1/5pR1/8/1p2p2p/3PP3/1Q5K/1PB2P2/6R1 b - - 0 34",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g8h8",
+      "score": -9998,
+      "pv": [
+       "g8h8",
+       "b3f7",
+       "e5d4",
+       "f7h5"
+      ]
+     },
+     {
+      "move": "g8f8",
+      "score": -9999,
+      "pv": [
+       "g8f8",
+       "b3f7"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r5k/5pR1/8/1p2p2p/3PP3/1Q5K/1PB2P2/6R1 w - - 1 35",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "b3f7",
+      "score": 9998,
+      "pv": [
+       "b3f7",
+       "e5d4",
+       "f7h5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "1r5k/5QR1/8/1p2p2p/3PP3/7K/1PB2P2/6R1 b - - 0 35",
+    "multipv": 3,
+    "depth": 10,
+    "result": [
+     {
+      "move": "b5b4",
+      "score": -9999,
+      "pv": [
+       "b5b4",
+       "f7h5"
+      ]
+     },
+     {
+      "move": "h5h4",
+      "score": -9999,
+      "pv": [
+       "h5h4",
+       "g7h7"
+      ]
+     },
+     {
+      "move": "e5d4",
+      "score": -9999,
+      "pv": [
+       "e5d4",
+       "f7h5"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "analyse",
+    "fen": "7k/5QR1/1r6/1p2p2p/3PP3/7K/1PB2P2/6R1 w - - 1 36",
+    "multipv": 1,
+    "depth": 10,
+    "result": [
+     {
+      "move": "g7h7",
+      "score": 9999,
+      "pv": [
+       "g7h7"
+      ]
+     }
+    ]
+   }
+  ],
+  "weak": [
+   {
+    "op": "play",
+    "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    "movetimeMs": 50,
+    "result": "e2e4"
+   },
+   {
+    "op": "play",
+    "fen": "rnbqkbnr/pppppp1p/6p1/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+    "movetimeMs": 50,
+    "result": "g1f3"
+   },
+   {
+    "op": "play",
+    "fen": "rnbqkbnr/ppp1pp1p/3p2p1/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3",
+    "movetimeMs": 50,
+    "result": "d2d4"
+   },
+   {
+    "op": "play",
+    "fen": "rnbqk1nr/ppp1ppbp/3p2p1/8/3PP3/5N2/PPP2PPP/RNBQKB1R w KQkq - 1 4",
+    "movetimeMs": 50,
+    "result": "b1c3"
+   },
+   {
+    "op": "play",
+    "fen": "rnbqk1nr/1pp1ppbp/3p2p1/p7/3PP3/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 0 5",
+    "movetimeMs": 50,
+    "result": "c1e3"
+   },
+   {
+    "op": "play",
+    "fen": "rn1qk1nr/1pp1ppbp/3p2p1/p7/3PP1b1/2N1BN2/PPP2PPP/R2QKB1R w KQkq - 2 6",
+    "movetimeMs": 50,
+    "result": "f1d3"
+   },
+   {
+    "op": "play",
+    "fen": "rn1qk1nr/1pp2pbp/3pp1p1/p7/3PP1b1/2NBBN2/PPP2PPP/R2QK2R w KQkq - 0 7",
+    "movetimeMs": 50,
+    "result": "h2h3"
+   },
+   {
+    "op": "play",
+    "fen": "rn1qk1nr/1pp2pbp/3pp1p1/p7/3PP3/2NBBb1P/PPP2PP1/R2QK2R w KQkq - 0 8",
+    "movetimeMs": 50,
+    "result": "g2f3"
+   },
+   {
+    "op": "play",
+    "fen": "rn1qk1nr/1pp2pbp/3pp1p1/8/p2PP3/2NBBP1P/PPP2P2/R2QK2R w KQkq - 0 9",
+    "movetimeMs": 50,
+    "result": "d3b5"
+   },
+   {
+    "op": "play",
+    "fen": "rn1qk1nr/1p3pbp/2ppp1p1/1B6/p2PP3/2N1BP1P/PPP2P2/R2QK2R w KQkq - 0 10",
+    "movetimeMs": 50,
+    "result": "b5a4"
+   },
+   {
+    "op": "play",
+    "fen": "r2qk1nr/1p1n1pbp/2ppp1p1/8/B2PP3/2N1BP1P/PPP2P2/R2QK2R w KQkq - 1 11",
+    "movetimeMs": 50,
+    "result": "h3h4"
+   },
+   {
+    "op": "play",
+    "fen": "r2qk1nr/1p1n1pbp/2p1p1p1/3p4/B2PP2P/2N1BP2/PPP2P2/R2QK2R w KQkq - 0 12",
+    "movetimeMs": 50,
+    "result": "a4b3"
+   },
+   {
+    "op": "play",
+    "fen": "r2qk1nr/1p1n1pb1/2p1p1p1/3p3p/3PP2P/1BN1BP2/PPP2P2/R2QK2R w KQkq - 0 13",
+    "movetimeMs": 50,
+    "result": "c3e2"
+   },
+   {
+    "op": "play",
+    "fen": "r3k1nr/1p1n1pb1/1qp1p1p1/3p3p/3PP2P/1B2BP2/PPP1NP2/R2QK2R w KQkq - 2 14",
+    "movetimeMs": 50,
+    "result": "a2a4"
+   },
+   {
+    "op": "play",
+    "fen": "r3k1nr/1p1n1pb1/2p1p1p1/3p3p/Pq1PP2P/1B2BP2/1PP1NP2/R2QK2R w KQkq - 1 15",
+    "movetimeMs": 50,
+    "result": "e1f1"
+   },
+   {
+    "op": "play",
+    "fen": "r3k2r/1p1nnpb1/2p1p1p1/3p3p/Pq1PP2P/1B2BP2/1PP1NP2/R2Q1K1R w kq - 3 16",
+    "movetimeMs": 50,
+    "result": "c2c3"
+   },
+   {
+    "op": "play",
+    "fen": "r3k2r/1p1nnpb1/2p1p1p1/q2p3p/P2PP2P/1BP1BP2/1P2NP2/R2Q1K1R w kq - 1 17",
+    "movetimeMs": 50,
+    "result": "e3g5"
+   },
+   {
+    "op": "play",
+    "fen": "r3k2r/1p1nnpb1/q1p1p1p1/3p2Bp/P2PP2P/1BP2P2/1P2NP2/R2Q1K1R w kq - 3 18",
+    "movetimeMs": 50,
+    "result": "f1g1"
+   },
+   {
+    "op": "play",
+    "fen": "r4nk1/5pb1/q1p1p1p1/1p5p/P2PpN1P/1BP2P2/1P3P2/R2Q2KR w - - 0 22",
+    "movetimeMs": 50,
+    "result": "b3c2"
+   },
+   {
+    "op": "play",
+    "fen": "r4nk1/5p2/q1p1p1pb/1p5p/P2PpN1P/2P2P2/1PB2P2/R2Q2KR w - - 2 23",
+    "movetimeMs": 50,
+    "result": "f4h3"
+   },
+   {
+    "op": "play",
+    "fen": "r4nk1/5p2/q1p3pb/1p2p2p/P2Pp2P/2P2P1N/1PB2P2/R2Q2KR w - - 0 24",
+    "movetimeMs": 50,
+    "result": "f3e4"
+   },
+   {
+    "op": "play",
+    "fen": "r5k1/5p2/q1p1n1pb/1p2p2p/P2PP2P/2P4N/1PB2P2/R2Q2KR w - - 1 25",
+    "movetimeMs": 50,
+    "result": "d1d3"
+   },
+   {
+    "op": "play",
+    "fen": "1r1q2k1/5p2/2p3pb/1P2p2p/3PP2P/3Q3N/1PB2P1K/R5R1 w - - 1 30",
+    "movetimeMs": 50,
+    "result": "d3b3"
+   },
+   {
+    "op": "play",
+    "fen": "1r4k1/5p2/2p3pb/1P2p2p/3PP2q/1Q5N/1PB2P1K/R5R1 w - - 0 31",
+    "movetimeMs": 50,
+    "result": "g1g6"
+   },
+   {
+    "op": "play",
+    "fen": "1r4k1/5pb1/2p3R1/1P2p2p/3PP2q/1Q5N/1PB2P1K/R7 w - - 1 32",
+    "movetimeMs": 50,
+    "result": "a1g1"
+   },
+   {
+    "op": "play",
+    "fen": "1r4k1/5pb1/2p3R1/1P2p2p/3PP3/1Q5q/1PB2P1K/6R1 w - - 0 33",
+    "movetimeMs": 50,
+    "result": "h2h3"
+   },
+   {
+    "op": "play",
+    "fen": "1r4k1/5pb1/6R1/1p2p2p/3PP3/1Q5K/1PB2P2/6R1 w - - 0 34",
+    "movetimeMs": 50,
+    "result": "g6g7"
+   },
+   {
+    "op": "play",
+    "fen": "1r5k/5pR1/8/1p2p2p/3PP3/1Q5K/1PB2P2/6R1 w - - 1 35",
+    "movetimeMs": 50,
+    "result": "b3f7"
+   },
+   {
+    "op": "play",
+    "fen": "7k/5QR1/1r6/1p2p2p/3PP3/7K/1PB2P2/6R1 w - - 1 36",
+    "movetimeMs": 50,
+    "result": "f7f8"
+   }
+  ]
+ },
+ "lessons": [
+  {
+   "id": 1,
+   "ply": 9,
+   "fenBefore": "rnbqk1nr/1pp1ppbp/3p2p1/p7/3PP3/2N1BN2/PPP2PPP/R2QKB1R b KQkq - 1 5",
+   "userMove": "c8g4",
+   "bestMove": "c7c6",
+   "bestScore": -86,
+   "userScore": -160,
+   "feature": "development",
+   "principle": "develop",
+   "kind": "missed_chance",
+   "baseline": -3,
+   "predicted": -2,
+   "bestValue": -1,
+   "triggerAt": -2,
+   "userLine": [
+    "c8g4",
+    "h2h3",
+    "g4f3",
+    "d1f3",
+    "e7e6",
+    "e1c1",
+    "c7c6"
+   ],
+   "bestLine": [
+    "c7c6",
+    "f1d3",
+    "g8f6",
+    "d1d2",
+    "b8d7",
+    "e3h6",
+    "e8g8"
+   ],
+   "userValues": [
+    -2,
+    -2,
+    -2,
+    -2,
+    -2,
+    -2,
+    -2
+   ],
+   "bestValues": [
+    -3,
+    -3,
+    -2,
+    -2,
+    -1,
+    -1,
+    -1
+   ],
+   "divergence": 4,
+   "baselineDetail": "undeveloped: knight on b8, knight on g8, bishop on c8",
+   "userDetail": "undeveloped: knight on b8, knight on g8",
+   "bestDetail": "undeveloped: bishop on c8",
+   "hangingAfter": [],
+   "status": "fixed",
+   "resolvedPly": 14,
+   "triggerText": "",
+   "deferred": false,
+   "chanceMove": "g4f3",
+   "label": "5... Bg4",
+   "facts": {
+    "move_number": 5,
+    "player_colour": "black",
+    "you_played": "Bg4",
+    "better_was": "c6",
+    "your_line": "5...Bg4 6. h3 Bxf3 7. Qxf3 e6 8. O-O-O c6",
+    "better_line": "5...c6 6. Bd3 Nf6 7. Qd2 Nbd7 8. Bh6 O-O",
+    "evaluation_cost_in_pawns": 0.7,
+    "lesson_type": "a better opportunity was missed",
+    "what_happened_in_the_game": "",
+    "key_factor": "development",
+    "before_your_move": "undeveloped: knight on b8, knight on g8, bishop on c8",
+    "end_of_your_line": "undeveloped: knight on b8, knight on g8",
+    "end_of_better_line": "undeveloped: bishop on c8",
+    "lines_diverge_after_ply": 5,
+    "pieces_left_undefended_by_your_move": [],
+    "principle": {
+     "title": "Develop your knights and bishops first",
+     "explanation": "In the opening, get your minor pieces off the back rank before starting an attack. Undeveloped pieces can't help."
+    }
+   },
+   "hints": [
+    "It was a bishop move.",
+    "Look at move 5, when you played Bg4."
+   ],
+   "template": "On move 5 you played Bg4. c6 was better.\n\n  What you played:  5...Bg4 6. h3 Bxf3 7. Qxf3 e6 8. O-O-O c6\n  What was better:  5...c6 6. Bd3 Nf6 7. Qd2 Nbd7 8. Bh6 O-O\n\nYour move wasn't a disaster, but c6 would have improved development.\nAfter the better line: undeveloped: bishop on c8. After yours: undeveloped: knight on b8, knight on g8.\n\nPrinciple: Develop your knights and bishops first. In the opening, get your minor pieces off the back rank before starting an attack. Undeveloped pieces can't help.",
+   "recentUserMoves": [
+    "5... Bg4",
+    "6... e6",
+    "7... Bxf3",
+    "8... a4",
+    "9... c6",
+    "10... Nd7",
+    "11... d5",
+    "12... h5",
+    "13... Qb6",
+    "14... Qb4+",
+    "15... Ne7",
+    "16... Qa5",
+    "17... Qa6",
+    "18... b5",
+    "19... O-O",
+    "20... dxe4",
+    "21... Nxf8",
+    "22... Bh6",
+    "23... e5",
+    "24... Ne6",
+    "25... Nxd4",
+    "26... Qc8",
+    "27... Qe8",
+    "28... Qd8",
+    "29... Rb8",
+    "30... Qxh4",
+    "31... Bg7",
+    "32... Qxh3+",
+    "33... cxb5",
+    "34... Kh8",
+    "35... Rb6"
+   ]
+  },
+  {
+   "id": 2,
+   "ply": 27,
+   "fenBefore": "r3k1nr/1p1n1pb1/1qp1p1p1/3p3p/P2PP2P/1B2BP2/1PP1NP2/R2QK2R b KQkq - 0 14",
+   "userMove": "b6b4",
+   "bestMove": "g8e7",
+   "bestScore": -86,
+   "userScore": -163,
+   "feature": "their_pawns",
+   "principle": "target_weaknesses",
+   "kind": "missed_chance",
+   "baseline": 2,
+   "predicted": 2,
+   "bestValue": 4,
+   "triggerAt": 2,
+   "userLine": [
+    "b6b4",
+    "c2c3",
+    "b4e7",
+    "e1f1",
+    "g7h6",
+    "d1d2",
+    "e7d6"
+   ],
+   "bestLine": [
+    "g8e7",
+    "e1f1",
+    "e8g8",
+    "f1g2",
+    "c6c5",
+    "e4d5",
+    "e6d5"
+   ],
+   "userValues": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+   ],
+   "bestValues": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    5,
+    4
+   ],
+   "divergence": 5,
+   "baselineDetail": "opponent's pawns: isolated pawn(s) on h4; doubled pawns on the f-file",
+   "userDetail": "opponent's pawns: isolated pawn(s) on h4; doubled pawns on the f-file",
+   "bestDetail": "opponent's pawns: isolated pawn(s) on f2, f3, h4; doubled pawns on the f-file",
+   "hangingAfter": [],
+   "status": "triggered",
+   "resolvedPly": 29,
+   "triggerText": "The chance has gone.",
+   "deferred": false,
+   "chanceMove": null,
+   "label": "14... Qb4+",
+   "facts": {
+    "move_number": 14,
+    "player_colour": "black",
+    "you_played": "Qb4+",
+    "better_was": "Ne7",
+    "your_line": "14...Qb4+ 15. c3 Qe7 16. Kf1 Bh6 17. Qd2 Qd6",
+    "better_line": "14...Ne7 15. Kf1 O-O 16. Kg2 c5 17. exd5 exd5",
+    "evaluation_cost_in_pawns": 0.8,
+    "lesson_type": "a better opportunity was missed",
+    "what_happened_in_the_game": "The chance has gone.",
+    "key_factor": "your opponent's pawn weaknesses",
+    "before_your_move": "opponent's pawns: isolated pawn(s) on h4; doubled pawns on the f-file",
+    "end_of_your_line": "opponent's pawns: isolated pawn(s) on h4; doubled pawns on the f-file",
+    "end_of_better_line": "opponent's pawns: isolated pawn(s) on f2, f3, h4; doubled pawns on the f-file",
+    "lines_diverge_after_ply": 6,
+    "pieces_left_undefended_by_your_move": [],
+    "principle": {
+     "title": "Create and attack weaknesses",
+     "explanation": "If you can force your opponent into isolated, doubled or backward pawns, they become long-term targets."
+    }
+   },
+   "hints": [
+    "It was a queen move.",
+    "Look at move 14, when you played Qb4+."
+   ],
+   "template": "On move 14 you played Qb4+. Ne7 was better.\n\n  What you played:  14...Qb4+ 15. c3 Qe7 16. Kf1 Bh6 17. Qd2 Qd6\n  What was better:  14...Ne7 15. Kf1 O-O 16. Kg2 c5 17. exd5 exd5\n\nYour move wasn't a disaster, but Ne7 would have improved your opponent's pawn weaknesses.\nAfter the better line: opponent's pawns: isolated pawn(s) on f2, f3, h4; doubled pawns on the f-file. After yours: opponent's pawns: isolated pawn(s) on h4; doubled pawns on the f-file.\n\nPrinciple: Create and attack weaknesses. If you can force your opponent into isolated, doubled or backward pawns, they become long-term targets.",
+   "recentUserMoves": [
+    "14... Qb4+",
+    "15... Ne7",
+    "16... Qa5",
+    "17... Qa6",
+    "18... b5",
+    "19... O-O",
+    "20... dxe4",
+    "21... Nxf8",
+    "22... Bh6",
+    "23... e5",
+    "24... Ne6",
+    "25... Nxd4",
+    "26... Qc8",
+    "27... Qe8",
+    "28... Qd8",
+    "29... Rb8",
+    "30... Qxh4",
+    "31... Bg7",
+    "32... Qxh3+",
+    "33... cxb5",
+    "34... Kh8",
+    "35... Rb6"
+   ]
+  },
+  {
+   "id": 3,
+   "ply": 35,
+   "fenBefore": "r3k2r/1p1nnpb1/q1p1p1p1/3p2Bp/P2PP2P/1BP2P2/1P2NP2/R2Q2KR b kq - 4 18",
+   "userMove": "b7b5",
+   "bestMove": "g7f6",
+   "bestScore": -141,
+   "userScore": -217,
+   "feature": "material",
+   "principle": "safety",
+   "kind": "consequence",
+   "baseline": -1,
+   "predicted": -2,
+   "bestValue": -1,
+   "triggerAt": -1.75,
+   "userLine": [
+    "b7b5",
+    "g1g2",
+    "d7b6",
+    "a4b5"
+   ],
+   "bestLine": [
+    "g7f6",
+    "g1g2",
+    "e8g8",
+    "b3c2"
+   ],
+   "userValues": [
+    -1,
+    -1,
+    -1,
+    -2
+   ],
+   "bestValues": [
+    -1,
+    -1,
+    -1,
+    -1
+   ],
+   "divergence": 3,
+   "baselineDetail": "material balance -1",
+   "userDetail": "material balance -2",
+   "bestDetail": "material balance -1",
+   "hangingAfter": [],
+   "status": "superseded",
+   "resolvedPly": 38,
+   "triggerText": "",
+   "deferred": false,
+   "chanceMove": null,
+   "label": "18... b5",
+   "facts": {
+    "move_number": 18,
+    "player_colour": "black",
+    "you_played": "b5",
+    "better_was": "Bf6",
+    "your_line": "18...b5 19. Kg2 Nb6 20. axb5",
+    "better_line": "18...Bf6 19. Kg2 O-O 20. Bc2",
+    "evaluation_cost_in_pawns": 0.8,
+    "lesson_type": "something went wrong because of this move",
+    "what_happened_in_the_game": "",
+    "key_factor": "material",
+    "before_your_move": "material balance -1",
+    "end_of_your_line": "material balance -2",
+    "end_of_better_line": "material balance -1",
+    "lines_diverge_after_ply": 4,
+    "pieces_left_undefended_by_your_move": [],
+    "principle": {
+     "title": "Check checks, captures and threats",
+     "explanation": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?"
+    }
+   },
+   "hints": [
+    "It was a pawn move.",
+    "Look at move 18, when you played b5."
+   ],
+   "template": "On move 18 you played b5. Bf6 was better.\n\n  What you played:  18...b5 19. Kg2 Nb6 20. axb5\n  What was better:  18...Bf6 19. Kg2 O-O 20. Bc2\n\nThe difference is material. Before your move: material balance -1.\nAfter your line: material balance -2. After the better line: material balance -1.\n\nPrinciple: Check checks, captures and threats. Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+   "recentUserMoves": [
+    "18... b5",
+    "19... O-O",
+    "20... dxe4",
+    "21... Nxf8",
+    "22... Bh6",
+    "23... e5",
+    "24... Ne6",
+    "25... Nxd4",
+    "26... Qc8",
+    "27... Qe8",
+    "28... Qd8",
+    "29... Rb8",
+    "30... Qxh4",
+    "31... Bg7",
+    "32... Qxh3+",
+    "33... cxb5",
+    "34... Kh8",
+    "35... Rb6"
+   ]
+  },
+  {
+   "id": 4,
+   "ply": 37,
+   "fenBefore": "r3k2r/3nnpb1/q1p1p1p1/1p1p2Bp/P2PPN1P/1BP2P2/1P3P2/R2Q2KR b kq - 1 19",
+   "userMove": "e8g8",
+   "bestMove": "d7b6",
+   "bestScore": -149,
+   "userScore": -367,
+   "feature": "material",
+   "principle": "hanging",
+   "kind": "consequence",
+   "baseline": -1,
+   "predicted": -4,
+   "bestValue": 0,
+   "triggerAt": -3.25,
+   "userLine": [
+    "e8g8",
+    "g5e7",
+    "f8e8",
+    "e7d6",
+    "b5a4",
+    "a1a4"
+   ],
+   "bestLine": [
+    "d7b6",
+    "a4a5",
+    "b6c4",
+    "f4d3",
+    "c4a5",
+    "b3c2"
+   ],
+   "userValues": [
+    -4,
+    -4,
+    -4,
+    -4,
+    -4,
+    -4
+   ],
+   "bestValues": [
+    -1,
+    -1,
+    -1,
+    -1,
+    0,
+    0
+   ],
+   "divergence": 0,
+   "baselineDetail": "material balance -1",
+   "userDetail": "material balance -4",
+   "bestDetail": "material balance +0",
+   "hangingAfter": [
+    "e7"
+   ],
+   "status": "triggered",
+   "resolvedPly": 39,
+   "triggerText": "You've lost a knight: you're 3 pawns worse off than before.",
+   "deferred": false,
+   "chanceMove": null,
+   "label": "19... O-O",
+   "facts": {
+    "move_number": 19,
+    "player_colour": "black",
+    "you_played": "O-O",
+    "better_was": "Nb6",
+    "your_line": "19...O-O 20. Bxe7 Rfe8 21. Bd6 bxa4 22. Rxa4",
+    "better_line": "19...Nb6 20. a5 Nc4 21. Nd3 Nxa5 22. Bc2",
+    "evaluation_cost_in_pawns": 2.2,
+    "lesson_type": "something went wrong because of this move",
+    "what_happened_in_the_game": "You've lost a knight: you're 3 pawns worse off than before.",
+    "key_factor": "material",
+    "before_your_move": "material balance -1",
+    "end_of_your_line": "material balance -4",
+    "end_of_better_line": "material balance +0",
+    "lines_diverge_after_ply": 1,
+    "pieces_left_undefended_by_your_move": [
+     "knight on e7"
+    ],
+    "principle": {
+     "title": "Don't leave pieces undefended",
+     "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+    }
+   },
+   "hints": [
+    "It was when you castled.",
+    "Look at move 19, when you played O-O."
+   ],
+   "template": "On move 19 you played O-O. Nb6 was better.\n\n  What you played:  19...O-O 20. Bxe7 Rfe8 21. Bd6 bxa4 22. Rxa4\n  What was better:  19...Nb6 20. a5 Nc4 21. Nd3 Nxa5 22. Bc2\n\nThe difference is material. Before your move: material balance -1.\nAfter your line: material balance -4. After the better line: material balance +0.\nYour move left this undefended: knight on e7.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+   "recentUserMoves": [
+    "19... O-O",
+    "20... dxe4",
+    "21... Nxf8",
+    "22... Bh6",
+    "23... e5",
+    "24... Ne6",
+    "25... Nxd4",
+    "26... Qc8",
+    "27... Qe8",
+    "28... Qd8",
+    "29... Rb8",
+    "30... Qxh4",
+    "31... Bg7",
+    "32... Qxh3+",
+    "33... cxb5",
+    "34... Kh8",
+    "35... Rb6"
+   ]
+  },
+  {
+   "id": 5,
+   "ply": 39,
+   "fenBefore": "r4rk1/3nBpb1/q1p1p1p1/1p1p3p/P2PPN1P/1BP2P2/1P3P2/R2Q2KR b - - 0 20",
+   "userMove": "d5e4",
+   "bestMove": "f8e8",
+   "bestScore": -380,
+   "userScore": -546,
+   "feature": "material",
+   "principle": "hanging",
+   "kind": "consequence",
+   "baseline": -4,
+   "predicted": -6,
+   "bestValue": -4,
+   "triggerAt": -5.5,
+   "userLine": [
+    "d5e4",
+    "e7f8",
+    "g7f8",
+    "f3e4",
+    "c6c5",
+    "h1h3",
+    "c5d4"
+   ],
+   "bestLine": [
+    "f8e8",
+    "e7d6",
+    "e6e5",
+    "d4e5",
+    "d7e5",
+    "d6e5",
+    "g7e5"
+   ],
+   "userValues": [
+    -5,
+    -6,
+    -6,
+    -6,
+    -6,
+    -6,
+    -6
+   ],
+   "bestValues": [
+    -4,
+    -4,
+    -4,
+    -5,
+    -4,
+    -4,
+    -4
+   ],
+   "divergence": 0,
+   "baselineDetail": "material balance -4",
+   "userDetail": "material balance -6",
+   "bestDetail": "material balance -4",
+   "hangingAfter": [
+    "f8",
+    "e4"
+   ],
+   "status": "triggered",
+   "resolvedPly": 41,
+   "triggerText": "Since that move you've lost a rook and taken a pawn: overall you're 4 pawns down.",
+   "deferred": false,
+   "chanceMove": null,
+   "label": "20... dxe4",
+   "facts": {
+    "move_number": 20,
+    "player_colour": "black",
+    "you_played": "dxe4",
+    "better_was": "Rfe8",
+    "your_line": "20...dxe4 21. Bxf8 Bxf8 22. fxe4 c5 23. Rh3 cxd4",
+    "better_line": "20...Rfe8 21. Bd6 e5 22. dxe5 Nxe5 23. Bxe5 Bxe5",
+    "evaluation_cost_in_pawns": 1.7,
+    "lesson_type": "something went wrong because of this move",
+    "what_happened_in_the_game": "Since that move you've lost a rook and taken a pawn: overall you're 4 pawns down.",
+    "key_factor": "material",
+    "before_your_move": "material balance -4",
+    "end_of_your_line": "material balance -6",
+    "end_of_better_line": "material balance -4",
+    "lines_diverge_after_ply": 1,
+    "pieces_left_undefended_by_your_move": [
+     "rook on f8",
+     "the piece you moved, now on e4"
+    ],
+    "principle": {
+     "title": "Don't leave pieces undefended",
+     "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+    }
+   },
+   "hints": [
+    "It was a pawn move.",
+    "Look at move 20, when you played dxe4."
+   ],
+   "template": "On move 20 you played dxe4. Rfe8 was better.\n\n  What you played:  20...dxe4 21. Bxf8 Bxf8 22. fxe4 c5 23. Rh3 cxd4\n  What was better:  20...Rfe8 21. Bd6 e5 22. dxe5 Nxe5 23. Bxe5 Bxe5\n\nThe difference is material. Before your move: material balance -4.\nAfter your line: material balance -6. After the better line: material balance -4.\nYour move left this undefended: rook on f8, the piece you moved, now on e4.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+   "recentUserMoves": [
+    "20... dxe4",
+    "21... Nxf8",
+    "22... Bh6",
+    "23... e5",
+    "24... Ne6",
+    "25... Nxd4",
+    "26... Qc8",
+    "27... Qe8",
+    "28... Qd8",
+    "29... Rb8",
+    "30... Qxh4",
+    "31... Bg7",
+    "32... Qxh3+",
+    "33... cxb5",
+    "34... Kh8",
+    "35... Rb6"
+   ]
+  },
+  {
+   "id": 6,
+   "ply": 49,
+   "fenBefore": "r5k1/5p2/q1p1n1pb/1p2p2p/P2PP2P/2PQ3N/1PB2P2/R5KR b - - 2 25",
+   "userMove": "e6d4",
+   "bestMove": "e5d4",
+   "bestScore": -421,
+   "userScore": -573,
+   "feature": "material",
+   "principle": "hanging",
+   "kind": "consequence",
+   "baseline": -6,
+   "predicted": -9,
+   "bestValue": -6,
+   "triggerAt": -8.25,
+   "userLine": [
+    "e6d4",
+    "c3d4",
+    "c6c5",
+    "g1h2",
+    "a8d8"
+   ],
+   "bestLine": [
+    "e5d4",
+    "a1d1",
+    "c6c5",
+    "a4b5",
+    "a6b7"
+   ],
+   "userValues": [
+    -7,
+    -8,
+    -8,
+    -8,
+    -9
+   ],
+   "bestValues": [
+    -5,
+    -5,
+    -6,
+    -6,
+    -6
+   ],
+   "divergence": 0,
+   "baselineDetail": "material balance -6",
+   "userDetail": "material balance -9",
+   "bestDetail": "material balance -6",
+   "hangingAfter": [
+    "d4"
+   ],
+   "status": "triggered",
+   "resolvedPly": 57,
+   "triggerText": "Since that move you've lost a knight, a pawn and taken a pawn: overall you're 3 pawns down.",
+   "deferred": false,
+   "chanceMove": null,
+   "label": "25... Nxd4",
+   "facts": {
+    "move_number": 25,
+    "player_colour": "black",
+    "you_played": "Nxd4",
+    "better_was": "exd4",
+    "your_line": "25...Nxd4 26. cxd4 c5 27. Kh2 Rd8",
+    "better_line": "25...exd4 26. Rd1 c5 27. axb5 Qb7",
+    "evaluation_cost_in_pawns": 1.5,
+    "lesson_type": "something went wrong because of this move",
+    "what_happened_in_the_game": "Since that move you've lost a knight, a pawn and taken a pawn: overall you're 3 pawns down.",
+    "key_factor": "material",
+    "before_your_move": "material balance -6",
+    "end_of_your_line": "material balance -9",
+    "end_of_better_line": "material balance -6",
+    "lines_diverge_after_ply": 1,
+    "pieces_left_undefended_by_your_move": [
+     "the piece you moved, now on d4"
+    ],
+    "principle": {
+     "title": "Don't leave pieces undefended",
+     "explanation": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else."
+    }
+   },
+   "hints": [
+    "It was a knight move.",
+    "Look at move 25, when you played Nxd4."
+   ],
+   "template": "On move 25 you played Nxd4. exd4 was better.\n\n  What you played:  25...Nxd4 26. cxd4 c5 27. Kh2 Rd8\n  What was better:  25...exd4 26. Rd1 c5 27. axb5 Qb7\n\nThe difference is material. Before your move: material balance -6.\nAfter your line: material balance -9. After the better line: material balance -6.\nYour move left this undefended: the piece you moved, now on d4.\n\nPrinciple: Don't leave pieces undefended. Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+   "recentUserMoves": [
+    "25... Nxd4",
+    "26... Qc8",
+    "27... Qe8",
+    "28... Qd8",
+    "29... Rb8",
+    "30... Qxh4",
+    "31... Bg7",
+    "32... Qxh3+",
+    "33... cxb5",
+    "34... Kh8",
+    "35... Rb6"
+   ]
+  }
+ ],
+ "finalFen": "5Q1k/6R1/1r6/1p2p2p/3PP3/7K/1PB2P2/6R1 b - - 2 36"
+}

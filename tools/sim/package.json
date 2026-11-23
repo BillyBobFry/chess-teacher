@@ -1,0 +1,15 @@
+{
+  "name": "@chess-teacher/sim",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "sim": "tsx src/simulate.ts"
+  },
+  "dependencies": {
+    "@chess-teacher/core": "workspace:*",
+    "@chess-teacher/engine": "workspace:*",
+    "chess.js": "1.4.0"
+  }
+}

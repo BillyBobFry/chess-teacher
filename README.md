@@ -1,69 +1,47 @@
 # Chess Teacher
 
 An app that teaches chess strategy by letting your mistakes come back to bite you, then
-helping you work out which move caused it. See [`docs/concept.md`](docs/concept.md) for
-the product concept.
+helping you work out which move caused it.
 
-This repository currently contains **Prototype 1**: a command-line version that tests
-the riskiest idea, namely that we can detect a mistake, predict its consequence as a
-checkable condition, have the opponent deliberately exploit it, and reveal the lesson
-when the consequence actually lands.
+- Product concept: [`docs/concept.md`](docs/concept.md)
+- Architecture and decisions: [`docs/architecture.md`](docs/architecture.md)
+
+**Status:** Milestone 1 done. The teaching core is in TypeScript and proven to behave
+identically to the original Python prototype. No UI yet; that's Milestone 2.
+
+## Layout
+
+| Path | What |
+|---|---|
+| `packages/core` | The teaching logic, in pure TypeScript (runs in the browser, Node and React Native): strategic features, lesson detection, triggers, the teaching opponent, explanations, and the game session as serialisable state. |
+| `packages/engine` | Engine adapters: UCI protocol parser, a replay engine for tests, and a Node adapter for a Stockfish process (`@chess-teacher/engine/node`). |
+| `tools/sim` | Simulation harness, parity tests against the Python prototype, profiling. |
+| `prototype` | The original Python prototype, benchmarks and research tools. Kept as the reference implementation for now. |
 
 ## Setup
 
-Needs Python 3.10+ and [Stockfish](https://stockfishchess.org/).
+Needs Node 22+, pnpm, and [Stockfish](https://stockfishchess.org/) (`apt install stockfish`,
+`brew install stockfish`, or set `STOCKFISH_PATH`).
 
 ```bash
-# Stockfish: apt install stockfish   |   brew install stockfish
-# (or set STOCKFISH_PATH to the binary)
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+pnpm install
+pnpm check      # typecheck + lint + tests
+pnpm sim -- --games 12 --compare --out ../../reports   # simulated games with real Stockfish
 ```
 
-## Play
+## Tests
+
+- **Feature parity:** all 11 strategic features measured on 268 positions (both colours)
+  must exactly match the Python prototype.
+- **Game parity:** 8 recorded games are replayed through the TypeScript core using the
+  Python prototype's recorded engine output. Opponent moves, every event at every step,
+  and every lesson (facts, explanation text, hints) must match exactly.
+- **Resume:** the same games, saving and reloading the session state as JSON after every
+  step, must produce identical results.
+- Unit tests for the UCI parser, the Stockfish adapter, rewind, and edge cases.
+
+To re-record the fixtures (needs the Python prototype set up, see `prototype/README.md`):
 
 ```bash
-.venv/bin/python play.py                 # play white against the teaching opponent
-.venv/bin/python play.py --color black
-.venv/bin/python play.py --easy          # warns when the opponent has spotted a weakness
-.venv/bin/python play.py --no-level-up   # opponent never exploits on purpose (test mode)
-.venv/bin/python play.py -v              # show when the opponent levels up, and lesson details
-.venv/bin/python play.py --llm           # explanations written by Claude (needs ANTHROPIC_API_KEY)
+prototype/.venv/bin/python prototype/record_fixtures.py --games 8 --out tools/sim/fixtures
 ```
-
-Enter moves as `Nf3`, `exd5`, `O-O` or `g1f3`. Type `moves` to list legal moves,
-`board` to redraw, `quit` to stop (you still get the post-game review).
-
-## Simulate
-
-Runs a weak engine "student" against the teaching opponent, with no human in the loop,
-and reports how lessons behave:
-
-```bash
-.venv/bin/python simulate.py --games 12 --compare
-```
-
-Writes `reports/simulation.md` (summary + sample explanations to judge by eye) and
-`reports/simulation.json`. `--compare` also runs a control where the opponent never
-levels up.
-
-## How it works
-
-| Module | Role |
-|---|---|
-| `teacher/engine.py` | Stockfish wrapper (python-chess) |
-| `teacher/features.py` | Strategic factors measured in code: material (after exchanges settle), development, king safety, centre, activity, pawn structure, passed pawns, outposts, open files, endgame king activity |
-| `teacher/principles.py` | The fixed curriculum; every lesson maps to one principle |
-| `teacher/lessons.py` | Mistake detection: compares the two futures, picks the factor that explains the gap, turns it into a checkable trigger condition |
-| `teacher/opponent.py` | The teaching opponent: weakened Stockfish normally; when a lesson is pending, picks from the strong engine's top moves the one that most directly cashes in the lesson |
-| `teacher/session.py` | Game flow: pending lessons, triggers, fixes, expiry, supersession, rewind |
-| `teacher/explain.py` | Template explanations, plus optional Claude explanations from the facts only, with a guardrail that rejects any mentioned square not in the facts |
-| `play.py` / `simulate.py` | Interactive CLI / simulation harness |
-
-## Known limitations
-
-- The normal-mode opponent is Stockfish at a low skill level, standing in for Maia.
-- The simulated student is also an engine, so its mistakes aren't quite human mistakes.
-- Strategic explanations are right roughly half the time when judged by eye; see
-  "Prototype 1 findings" in the concept doc.
-- The LLM path is implemented but hasn't yet been run against the live API.

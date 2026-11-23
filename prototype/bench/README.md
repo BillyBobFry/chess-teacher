@@ -1,7 +1,7 @@
 # Benchmarks
 
 Cost and speed measurements to inform hosting and pricing. They use the Python
-prototype, which does the same work per move as the planned TypeScript app.
+prototype, which does the same work per move as the TypeScript core. Run commands from `prototype/`.
 
 ## Engine (`engine_bench.py`)
 

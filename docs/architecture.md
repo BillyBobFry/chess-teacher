@@ -1,6 +1,6 @@
 # Chess Teacher — Architecture
 
-Status: **draft for review** (Milestone 1). Records the decisions made so far, why they
+Status: **agreed** (Milestone 1 complete). Records the decisions made so far, why they
 were made, and what is still open. The product concept is in [`concept.md`](concept.md);
 the measurements behind several decisions are in [`../bench/README.md`](../bench/README.md).
 
@@ -73,7 +73,7 @@ tools/
 apps/
   web/       Next.js app: game UI + API route handlers.                  [MS2–MS3]
   mobile/    Expo app.                                                   [later]
-prototype/   The Python prototype, kept until parity is proven, then removed.
+prototype/   The Python prototype: the reference for parity tests, removed when no longer needed.
 ```
 
 Rule enforced by lint: **`packages/core` may not import Node built-ins, DOM APIs or
@@ -215,26 +215,34 @@ code talks to the engine only over the UCI text protocol, which is generally con
 separate from it, but the App Store's terms and the GPL have a contentious history. chess.js
 is BSD-2-Clause.
 
-## 11. Milestone 1 plan
+## 11. Milestone 1 (done)
 
 1. This document.
-2. Monorepo scaffold: pnpm workspaces, TypeScript (strict), Vitest, ESLint (with the
-   `core` import rule), Prettier.
-3. `packages/engine`: interface, UCI parser, Node process adapter.
-4. `packages/core`: port features, principles, lesson detection, triggers, opponent policy
-   and session from the Python prototype.
-5. **Parity tests.** Engine output varies run to run, so parity is tested on *recorded*
-   engine output: the Python prototype records every analysis it receives plus the lessons
-   it produces; the TypeScript core replays the same analyses through a recording engine
-   adapter and must produce the same lessons and events.
-6. `tools/sim`: the simulation harness in TypeScript, with the same report as the Python one.
-7. When parity holds, move the Python prototype to `prototype/` (and later delete it).
+2. Monorepo scaffold: pnpm workspaces, TypeScript 6 (strict), Vitest, ESLint (with the
+   `core` platform-independence rule), Prettier.
+3. `packages/engine`: UCI parser, replay engine for tests, Node process adapter.
+4. `packages/core`: features, principles, lesson detection, triggers, teaching opponent,
+   explanations and the session state machine, ported from the Python prototype.
+5. **Parity tests** on recorded engine output: 268 positions × 11 features, and 8 whole
+   games (moves, events at every step, lessons, facts and explanation text) match the
+   Python prototype exactly, both straight through and with the state saved and reloaded
+   as JSON after every step. A deliberate one-constant change makes all of them fail.
+6. `tools/sim`: the simulation harness in TypeScript against real Stockfish. First run
+   (6 games per configuration): 90% of predicted consequences landed with the teaching
+   opponent vs 61% without, consistent with the Python results; ~64 ms per user move
+   including the engine at depth 10 (native Stockfish).
+7. The Python prototype moved to `prototype/`.
 
-Out of scope for MS1: any UI, the server, auth, the database, LLM calls.
+Performance note: the teaching code itself costs a few milliseconds per move. The one hot
+spot (resolving exchanges for the material count) was rewritten from chess.js move
+generation to a dedicated capture generator: 20.7 → 0.3 ms per position.
+
+Known gaps carried forward: no checkmate or endgame king-activity *lessons* occur in the
+recorded games (those features are still covered by the per-position parity test).
 
 ## 12. Open questions
 
-1. **Engine on the device (D2)**: confirm. It's the decision that most shapes the rest.
+1. ~~Engine on the device (D2)~~: confirmed.
 2. Next.js vs Vite SPA + Vercel functions (D8): confirm in MS2.
 3. Auth provider: MS3.
 4. LLM model and price points: after the LLM benchmark runs.
