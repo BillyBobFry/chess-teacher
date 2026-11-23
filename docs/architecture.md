@@ -28,7 +28,7 @@ the measurements behind several decisions are in [`../bench/README.md`](../bench
 | D5 | **Explanations are generated in the background, before the reveal** | A lesson is created several moves before it is revealed, so the LLM explanation can be generated while the game continues. The template is shown if it isn't ready. |
 | D6 | **Per-user explanation quotas** | The server can't verify the device's engine analysis, so LLM spend is bounded per user instead. Free and paid tiers become different quotas. |
 | D7 | **Neon Postgres + Drizzle ORM** | Already in use; serverless driver works from Vercel functions; Drizzle gives typed queries and migrations in TypeScript. |
-| D8 | **Next.js on Vercel for the web app and API** *(confirm in MS2)* | One deploy for the UI and the API route handlers; mature auth options. The game screen is a client component, so it would port to React Native as well as a Vite app would. |
+| D8 | **A Vite + React single-page app, with a Hono API on Vercel Functions** | The game runs entirely on the device, so server rendering would add complexity without helping the core screen. A static SPA keeps offline (service worker) and React Native reuse simple. The API is written with Hono, which is independent of the web framework, so the API that mobile apps depend on isn't tied to it. Server-rendered public pages are handled separately (see §7.1). |
 | D9 | **API schemas defined once with Zod** | Types for every TypeScript client come from the schemas; OpenAPI is generated from them for any future Swift/Kotlin app. |
 | D10 | **Game sessions are plain, serialisable state, saved after every move** | The engine is stateless (position in, analysis out), so everything needed to continue a game is the session state: moves, pending lessons with their trigger conditions, resolved lessons and settings. Saved to the server after each move, any game can be resumed later on any device by loading the state and starting a fresh engine (~0.15 s). |
 
@@ -45,7 +45,7 @@ the measurements behind several decisions are in [`../bench/README.md`](../bench
                                        │ HTTPS (typed client, schemas from packages/api)
                                        ▼
  ┌──────────────────────────── Vercel ─────────────────────────────┐      ┌──────────────┐
- │  Next.js route handlers                                         │      │  Claude API  │
+ │  Hono API on Vercel Functions                                   │      │  Claude API  │
  │   auth · save moves & lessons · request explanation · quotas    │ ───► │              │
  │   validates games with the same core package (no engine)        │      └──────────────┘
  └────────────────────────────────┬────────────────────────────────┘
@@ -71,7 +71,9 @@ packages/
 tools/
   sim/       Simulation harness, parity tests against the Python prototype, benchmarks.
 apps/
-  web/       Next.js app: game UI + API route handlers.                  [MS2–MS3]
+  web/       Vite + React SPA: the game UI.                              [MS2]
+  api/       (in apps/web or alongside) Hono API on Vercel Functions.    [MS3]
+  site/      Marketing site (Astro), if and when marketing outgrows one page. [later]
   mobile/    Expo app.                                                   [later]
 prototype/   The Python prototype: the reference for parity tests, removed when no longer needed.
 ```
@@ -148,7 +150,7 @@ Porting notes from the Python prototype:
 
 ## 7. The server
 
-Next.js route handlers on Vercel, Neon Postgres via Drizzle. Endpoint sketch (finalised in MS3):
+A Hono API on Vercel Functions, Neon Postgres via Drizzle. Endpoint sketch (finalised in MS3):
 
 ```
 POST /api/games                       start a game (colour, difficulty)
@@ -186,6 +188,22 @@ work better, which thresholds feel nitpicky).
 
 **Auth:** decided in MS3. Candidates: Better Auth or Auth.js (self-hosted on Neon), or
 Clerk (hosted). Email magic link plus Google sign-in to start.
+
+### 7.1 Hosting layout
+
+One Vercel project, one domain, so sign-in uses a first-party session cookie with no
+cross-origin setup:
+
+```
+example.com/          static landing / pricing pages (prerendered HTML, search-friendly)  [MS3+]
+example.com/app/...   the SPA: sign-in screen, games, progress
+example.com/api/...   the Hono API
+```
+
+Visiting `/app` signed out redirects to `/app/sign-in`; the marketing pages' "Sign in" and
+"Start learning" buttons link there. Mobile apps call the same API with token-based
+sessions. If marketing grows (blog, SEO content), an Astro site can take over `/` through
+Vercel rewrites, or move the app to `app.example.com`; neither changes the app or the API.
 
 ## 8. LLM explanations
 
@@ -243,7 +261,7 @@ recorded games (those features are still covered by the per-position parity test
 ## 12. Open questions
 
 1. ~~Engine on the device (D2)~~: confirmed.
-2. Next.js vs Vite SPA + Vercel functions (D8): confirm in MS2.
+2. ~~Next.js vs Vite SPA + Vercel functions (D8)~~: SPA + Hono.
 3. Auth provider: MS3.
 4. LLM model and price points: after the LLM benchmark runs.
 5. Licensing advice before any paid launch.
