@@ -1,0 +1,20 @@
+{
+  "name": "@chess-teacher/lesson-text",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "i18n": "paraglide-js compile --project ../../apps/web/project.inlang --outdir ./src/paraglide --strategy baseLocale --silent",
+    "i18n:watch": "paraglide-js compile --project ../../apps/web/project.inlang --outdir ./src/paraglide --strategy baseLocale --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@chess-teacher/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@inlang/paraglide-js": "3.2.1"
+  }
+}

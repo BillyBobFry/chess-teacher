@@ -8,5 +8,6 @@ apps/web/public/stockfish11/
 apps/api/.data/
 apps/api/drizzle/
 apps/web/src/paraglide/
+packages/lesson-text/src/paraglide/
 # Vendored from modern-web-guidance; keep byte-identical so updates diff cleanly
 .claude/skills/modern-web-guidance/
