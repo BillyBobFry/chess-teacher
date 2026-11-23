@@ -28,10 +28,12 @@ Needs Node 22+ and pnpm (`corepack enable pnpm`). No database or API keys needed
 
 ```bash
 pnpm install
-pnpm dev          # API on :8787, web on http://localhost:5173/app/ (proxies /api)
+pnpm dev          # API + web; open the URL it prints, e.g. http://localhost:5173/app/
 ```
 
-Locally the API uses an embedded Postgres stored in `apps/api/.data` (delete the folder to
+Both servers take the next free port if theirs is busy (the web dev server proxies `/api` to
+wherever the API ended up), and sign-in accepts any `localhost` port locally. Locally the API
+uses an embedded Postgres stored in `apps/api/.data` (delete the folder to
 start fresh). Optional settings go in `apps/api/.env`; see `apps/api/.env.example`:
 
 - `ANTHROPIC_API_KEY`: real AI explanations (costs money; see `prototype/bench` for the

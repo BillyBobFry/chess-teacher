@@ -5,8 +5,13 @@ export interface Env {
   databaseUrl?: string;
   /** Where PGlite stores data locally. Unset → in memory. */
   pgliteDir?: string;
-  /** Public base URL of the site, e.g. https://chess.example.com or http://localhost:5173. */
-  authUrl: string;
+  /**
+   * Public base URL of the site, e.g. https://chess.example.com. Unset locally: it's then
+   * taken from each request, so the web dev server can run on any port.
+   */
+  authUrl?: string;
+  /** Running on a developer's machine (not on Vercel, not production). */
+  local: boolean;
   authSecret: string;
   trustedOrigins: string[];
   google?: { clientId: string; clientSecret: string };
@@ -19,16 +24,22 @@ export interface Env {
 
 const DEV_SECRET = "dev-only-secret-change-me-in-production-0123456789";
 
+/** http://localhost or http://127.0.0.1 on any port: trusted only when running locally. */
+export const isLocalOrigin = (origin: string): boolean =>
+  /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
 export function readEnv(e: Record<string, string | undefined> = process.env): Env {
   const vercelUrl = e.VERCEL_URL ? `https://${e.VERCEL_URL}` : undefined;
-  const authUrl = e.BETTER_AUTH_URL ?? vercelUrl ?? "http://localhost:5173";
+  const authUrl = e.BETTER_AUTH_URL ?? vercelUrl;
   const production = e.VERCEL_ENV === "production" || e.NODE_ENV === "production";
+  const local = !e.VERCEL && !production;
   const authSecret = e.BETTER_AUTH_SECRET ?? (production ? undefined : DEV_SECRET);
   if (!authSecret) throw new Error("BETTER_AUTH_SECRET must be set in production.");
   return {
     databaseUrl: e.DATABASE_URL || undefined,
     pgliteDir: e.PGLITE_DIR || undefined,
     authUrl,
+    local,
     authSecret,
     trustedOrigins: [authUrl, vercelUrl, e.VERCEL_BRANCH_URL && `https://${e.VERCEL_BRANCH_URL}`].filter(
       (x): x is string => !!x,

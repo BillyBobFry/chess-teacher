@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "pnpm@10.28.0",
   "scripts": {
-    "dev": "concurrently -n api,web -c blue,green \"pnpm --filter @chess-teacher/api dev\" \"pnpm --filter @chess-teacher/web dev\"",
+    "dev": "node scripts/dev.mjs",
     "build": "node scripts/build-vercel.mjs",
     "serve": "node scripts/serve-vercel-output.mjs",
     "smoke": "node scripts/build-vercel.mjs && pnpm --filter @chess-teacher/web smoke",

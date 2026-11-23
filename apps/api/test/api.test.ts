@@ -285,3 +285,38 @@ describe("explanations", () => {
 beforeEach(() => {
   expect(recorded.lessons.length).toBeGreaterThan(1);
 });
+
+describe("trusted origins", () => {
+  const signUpFrom = async (env: ReturnType<typeof readEnv>, origin: string) => {
+    const server = await createServer({ env, llm: null, migrate: true });
+    const res = await server.app.request("http://localhost:5178/api/auth/sign-up/email", {
+      method: "POST",
+      // Better Auth checks the origin when cookies are present (CSRF protection), as they are
+      // when a browser already has a session cookie for localhost from another port.
+      headers: { "content-type": "application/json", origin, cookie: "better-auth.session_token=stale" },
+      body: JSON.stringify({ email: "port@example.com", password: "correct horse battery", name: "Port" }),
+    });
+    return res.status;
+  };
+
+  it("locally, accepts the web dev server on any localhost port", async () => {
+    expect(await signUpFrom(readEnv({}), "http://localhost:5178")).toBe(200);
+    expect(await signUpFrom(readEnv({}), "http://127.0.0.1:4000")).toBe(200);
+  });
+
+  it("locally, still rejects other sites", async () => {
+    expect(await signUpFrom(readEnv({}), "https://evil.example")).toBe(403);
+    expect(await signUpFrom(readEnv({}), "http://localhost.evil.example:5178")).toBe(403);
+  });
+
+  it("in production, only trusts the configured URL", async () => {
+    const prod = readEnv({
+      VERCEL: "1",
+      VERCEL_ENV: "production",
+      BETTER_AUTH_URL: "https://chess.example.com",
+      BETTER_AUTH_SECRET: "a-long-production-secret-for-tests-0123456789",
+    });
+    expect(prod.local).toBe(false);
+    expect(await signUpFrom(prod, "http://localhost:5178")).toBe(403);
+  });
+});

@@ -10,7 +10,7 @@ import { createServer } from "./server.ts";
 
 process.env.PGLITE_DIR ??= join(import.meta.dirname, "..", ".data", "pglite");
 const { app, env } = await createServer({ migrate: true });
-const port = Number(process.env.PORT ?? 8787);
+const port = Number(process.env.API_PORT ?? process.env.PORT ?? 8787);
 serve({ fetch: app.fetch, port }, () => {
   console.log(`API on http://localhost:${port}/api`);
   console.log(
