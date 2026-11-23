@@ -1,0 +1,258 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_name": "Chess Teacher",
+  "loading": "Loading…",
+  "back": "Back",
+  "dismiss": "Dismiss",
+  "footer_licences": "Licenses",
+  "busy_loading": "Loading your game…",
+  "busy_engine": "Starting the engine…",
+  "busy_preparing": "Getting ready for your move…",
+  "busy_checking": "Thinking about your move…",
+  "busy_opponent": "Your opponent is thinking…",
+  "result_lost": "Checkmate. You lost this one.",
+  "result_won": "Checkmate. You won!",
+  "result_stalemate": "Stalemate: a draw.",
+  "result_draw": "Draw.",
+  "result_ended": "Game ended.",
+  "nav_end_game": "End game",
+  "nav_new_game": "New game",
+  "confirm_abandon": "Abandon this game and start a new one?",
+  "account_menu": "Account",
+  "account_allowance": [
+    {
+      "declarations": [
+        "input remaining",
+        "input limit",
+        "local remainingCount = remaining: number",
+        "local limitPlural = limit: plural",
+        "local limitCount = limit: number"
+      ],
+      "selectors": ["limitPlural"],
+      "match": {
+        "limitPlural=one": "{remainingCount} of {limitCount} AI explanation left this month",
+        "limitPlural=other": "{remainingCount} of {limitCount} AI explanations left this month"
+      }
+    }
+  ],
+  "account_progress": "Your progress",
+  "account_sign_out": "Sign out",
+  "game_back_to_current": "Back to the current game",
+  "status_paused": "Game paused",
+  "status_your_move": "Your move",
+  "panel_moves": "Moves",
+  "panel_play_hint": "Play normally. If a mistake comes back to bite you, the game will pause so you can find out why.",
+  "moves_empty": "No moves yet.",
+  "error_conflict": "This game was changed on another device.",
+  "toast_fixed": "Nice! {move} had left a weakness, and you fixed it before it cost you.",
+  "toast_found_chance": "Nice! You found the better idea you missed with {move}.",
+  "new_game_title": "Learn from your own mistakes",
+  "new_game_intro": "Play a game. When a mistake comes back to bite you, the game pauses and you work out which move caused it, then see what would have happened with the better move.",
+  "new_game_play_as": "Play as",
+  "colour_white": "White",
+  "colour_black": "Black",
+  "colour_random": "Random",
+  "new_game_opponent": "Opponent",
+  "strength_gentle": "Gentle",
+  "strength_gentle_note": "for new players",
+  "strength_steady": "Steady",
+  "strength_steady_note": "a fair fight for improving players",
+  "strength_testing": "Testing",
+  "strength_testing_note": "for players who know the basics well",
+  "new_game_warn": "Warn me when my opponent spots a weakness",
+  "new_game_start": "Start game",
+  "sign_in_title": "Welcome back",
+  "sign_in_intro": "Sign in to carry on where you left off.",
+  "sign_up_title": "Create your account",
+  "sign_up_intro": "Your games and lessons are saved to your account, so you can pick up on any device.",
+  "sign_in_google": "Continue with Google",
+  "sign_in_or": "or",
+  "field_name": "Name",
+  "field_email": "Email",
+  "field_password": "Password",
+  "error_generic": "Something went wrong. Please try again.",
+  "sign_in_submit": "Sign in",
+  "sign_up_submit": "Create account",
+  "sign_in_new_here": "New here?",
+  "sign_in_to_sign_up": "Create an account",
+  "sign_up_have_account": "Already have an account?",
+  "reveal_missed_last": "Your last move missed a better option.",
+  "reveal_chance_gone": "The chance has gone.",
+  "reveal_cause_recent": "The cause was one of your recent moves.",
+  "reveal_missed_last_detail": "Instead of {move}, there was a clearly better move.",
+  "reveal_missed_ago_detail": [
+    {
+      "declarations": [
+        "input ago",
+        "input move",
+        "local agoPlural = ago: plural",
+        "local agoCount = ago: number"
+      ],
+      "selectors": ["agoPlural"],
+      "match": {
+        "agoPlural=one": "{agoCount} move ago, with {move}, you had a clearly better option.",
+        "agoPlural=other": "{agoCount} moves ago, with {move}, you had a clearly better option."
+      }
+    }
+  ],
+  "reveal_find": "Can you find the move that caused it?",
+  "reveal_not_that": "Not that one.",
+  "reveal_hint": "Hint: {hint}",
+  "reveal_show_answer": "Show me the answer",
+  "reveal_found": "Yes, that's the one.",
+  "reveal_rewind": "Rewind to before {move}",
+  "reveal_carry_on": "Carry on",
+  "review_title": "Game review",
+  "review_none": "No clear mistakes found. Well played!",
+  "outcome_fixed": "You fixed it in time",
+  "outcome_deferred": "Happened at the same time as another lesson",
+  "outcome_found": "Found it yourself",
+  "outcome_revealed": "Revealed during the game",
+  "outcome_shown": "Shown during the game",
+  "outcome_not_shown": "Not shown during the game",
+  "outcome_superseded": "Overtaken by a later mistake of the same kind",
+  "outcome_got_away": "You got away with it: a stronger player would have punished it",
+  "outcome_missed": "Missed chance",
+  "futures_note_real": "Left: what actually happened in your game. Right: how the better move could have gone (the engine's prediction).",
+  "futures_note_predicted": "How each could have gone: the engine's prediction, not moves from your game.",
+  "futures_what_happened": "What happened",
+  "futures_your_move": "Your move, then…",
+  "futures_better": "The better move, then…",
+  "futures_stepper": "Step through both lines",
+  "futures_start": "Start",
+  "futures_back": "Back",
+  "futures_forward": "Forward",
+  "futures_end": "End",
+  "futures_before": "Before the move",
+  "futures_step": [
+    {
+      "declarations": [
+        "input step",
+        "input total",
+        "local stepCount = step: number",
+        "local totalCount = total: number"
+      ],
+      "selectors": [],
+      "match": {
+        "": "Move {stepCount} of {totalCount}"
+      }
+    }
+  ],
+  "explanation_lead": "On move {moveNumber} you played {#strong}{played}{/strong}. {#strong}{better}{/strong} was better.",
+  "explanation_mate": "After your move, your opponent had a forced checkmate.",
+  "facts_before": "Before your move",
+  "facts_your_line": "Where your move leads",
+  "facts_better_line": "Where the better move leads",
+  "explanation_missed_pawns": "Your move wasn't a disaster, but {better} would have left your opponent with pawn weaknesses.",
+  "explanation_missed_improved": "Your move wasn't a disaster, but {better} would have improved {factor}.",
+  "explanation_undefended": "Your move left this undefended: {pieces}.",
+  "ai_writing": "Your coach is writing an explanation…",
+  "ai_quota": "You've used this month's AI explanations. Here's what we measured:",
+  "ai_label": "Your coach",
+  "ai_foot": [
+    {
+      "declarations": [
+        "input remaining",
+        "local remainingPlural = remaining: plural",
+        "local remainingCount = remaining: number"
+      ],
+      "selectors": ["remainingPlural"],
+      "match": {
+        "remainingPlural=one": "Written by AI from the measured facts below · {remainingCount} AI explanation left this month",
+        "remainingPlural=other": "Written by AI from the measured facts below · {remainingCount} AI explanations left this month"
+      }
+    }
+  ],
+  "ai_what_missed": "What it missed",
+  "ai_what_allowed": "What it allowed",
+  "ai_why_better": "Why {#move}{move}{/move} was better",
+  "feedback_question": "Did this lesson make sense?",
+  "feedback_yes": "Yes, it made sense",
+  "feedback_no": "No, it didn't make sense",
+  "feedback_comment_label": "What didn't make sense?",
+  "feedback_comment_placeholder": "What didn't make sense? (optional)",
+  "feedback_send": "Send",
+  "feedback_thanks": "Thanks: that helps us improve the lessons.",
+  "progress_title": "Your progress",
+  "progress_error": "Couldn't load your progress. Please try again.",
+  "progress_empty": "Nothing yet. Play a game: every lesson you meet is counted here by the principle it teaches.",
+  "progress_summary": [
+    {
+      "declarations": [
+        "input lessons",
+        "input games",
+        "local lessonsPlural = lessons: plural",
+        "local gamesPlural = games: plural",
+        "local lessonsCount = lessons: number",
+        "local gamesCount = games: number"
+      ],
+      "selectors": ["lessonsPlural", "gamesPlural"],
+      "match": {
+        "lessonsPlural=one, gamesPlural=one": "{lessonsCount} lesson across your last {gamesCount} game.",
+        "lessonsPlural=one, gamesPlural=other": "{lessonsCount} lesson across your last {gamesCount} games.",
+        "lessonsPlural=other, gamesPlural=one": "{lessonsCount} lessons across your last {gamesCount} game.",
+        "lessonsPlural=other, gamesPlural=other": "{lessonsCount} lessons across your last {gamesCount} games."
+      }
+    }
+  ],
+  "progress_focus": "Your focus",
+  "progress_lessons": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countValue = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countValue} lesson",
+        "countPlural=other": "{countValue} lessons"
+      }
+    }
+  ],
+  "progress_found": [
+    {
+      "declarations": [
+        "input found",
+        "input revealed",
+        "local foundCount = found: number",
+        "local revealedCount = revealed: number"
+      ],
+      "selectors": [],
+      "match": {
+        "": "Found the cause yourself {foundCount} of {revealedCount}"
+      }
+    }
+  ],
+  "progress_fixed": [
+    {
+      "declarations": ["input count", "local countValue = count: number"],
+      "selectors": [],
+      "match": {
+        "": "Fixed in time {countValue}×"
+      }
+    }
+  ],
+  "progress_recent": [
+    {
+      "declarations": [
+        "input count",
+        "input games",
+        "local gamesPlural = games: plural",
+        "local countValue = count: number",
+        "local gamesCount = games: number"
+      ],
+      "selectors": ["gamesPlural"],
+      "match": {
+        "gamesPlural=one": "In {countValue} of your last {gamesCount} game",
+        "gamesPlural=other": "In {countValue} of your last {gamesCount} games"
+      }
+    }
+  ],
+  "licences_title": "Licenses",
+  "licences_stockfish": "The chess engine running in your browser is Stockfish 19 (the WebAssembly build by the stockfish.js project), licensed under the {#gpl}GNU General Public License v3{/gpl}. Source code: {#stockfish}Stockfish{/stockfish} and {#stockfishjs}stockfish.js{/stockfishjs}. A second engine, Stockfish 11 (also GPL v3, {#licence11}license{/licence11}), is used for its classical evaluation when checking strategic lessons. This app talks to both engines only through the UCI text protocol.",
+  "licences_other": "Other components",
+  "licences_item": "{component}: {licence}",
+  "licences_stockfish_heading": "Stockfish",
+  "licences_item_pieces": "{component} (including its piece set): {licence}"
+}

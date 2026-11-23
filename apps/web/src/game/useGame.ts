@@ -26,6 +26,7 @@ import {
 } from "@chess-teacher/core";
 import { api } from "../api/client.ts";
 import { getEngines } from "../engine/engines.ts";
+import { m } from "../paraglide/messages.js";
 import { ConflictError, Saver, createGame, loadActiveGame, type SavedGame } from "./storage.ts";
 
 export type Busy = null | "loading" | "engine" | "preparing" | "checking" | "opponent";
@@ -152,8 +153,8 @@ export function useGame(opts: { llmEnabled: boolean }) {
         } else if (e.kind === "fixed") {
           toast(
             lesson.kind === "consequence"
-              ? `Nice! ${lessonLabel(lesson)} had left a weakness, and you fixed it before it cost you.`
-              : `Nice! You found the better idea you missed with ${lessonLabel(lesson)}.`,
+              ? m.toast_fixed({ move: lessonLabel(lesson) })
+              : m.toast_found_chance({ move: lessonLabel(lesson) }),
             "good",
           );
         } else if (e.kind === "warning") {

@@ -2,6 +2,7 @@ import type { ProgressResponse } from "@chess-teacher/contract";
 import { PRINCIPLES } from "@chess-teacher/core";
 import { useEffect, useState } from "react";
 import { api } from "../api/client.ts";
+import { m } from "../paraglide/messages.js";
 
 /** Which principles keep coming up, and how you're doing with them. */
 export function Progress({ onBack }: { onBack: () => void }) {
@@ -17,22 +18,16 @@ export function Progress({ onBack }: { onBack: () => void }) {
 
   return (
     <section className="progress">
-      <h1>Your progress</h1>
-      {error && <p className="error">Couldn't load your progress. Please try again.</p>}
-      {!data && !error && <p className="muted">Loading…</p>}
-      {data && data.lessons === 0 && (
-        <p className="muted">
-          Nothing yet. Play a game: every lesson you meet is counted here by the principle it teaches.
-        </p>
-      )}
+      <h1>{m.progress_title()}</h1>
+      {error && <p className="error">{m.progress_error()}</p>}
+      {!data && !error && <p className="muted">{m.loading()}</p>}
+      {data && data.lessons === 0 && <p className="muted">{m.progress_empty()}</p>}
       {data && data.lessons > 0 && (
         <>
-          <p className="muted">
-            {data.lessons} lessons across your last {data.games} {data.games === 1 ? "game" : "games"}.
-          </p>
+          <p className="muted">{m.progress_summary({ lessons: data.lessons, games: data.games })}</p>
           {data.principles[0] && (
             <div className="focus">
-              <div className="focus-label">Your focus</div>
+              <div className="focus-label">{m.progress_focus()}</div>
               <div className="focus-title">{data.principles[0].title}</div>
               <p>{PRINCIPLES[data.principles[0].id]?.text}</p>
             </div>
@@ -42,9 +37,7 @@ export function Progress({ onBack }: { onBack: () => void }) {
               <li key={p.id}>
                 <div className="principle-row">
                   <span className="principle-name">{p.title}</span>
-                  <span className="principle-count">
-                    {p.lessons} {p.lessons === 1 ? "lesson" : "lessons"}
-                  </span>
+                  <span className="principle-count">{m.progress_lessons({ count: p.lessons })}</span>
                 </div>
                 <div
                   className="bar"
@@ -53,15 +46,11 @@ export function Progress({ onBack }: { onBack: () => void }) {
                 />
                 <div className="principle-stats muted small">
                   {p.revealed > 0 && (
-                    <span>
-                      Found the cause yourself {p.foundYourself} of {p.revealed}
-                    </span>
+                    <span>{m.progress_found({ found: p.foundYourself, revealed: p.revealed })}</span>
                   )}
-                  {p.fixed > 0 && <span>Fixed in time {p.fixed}×</span>}
+                  {p.fixed > 0 && <span>{m.progress_fixed({ count: p.fixed })}</span>}
                   {p.recentGames > 0 && (
-                    <span>
-                      In {p.recentGames} of your last {Math.min(5, data.games)} games
-                    </span>
+                    <span>{m.progress_recent({ count: p.recentGames, games: Math.min(5, data.games) })}</span>
                   )}
                 </div>
               </li>
@@ -69,7 +58,7 @@ export function Progress({ onBack }: { onBack: () => void }) {
           </ul>
         </>
       )}
-      <button onClick={onBack}>Back</button>
+      <button onClick={onBack}>{m.back()}</button>
     </section>
   );
 }

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { NewGameOptions } from "../game/useGame.ts";
+import { m } from "../paraglide/messages.js";
 
 const STRENGTHS = [
-  { skill: 0, label: "Gentle", note: "for new players" },
-  { skill: 3, label: "Steady", note: "a fair fight for improving players" },
-  { skill: 6, label: "Testing", note: "for players who know the basics well" },
+  { skill: 0, label: m.strength_gentle, note: m.strength_gentle_note },
+  { skill: 3, label: m.strength_steady, note: m.strength_steady_note },
+  { skill: 6, label: m.strength_testing, note: m.strength_testing_note },
 ];
 
 export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => void; busy: boolean }) {
@@ -14,20 +15,17 @@ export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => voi
 
   return (
     <section className="new-game">
-      <h1>Learn from your own mistakes</h1>
-      <p className="muted">
-        Play a game. When a mistake comes back to bite you, the game pauses and you work out which move caused
-        it, then see what would have happened with the better move.
-      </p>
+      <h1>{m.new_game_title()}</h1>
+      <p className="muted">{m.new_game_intro()}</p>
 
       <fieldset>
-        <legend>Play as</legend>
+        <legend>{m.new_game_play_as()}</legend>
         <div className="segmented">
           {(
             [
-              ["w", "White"],
-              ["b", "Black"],
-              ["random", "Random"],
+              ["w", m.colour_white],
+              ["b", m.colour_black],
+              ["random", m.colour_random],
             ] as const
           ).map(([v, label]) => (
             <label key={v} className={colour === v ? "on" : ""}>
@@ -38,14 +36,14 @@ export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => voi
                 checked={colour === v}
                 onChange={() => setColour(v)}
               />
-              {label}
+              {label()}
             </label>
           ))}
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>Opponent</legend>
+        <legend>{m.new_game_opponent()}</legend>
         <div className="options">
           {STRENGTHS.map((s) => (
             <label key={s.skill} className={skill === s.skill ? "option on" : "option"}>
@@ -55,7 +53,7 @@ export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => voi
                 checked={skill === s.skill}
                 onChange={() => setSkill(s.skill)}
               />
-              <strong>{s.label}</strong> <span className="muted">{s.note}</span>
+              <strong>{s.label()}</strong> <span className="muted">{s.note()}</span>
             </label>
           ))}
         </div>
@@ -63,7 +61,7 @@ export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => voi
 
       <label className="toggle">
         <input type="checkbox" checked={easy} onChange={(e) => setEasy(e.target.checked)} />
-        Warn me when my opponent spots a weakness
+        {m.new_game_warn()}
       </label>
 
       <button
@@ -71,7 +69,7 @@ export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => voi
         disabled={busy}
         onClick={() => onStart({ colour, opponentSkill: skill, easy })}
       >
-        {busy ? "Starting the engine…" : "Start game"}
+        {busy ? m.busy_engine() : m.new_game_start()}
       </button>
     </section>
   );

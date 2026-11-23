@@ -13,6 +13,7 @@ import { AiExplanation } from "./AiExplanation.tsx";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
+import { m } from "../paraglide/messages.js";
 
 interface Props {
   gameId: string;
@@ -45,14 +46,14 @@ export function Reveal({
     lesson.kind === "consequence"
       ? lesson.triggerText
       : ago === 1
-        ? "Your last move missed a better option."
-        : "The chance has gone.";
+        ? m.reveal_missed_last()
+        : m.reveal_chance_gone();
   const sub =
     lesson.kind === "consequence"
-      ? "The cause was one of your recent moves."
+      ? m.reveal_cause_recent()
       : ago === 1
-        ? `Instead of ${lessonLabel(lesson)}, there was a clearly better move.`
-        : `${ago} moves ago, with ${lessonLabel(lesson)}, you had a clearly better option.`;
+        ? m.reveal_missed_last_detail({ move: lessonLabel(lesson) })
+        : m.reveal_missed_ago_detail({ ago, move: lessonLabel(lesson) });
 
   return (
     <section className="reveal" aria-live="polite">
@@ -68,7 +69,7 @@ export function Reveal({
 
       {reveal.step === "find" ? (
         <div className="find">
-          <p className="prompt">Can you find the move that caused it?</p>
+          <p className="prompt">{m.reveal_find()}</p>
           <div className="choices">
             {recentUserMoves(state, lesson).map(([ply, label]) => (
               <button
@@ -81,15 +82,19 @@ export function Reveal({
               </button>
             ))}
           </div>
-          {reveal.attempts > 0 && <p className="not-that">Not that one.</p>}
-          {hint && <p className="hint">Hint: {hint}</p>}
+          {reveal.attempts > 0 && <p className="not-that">{m.reveal_not_that()}</p>}
+          {hint && <p className="hint">{m.reveal_hint({ hint })}</p>}
           <button className="link" onClick={onShowAnswer}>
-            Show me the answer
+            {m.reveal_show_answer()}
           </button>
         </div>
       ) : (
         <div className="explain">
-          {lesson.foundCause && <p className="found">✓ Yes, that's the one.</p>}
+          {lesson.foundCause && (
+            <p className="found">
+              <span aria-hidden>✓</span> {m.reveal_found()}
+            </p>
+          )}
           <AiExplanation
             load={loadExplanation}
             betterMove={lessonBestSan(lesson)}
@@ -100,9 +105,9 @@ export function Reveal({
           <LessonFeedback gameId={gameId} lessonId={lesson.id} />
           <div className="actions">
             <button className="primary" onClick={onRewind}>
-              Rewind to before {lessonLabel(lesson)}
+              {m.reveal_rewind({ move: lessonLabel(lesson) })}
             </button>
-            <button onClick={onContinue}>Carry on</button>
+            <button onClick={onContinue}>{m.reveal_carry_on()}</button>
           </div>
         </div>
       )}

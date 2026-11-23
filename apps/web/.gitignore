@@ -1,2 +1,4 @@
 public/stockfish/
 public/stockfish11/
+# Compiled from messages/ by Paraglide (vite plugin and `pnpm typecheck`)
+src/paraglide/
