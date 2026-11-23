@@ -1,4 +1,4 @@
-/** Integration test against a real Stockfish process (skipped if none is installed). */
+/** Integration test against a real Stockfish process (skipped locally if none is installed). */
 
 import { describe, expect, it } from "vitest";
 import { NodeUciEngine, findStockfish } from "../src/node.ts";
@@ -11,7 +11,8 @@ try {
   available = false;
 }
 
-describe.skipIf(!available)("NodeUciEngine", () => {
+// CI installs Stockfish, so there a missing binary fails the test instead of skipping it.
+describe.skipIf(!available && !process.env.CI)("NodeUciEngine", () => {
   it("analyses with MultiPV and plays moves", async () => {
     const engine = await NodeUciEngine.start();
     try {

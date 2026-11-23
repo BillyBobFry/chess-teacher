@@ -25,7 +25,7 @@ import {
   type SessionState,
 } from "@chess-teacher/core";
 import { RecordedEngine, type RecordedCall } from "@chess-teacher/engine";
-// Playwright is pre-installed globally in dev/CI containers rather than a project dependency.
+// Browsers: `pnpm --filter @chess-teacher/web exec playwright install chromium` once.
 import type { BrowserType, Page, devices as Devices } from "playwright";
 
 const require = createRequire(import.meta.url);

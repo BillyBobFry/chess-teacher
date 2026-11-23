@@ -8,35 +8,35 @@ the measurements behind several decisions are in [`../bench/README.md`](../bench
 
 ## 1. Goals and constraints
 
-| | |
-|---|---|
-| Scale | Hobby project with room to grow |
-| Model | Open source (AGPL-3.0), free to self-host. Hosted version: free play, N free coached games a month, pay-as-you-go bundles of coached games (concept §9) |
-| Platforms | Web first; native mobile apps later, without a rewrite |
-| Offline | Not needed now, but the design must not rule it out |
-| Accounts | Sign-in from day one (LLM explanations cost money; no anonymous play) |
-| Self-hosting | One server process plus Postgres (or the embedded database), no Vercel required |
-| Hosting | Vercel (web + functions) and Neon (Postgres), already in use |
-| Cost | Server cost per game should be close to zero; LLM cost bounded per user |
+|              |                                                                                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Scale        | Hobby project with room to grow                                                                                                                         |
+| Model        | Open source (AGPL-3.0), free to self-host. Hosted version: free play, N free coached games a month, pay-as-you-go bundles of coached games (concept §9) |
+| Platforms    | Web first; native mobile apps later, without a rewrite                                                                                                  |
+| Offline      | Not needed now, but the design must not rule it out                                                                                                     |
+| Accounts     | Sign-in from day one (LLM explanations cost money; no anonymous play)                                                                                   |
+| Self-hosting | One server process plus Postgres (or the embedded database), no Vercel required                                                                         |
+| Hosting      | Vercel (web + functions) and Neon (Postgres), already in use                                                                                            |
+| Cost         | Server cost per game should be close to zero; LLM cost bounded per user                                                                                 |
 
 ## 2. Decisions
 
-| # | Decision | Why |
-|---|---|---|
-| D1 | **TypeScript everywhere** | Shared types *and* logic across server, web and mobile; keeps offline possible. The Python prototype is small enough to port cheaply now. |
-| D2 | **The engine and teaching logic run on the player's device** | Benchmarks: the 1.7 MB WebAssembly Stockfish build runs at ~native speed (≈140 ms per user move, ≈5 s CPU per game). Serverless functions can't keep engine processes warm, so running the engine on Vercel would be awkward and cost money per move; on the device it is free and is most of the way to offline. |
-| D3 | **A pure, portable teaching core** | One package holds all chess teaching logic, with no DOM, Node or network dependencies. It is tested in Node, runs in the browser, and later in React Native, unchanged. |
-| D4 | **The server is the trust boundary** | It owns what must be trusted: identity, saved games and lessons, spending LLM tokens, quotas and (later) billing. It never runs Stockfish. |
-| D5 | **Explanations are generated in the background, before the reveal** | A lesson is created several moves before it is revealed, so the LLM explanation can be generated while the game continues. The template is shown if it isn't ready. |
-| D6 | **Per-user metering of the AI coach** | The server can't verify the device's engine analysis, so LLM spend is bounded per user instead: by coached games (D13). |
-| D7 | **Neon Postgres + Drizzle ORM** | Already in use; serverless driver works from Vercel functions; Drizzle gives typed queries and migrations in TypeScript. |
-| D8 | **A Vite + React single-page app, with a Hono API on Vercel Functions** | The game runs entirely on the device, so server rendering would add complexity without helping the core screen. A static SPA keeps offline (service worker) and React Native reuse simple. The API is written with Hono, which is independent of the web framework, so the API that mobile apps depend on isn't tied to it. Server-rendered public pages are handled separately (see §7.1). |
-| D9 | **API schemas defined once with Zod** | Types for every TypeScript client come from the schemas; OpenAPI is generated from them for any future Swift/Kotlin app. |
-| D10 | **Game sessions are plain, serialisable state, saved after every move** | The engine is stateless (position in, analysis out), so everything needed to continue a game is the session state: moves, pending lessons with their trigger conditions, resolved lessons and settings. Saved to the server after each move, any game can be resumed later on any device by loading the state and starting a fresh engine (~0.15 s). |
-| D11 | **AGPL-3.0, with a CLA** | Free to use and self-host; anyone running a modified version as a service must publish it, so a competitor can't run a closed fork. Compatible with Stockfish's GPL, which also settles shipping Stockfish to browsers and app stores (Lichess's GPL app is on both stores). The CLA keeps other licensing options open. |
-| D12 | **One codebase, two modes: hosted and self-hosted** | A setting, not a fork. Self-hosted: no billing, the operator's own API key, coached games unlimited or limited by config. Hosted: monthly free coached games and paid bundles. Self-hosting ships as a Docker image (one Node process serving the static app and the API) with Postgres or the embedded database. |
-| D13 | **Coached games as the unit, with a server-side ledger** | A user-facing unit that's easy to understand. A game becomes "coached" when its first AI explanation is generated, and that's when one is consumed (free monthly allowance first, then purchased). AI explanations per game are capped. Balances live in one ledger on the server so Stripe purchases (web) and in-app purchases (mobile) share it. |
-| D14 | **Strategic lessons need a second opinion** | Our features say *what* differs between the two lines; Stockfish 11's classical evaluation says which of its terms account for the difference. A strategic lesson is only taught when its feature's term is a main reason. Stockfish 11 runs as a third, lazily loaded worker (3.7 MB, ~175 ms to start); when absent, lessons aren't checked. |
+| #   | Decision                                                                | Why                                                                                                                                                                                                                                                                                                                                                                                         |
+| --- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | **TypeScript everywhere**                                               | Shared types _and_ logic across server, web and mobile; keeps offline possible. The Python prototype is small enough to port cheaply now.                                                                                                                                                                                                                                                   |
+| D2  | **The engine and teaching logic run on the player's device**            | Benchmarks: the 1.7 MB WebAssembly Stockfish build runs at ~native speed (≈140 ms per user move, ≈5 s CPU per game). Serverless functions can't keep engine processes warm, so running the engine on Vercel would be awkward and cost money per move; on the device it is free and is most of the way to offline.                                                                           |
+| D3  | **A pure, portable teaching core**                                      | One package holds all chess teaching logic, with no DOM, Node or network dependencies. It is tested in Node, runs in the browser, and later in React Native, unchanged.                                                                                                                                                                                                                     |
+| D4  | **The server is the trust boundary**                                    | It owns what must be trusted: identity, saved games and lessons, spending LLM tokens, quotas and (later) billing. It never runs Stockfish.                                                                                                                                                                                                                                                  |
+| D5  | **Explanations are generated in the background, before the reveal**     | A lesson is created several moves before it is revealed, so the LLM explanation can be generated while the game continues. The template is shown if it isn't ready.                                                                                                                                                                                                                         |
+| D6  | **Per-user metering of the AI coach**                                   | The server can't verify the device's engine analysis, so LLM spend is bounded per user instead: by coached games (D13).                                                                                                                                                                                                                                                                     |
+| D7  | **Neon Postgres + Drizzle ORM**                                         | Already in use; serverless driver works from Vercel functions; Drizzle gives typed queries and migrations in TypeScript.                                                                                                                                                                                                                                                                    |
+| D8  | **A Vite + React single-page app, with a Hono API on Vercel Functions** | The game runs entirely on the device, so server rendering would add complexity without helping the core screen. A static SPA keeps offline (service worker) and React Native reuse simple. The API is written with Hono, which is independent of the web framework, so the API that mobile apps depend on isn't tied to it. Server-rendered public pages are handled separately (see §7.1). |
+| D9  | **API schemas defined once with Zod**                                   | Types for every TypeScript client come from the schemas; OpenAPI is generated from them for any future Swift/Kotlin app.                                                                                                                                                                                                                                                                    |
+| D10 | **Game sessions are plain, serialisable state, saved after every move** | The engine is stateless (position in, analysis out), so everything needed to continue a game is the session state: moves, pending lessons with their trigger conditions, resolved lessons and settings. Saved to the server after each move, any game can be resumed later on any device by loading the state and starting a fresh engine (~0.15 s).                                        |
+| D11 | **AGPL-3.0, with a CLA**                                                | Free to use and self-host; anyone running a modified version as a service must publish it, so a competitor can't run a closed fork. Compatible with Stockfish's GPL, which also settles shipping Stockfish to browsers and app stores (Lichess's GPL app is on both stores). The CLA keeps other licensing options open.                                                                    |
+| D12 | **One codebase, two modes: hosted and self-hosted**                     | A setting, not a fork. Self-hosted: no billing, the operator's own API key, coached games unlimited or limited by config. Hosted: monthly free coached games and paid bundles. Self-hosting ships as a Docker image (one Node process serving the static app and the API) with Postgres or the embedded database.                                                                           |
+| D13 | **Coached games as the unit, with a server-side ledger**                | A user-facing unit that's easy to understand. A game becomes "coached" when its first AI explanation is generated, and that's when one is consumed (free monthly allowance first, then purchased). AI explanations per game are capped. Balances live in one ledger on the server so Stripe purchases (web) and in-app purchases (mobile) share it.                                         |
+| D14 | **Strategic lessons need a second opinion**                             | Our features say _what_ differs between the two lines; Stockfish 11's classical evaluation says which of its terms account for the difference. A strategic lesson is only taught when its feature's term is a main reason. Stockfish 11 runs as a third, lazily loaded worker (3.7 MB, ~175 ms to start); when absent, lessons aren't checked.                                              |
 
 ## 3. Overview
 
@@ -100,8 +100,8 @@ interface Engine {
 
 type GameEvent =
   | { type: "opponentMoved"; move: string; mode: "normal" | "levelled" }
-  | { type: "lessonCreated"; lessonId: string }          // hidden from the player
-  | { type: "warning"; lessonId: string }                 // easy mode only
+  | { type: "lessonCreated"; lessonId: string } // hidden from the player
+  | { type: "warning"; lessonId: string } // easy mode only
   | { type: "lessonTriggered"; lessonId: string; text: string }
   | { type: "chanceGone"; lessonId: string }
   | { type: "fixed"; lessonId: string }
@@ -113,16 +113,20 @@ board or engine handle:
 
 ```ts
 interface SessionState {
-  version: number;              // schema version, for migrating saved games
+  version: number; // schema version, for migrating saved games
   startFen: string;
-  moves: string[];              // UCI, the source of truth for the position
+  moves: string[]; // UCI, the source of truth for the position
   userColour: "w" | "b";
   config: TeachingConfig;
-  lessons: Lesson[];            // pending ones included, with their trigger conditions
+  lessons: Lesson[]; // pending ones included, with their trigger conditions
   opponentModes: ("normal" | "levelled")[];
 }
 
-function step(state: SessionState, input: Input, engine: Engine): Promise<{ state: SessionState; events: GameEvent[] }>;
+function step(
+  state: SessionState,
+  input: Input,
+  engine: Engine,
+): Promise<{ state: SessionState; events: GameEvent[] }>;
 ```
 
 Every step returns a new state, which the client saves (locally first, then to the
@@ -136,7 +140,7 @@ release.
 
 Porting notes from the Python prototype:
 
-- chess.js covers move generation, SAN/FEN and attackers. Mobility for the side *not* to
+- chess.js covers move generation, SAN/FEN and attackers. Mobility for the side _not_ to
   move is computed by generating moves from a copy of the position with the turn flipped
   in the FEN.
 - python-chess's UCI handling is replaced by a small parser in `packages/engine`
@@ -144,7 +148,7 @@ Porting notes from the Python prototype:
 
 ## 6. The engine on the device
 
-- **Build:** Stockfish 19 WASM *lite, single-threaded* (1.7 MB). Single-threaded avoids
+- **Build:** Stockfish 19 WASM _lite, single-threaded_ (1.7 MB). Single-threaded avoids
   the COOP/COEP headers that multi-threaded WASM needs, and it was fast enough in the
   benchmarks. Revisit if phones prove too slow.
 - **Where it runs:** a Web Worker, so analysis never blocks the UI.
@@ -183,13 +187,13 @@ the cost of anyone faking them.
 
 **Data model (first cut):**
 
-| Table | Key columns |
-|---|---|
-| `users` | id, email, plan, created_at |
-| `games` | id, user_id, colour, settings (json), moves (UCI[]), state (json, the latest `SessionState`), state_version, status (active/finished), result, created_at, updated_at |
-| `lessons` | id, game_id, ply, principle, feature, kind, facts (json), status, found_cause, hints_used, rewound |
-| `explanations` | lesson_id, model, prompt_version, text, input_tokens, output_tokens, cost_usd, guardrail_ok |
-| `usage` | user_id, period, explanations_used |
+| Table          | Key columns                                                                                                                                                           |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `users`        | id, email, plan, created_at                                                                                                                                           |
+| `games`        | id, user_id, colour, settings (json), moves (UCI[]), state (json, the latest `SessionState`), state_version, status (active/finished), result, created_at, updated_at |
+| `lessons`      | id, game_id, ply, principle, feature, kind, facts (json), status, found_cause, hints_used, rewound                                                                    |
+| `explanations` | lesson_id, model, prompt_version, text, input_tokens, output_tokens, cost_usd, guardrail_ok                                                                           |
+| `usage`        | user_id, period, explanations_used                                                                                                                                    |
 
 Lessons are stored as data from day one: they drive progress tracking and are how the
 teaching gets improved (which principles players rarely find, which explanation versions
@@ -264,7 +268,7 @@ Performance note: the teaching code itself costs a few milliseconds per move. Th
 spot (resolving exchanges for the material count) was rewritten from chess.js move
 generation to a dedicated capture generator: 20.7 → 0.3 ms per position.
 
-Known gaps carried forward: no checkmate or endgame king-activity *lessons* occur in the
+Known gaps carried forward: no checkmate or endgame king-activity _lessons_ occur in the
 recorded games (those features are still covered by the per-position parity test).
 
 ## 12. Milestone 2 (done)
@@ -298,7 +302,7 @@ Vercel account), and speed on real phones.
   tests, so no database setup is needed to develop.
 - Games saved to the server after every step with optimistic version checks; resume on
   any device; abandoning a game finishes it.
-- AI explanations: requested when the lesson is *created* (several moves before its
+- AI explanations: requested when the lesson is _created_ (several moves before its
   reveal), generated from the saved lesson's facts only, guardrail-checked, stored once per
   lesson, counted against a monthly allowance (default 30) only when successful. Shown
   above the measured facts; the facts stand alone when there's no AI explanation.
@@ -338,6 +342,7 @@ gain ≥ 0.10 pawns, rank in the top two gains, and aren't dwarfed (> 3×) by an
   lessons were unaffected, and 75% of consequences still landed.
 
 **Also in this milestone:**
+
 - "Did this lesson make sense? 👍 👎" on every explanation (in the reveal and the review),
   with an optional comment on 👎, stored in `lesson_feedback` with the lesson's feature
   and principle for analysis.
@@ -349,6 +354,7 @@ gain ≥ 0.10 pawns, rank in the top two gains, and aren't dwarfed (> 3×) by an
   produces the kept/rejected report for grading.
 
 **Next for lesson quality** (data-driven, from the ratings):
+
 - Relabel instead of drop: many rejected lessons were really about king safety; teaching
   the dominant term's principle could turn them into correct lessons.
 - Treat "the better line wins material a few moves later" as a material lesson.

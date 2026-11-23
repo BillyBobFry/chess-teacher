@@ -17,8 +17,8 @@ Players who know the rules but not the strategy plateau because:
 
 - **They can't tell which move was the mistake.** When something goes wrong (a pawn
   falls, a piece gets trapped) the cause was often several moves earlier. Working that
-  out — *credit assignment* — is the hard part, and beginners rarely manage it alone.
-- **Existing feedback is about *what*, not *why*.** Game-review tools label moves
+  out — _credit assignment_ — is the hard part, and beginners rarely manage it alone.
+- **Existing feedback is about _what_, not _why_.** Game-review tools label moves
   ("inaccuracy", "blunder") and show the engine's preferred move, but rarely explain the
   strategic idea in a way a beginner can reuse in a different position.
 - **Strategic mistakes are invisible at the time.** A blunder is obvious one move later.
@@ -28,7 +28,7 @@ Players who know the rules but not the strategy plateau because:
 ## 2. Target user
 
 Someone who knows how the pieces move and has played some games, roughly 600–1400
-rating, and wants to understand *why* good moves are good. They cannot judge the
+rating, and wants to understand _why_ good moves are good. They cannot judge the
 correctness of chess explanations themselves, so **the app must never be confidently
 wrong.**
 
@@ -36,25 +36,27 @@ wrong.**
 
 1. **Play** a game against the teaching opponent (§4), which is pitched at your level.
 2. **You make a mistake.** The engine notices immediately, predicts what it will cost
-   you, and records a *pending lesson*. You are not told yet.
+   you, and records a _pending lesson_. You are not told yet.
 3. **The consequence lands.** The opponent exploits the mistake; you lose the pawn, the
    piece gets trapped, the file is taken.
 4. **The game pauses: "find the cause".**
-   > *"You just lost your d-pawn. The cause was one of your last 5 moves. Can you find it?"*
+
+   > _"You just lost your d-pawn. The cause was one of your last 5 moves. Can you find it?"_
 
    Hints are available (highlight the move, then the piece).
-5. **Compare the two futures.** Two boards side by side — *what you played* and *what was
-   better* — each playable forward a few moves, with the key squares and pieces
+
+5. **Compare the two futures.** Two boards side by side — _what you played_ and _what was
+   better_ — each playable forward a few moves, with the key squares and pieces
    highlighted and a small evaluation graph for each line.
 6. **Name the principle.** A short explanation tied to one named principle from a fixed
-   curriculum (§6), e.g. *"Knights are strongest on squares where pawns can't kick them
-   away."*
+   curriculum (§6), e.g. _"Knights are strongest on squares where pawns can't kick them
+   away."_
 7. **Rewind and retry** from the mistake, with the lesson fresh — or carry on.
 
 If you spot the weakness yourself and fix it before the punishment lands, the app
-celebrates that instead: *"Nice — you saw your d-pawn was weak and defended it in time."*
+celebrates that instead: _"Nice — you saw your d-pawn was weak and defended it in time."_
 
-Because the rule is simply *"reveal when the consequence lands"*, tactics and strategy
+Because the rule is simply _"reveal when the consequence lands"_, tactics and strategy
 are handled the same way: a hanging piece is revealed one move later; a weak pawn might
 be revealed eight moves later.
 
@@ -62,10 +64,10 @@ be revealed eight moves later.
 
 The opponent has two modes:
 
-| Mode | When | How it plays |
-|---|---|---|
-| **Normal** | No pending lesson | At the user's level, with human-like moves (target: [Maia](https://maiachess.com), a network trained on human games at specific ratings) |
-| **Levelled up** | A lesson is pending | Strong engine, **focused on exploiting that lesson** |
+| Mode            | When                | How it plays                                                                                                                             |
+| --------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Normal**      | No pending lesson   | At the user's level, with human-like moves (target: [Maia](https://maiachess.com), a network trained on human games at specific ratings) |
+| **Levelled up** | A lesson is pending | Strong engine, **focused on exploiting that lesson**                                                                                     |
 
 Rules for levelling up:
 
@@ -80,16 +82,16 @@ Rules for levelling up:
 - **One lesson at a time.** If several become pending, pursue the biggest; the rest go to
   the review.
 
-Unexploited lessons appear in the **post-game review** as *"you got away with it"*,
+Unexploited lessons appear in the **post-game review** as _"you got away with it"_,
 shown with the simulated lines instead of the real game.
 
 ### Difficulty ladder
 
-| Level | Behaviour |
-|---|---|
-| Easy | A subtle warning when a lesson becomes pending (*"Your opponent has spotted something…"*). The user tries to find and fix the weakness before it's punished. |
-| Normal | No warning. Lessons are revealed when they land. |
-| Test | Teaching opponent off. A fair game, to check whether the lessons stuck. |
+| Level  | Behaviour                                                                                                                                                    |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Easy   | A subtle warning when a lesson becomes pending (_"Your opponent has spotted something…"_). The user tries to find and fix the weakness before it's punished. |
+| Normal | No warning. Lessons are revealed when they land.                                                                                                             |
+| Test   | Teaching opponent off. A fair game, to check whether the lessons stuck.                                                                                      |
 
 ## 5. How the analysis works
 
@@ -123,16 +125,16 @@ happens against a realistic player).
 
 ### 5.3 Strategic features (computed in code, not by the LLM)
 
-| Feature | Measured as |
-|---|---|
-| Material | Standard piece values |
-| Development | Minor pieces on starting squares; castled or not |
-| Centre control | Attackers / occupiers of d4, d5, e4, e5 |
-| Piece activity | Legal moves per piece; pieces with almost none ("bad" pieces) |
-| Pawn structure | Isolated, doubled, backward and passed pawns |
-| Outposts | Knights on squares enemy pawns can never attack |
-| Open files | Rooks on open / half-open files |
-| King safety | Pawn shield; enemy pieces bearing on the king zone |
+| Feature        | Measured as                                                                 |
+| -------------- | --------------------------------------------------------------------------- |
+| Material       | Standard piece values                                                       |
+| Development    | Minor pieces on starting squares; castled or not                            |
+| Centre control | Attackers / occupiers of d4, d5, e4, e5                                     |
+| Piece activity | Legal moves per piece; pieces with almost none ("bad" pieces)               |
+| Pawn structure | Isolated, doubled, backward and passed pawns                                |
+| Outposts       | Knights on squares enemy pawns can never attack                             |
+| Open files     | Rooks on open / half-open files                                             |
+| King safety    | Pawn shield; enemy pieces bearing on the king zone                          |
 | Hanging pieces | Pieces attacked more times than defended, or attacked by lower-value pieces |
 
 (Shortcut for prototyping: Stockfish 11 and earlier expose a term-by-term `eval`
@@ -145,8 +147,8 @@ When a mistake is detected, a pending lesson records:
 
 - the move and position where it happened;
 - the predicted consequence, as a concrete, checkable condition derived from the
-  feature diff (e.g. *"white loses the d4 pawn"*, *"white's king has no pawn shield and a
-  black piece reaches the king zone"*, *"black's rook occupies the open e-file"*);
+  feature diff (e.g. _"white loses the d4 pawn"_, _"white's king has no pawn shield and a
+  black piece reaches the king zone"_, _"black's rook occupies the open e-file"_);
 - an expiry (move number).
 
 After every move in the real game, each pending lesson's condition is checked. When it
@@ -212,11 +214,11 @@ Competing apps sell AI chess teachers by subscription. This one differentiates b
 **open source** and **free at its core**, with paid usage only for the part that costs
 money to run: the AI coach.
 
-| | Self-hosted | Hosted (web and mobile app) |
-|---|---|---|
-| Price | Free | Free, plus optional pay-as-you-go bundles |
-| Playing, teaching opponent, find-the-cause, both futures, rewind, review, facts-based explanations | ✓ | ✓, unlimited |
-| AI coach (explanations, "ask the coach") | ✓ with your own Anthropic API key | **N free coached games every month**, then bundles of coached games |
+|                                                                                                    | Self-hosted                       | Hosted (web and mobile app)                                         |
+| -------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------- |
+| Price                                                                                              | Free                              | Free, plus optional pay-as-you-go bundles                           |
+| Playing, teaching opponent, find-the-cause, both futures, rewind, review, facts-based explanations | ✓                                 | ✓, unlimited                                                        |
+| AI coach (explanations, "ask the coach")                                                           | ✓ with your own Anthropic API key | **N free coached games every month**, then bundles of coached games |
 
 - **Licence:** AGPL-3.0, so anyone running a modified version as a service must publish
   their changes (a competitor can't run a closed fork). Compatible with Stockfish's GPL.
@@ -244,23 +246,23 @@ money to run: the AI coach.
 
 ## 10. Risks and open questions
 
-| Risk | Why it matters | How to test |
-|---|---|---|
-| **Explanation quality** | Wrong explanations are worse than none for this user | Run on real beginner games; have a strong (1800+) player grade a sample |
-| **Consequence prediction** | Can we turn a feature diff into a checkable condition that reliably triggers in the real game? | Prototype 1 (below) |
-| **Teaching opponent feel** | Does the levelled-up opponent feel fair, and is the exploit legible? | Playtest |
-| **Strategic signal at low ratings** | Below ~1200, games are decided mostly by tactics; strategic lessons may rarely trigger | Count lesson types across real games |
-| **Small eval gaps** | Engine preferences of <0.5 are often inexplicable | Threshold tuning; only teach when a feature explains the gap |
-| **Cost / latency** | Engine analysis every move plus LLM calls | LLM only at reveals; engine runs in the browser (Stockfish WASM) or on a server |
-| **Will people pay?** | The free tier is the whole core product; the paid part must be worth it | Usage of free coached games vs bundle conversion; "ask the coach" is the strongest paid draw |
-| **App-store rules** | In-app purchase requirements and fees, GPL + App Store | Follow the Lichess precedent (GPL app with Stockfish on both stores); consumable in-app purchases for bundles |
+| Risk                                | Why it matters                                                                                 | How to test                                                                                                   |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Explanation quality**             | Wrong explanations are worse than none for this user                                           | Run on real beginner games; have a strong (1800+) player grade a sample                                       |
+| **Consequence prediction**          | Can we turn a feature diff into a checkable condition that reliably triggers in the real game? | Prototype 1 (below)                                                                                           |
+| **Teaching opponent feel**          | Does the levelled-up opponent feel fair, and is the exploit legible?                           | Playtest                                                                                                      |
+| **Strategic signal at low ratings** | Below ~1200, games are decided mostly by tactics; strategic lessons may rarely trigger         | Count lesson types across real games                                                                          |
+| **Small eval gaps**                 | Engine preferences of <0.5 are often inexplicable                                              | Threshold tuning; only teach when a feature explains the gap                                                  |
+| **Cost / latency**                  | Engine analysis every move plus LLM calls                                                      | LLM only at reveals; engine runs in the browser (Stockfish WASM) or on a server                               |
+| **Will people pay?**                | The free tier is the whole core product; the paid part must be worth it                        | Usage of free coached games vs bundle conversion; "ask the coach" is the strongest paid draw                  |
+| **App-store rules**                 | In-app purchase requirements and fees, GPL + App Store                                         | Follow the Lichess precedent (GPL app with Stockfish on both stores); consumable in-app purchases for bundles |
 
 ## 11. Plan
 
 1. **Prototype 1 (command line):** play against a teaching opponent in the terminal.
    Detect mistakes, record pending lessons with checkable conditions, level the opponent
    up to exploit them, and reveal when they trigger. Templated explanations; LLM optional.
-   *Tests: consequence prediction and triggering.*
+   _Tests: consequence prediction and triggering._
 2. **Explanation evaluation:** run the analysis over a set of real beginner games;
    generate LLM explanations from the facts; have a strong player grade them.
 3. **Web MVP:** board UI, the find-the-cause reveal, side-by-side futures, rewind.
@@ -284,12 +286,12 @@ opponent (Stockfish skill 3, levelling up to full strength), with a control run 
 opponent never levels up. Numbers below are from 12 games per configuration; two earlier
 10-game runs gave the same picture.
 
-| | Teaching opponent | Control (no level-up) |
-|---|---|---|
-| Consequence lessons that actually landed in the game | **77%** | 51% |
-| Median delay from mistake to consequence | 2 moves | 1 move |
-| Longest delay | 8 moves | 9 moves |
-| Opponent moves spent levelled up | 14% | 0% |
+|                                                      | Teaching opponent | Control (no level-up) |
+| ---------------------------------------------------- | ----------------- | --------------------- |
+| Consequence lessons that actually landed in the game | **77%**           | 51%                   |
+| Median delay from mistake to consequence             | 2 moves           | 1 move                |
+| Longest delay                                        | 8 moves           | 9 moves               |
+| Opponent moves spent levelled up                     | 14%               | 0%                    |
 
 What we learned:
 
@@ -310,8 +312,8 @@ What we learned:
    tactics. Strategic lessons still appear in most games.
 5. **Strategic explanations are the weak point.** Judged by eye, material lessons are
    reliably right. Strategic lessons are right roughly half the time. Good examples:
-   *"Nc6 let their knight settle on an outpost on d5"*, *"Bd6 gave their rook the open
-   d-file"*, *"Bf6 blocked your knight's natural square; develop first"*. Bad examples
+   _"Nc6 let their knight settle on an outpost on d5"_, _"Bd6 gave their rook the open
+   d-file"_, _"Bf6 blocked your knight's natural square; develop first"_. Bad examples
    were rationalisations: the factor that differed wasn't why the engine preferred the
    other move. Fixes so far: requiring a difference to persist for two plies, treating
    the king as safe once queens are off, and adding endgame king activity.

@@ -10,7 +10,8 @@
     "dev": "tsx watch src/dev.ts",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/db/migrate-cli.ts"
+    "db:migrate": "tsx src/db/migrate-cli.ts",
+    "db:check": "drizzle-kit generate && test -z \"$(git status --porcelain -- drizzle)\" || (git status --short -- drizzle; echo \"schema.ts has changes with no migration: run pnpm --filter @chess-teacher/api db:generate and commit the result\"; exit 1)"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.12.0",
