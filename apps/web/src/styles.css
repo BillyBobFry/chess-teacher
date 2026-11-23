@@ -511,3 +511,140 @@ main.game {
 .licences h2 {
   font-size: 1.1rem;
 }
+
+/* ---------- sign in */
+
+.sign-in {
+  max-width: 420px;
+  margin: 0 auto;
+}
+.sign-in h1 {
+  margin: 0 0 0.25rem;
+}
+.sign-in form {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+.sign-in label {
+  display: grid;
+  gap: 0.3rem;
+  font-weight: 600;
+  font-size: 0.925rem;
+}
+.sign-in input {
+  font: inherit;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+.sign-in input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.google {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.7rem;
+  font-weight: 600;
+}
+.google span {
+  font-weight: 800;
+  margin-right: 0.4rem;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin: 1rem 0 0;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--border);
+}
+.form-error {
+  color: var(--warn);
+  background: var(--warn-bg);
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  margin: 0;
+}
+.switch {
+  margin-top: 1.25rem;
+}
+.back {
+  margin-top: 1rem;
+}
+a.brand {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------- account menu */
+
+.account {
+  position: relative;
+}
+.account summary {
+  list-style: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+.account summary::-webkit-details-marker {
+  display: none;
+}
+.account-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 10;
+  width: 240px;
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.account-name {
+  font-weight: 600;
+}
+header.top nav {
+  align-items: center;
+}
+
+/* ---------- AI explanation */
+
+.ai {
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.7rem 0.85rem;
+  margin-bottom: 0.75rem;
+  background: var(--good-bg);
+}
+.ai p {
+  margin: 0.2rem 0 0.4rem;
+}
+.ai-label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--good);
+}
+.ai-foot,
+.ai-note {
+  font-size: 0.8rem;
+}

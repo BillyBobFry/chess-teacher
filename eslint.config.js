@@ -7,7 +7,16 @@ import { builtinModules } from "node:module";
 const nodeBuiltins = [...builtinModules, ...builtinModules.map((m) => `node:${m}`)];
 
 export default tseslint.config(
-  { ignores: ["**/node_modules/**", "prototype/**", "**/dist/**", "apps/web/public/**"] },
+  {
+    ignores: [
+      "**/node_modules/**",
+      "prototype/**",
+      "**/dist/**",
+      "apps/web/public/**",
+      ".vercel/**",
+      "apps/api/drizzle/**",
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -53,6 +62,8 @@ export default tseslint.config(
       "tools/**/*.ts",
       "packages/*/test/**/*.ts",
       "apps/web/scripts/**",
+      "apps/api/**/*.ts",
+      "scripts/**",
       "**/*.config.*",
     ],
     languageOptions: { globals: globals.node },

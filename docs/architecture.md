@@ -1,6 +1,6 @@
 # Chess Teacher — Architecture
 
-Status: **agreed** (Milestones 1 and 2 complete). Records the decisions made so far, why they
+Status: **agreed** (Milestones 1–3 complete). Records the decisions made so far, why they
 were made, and what is still open. The product concept is in [`concept.md`](concept.md);
 the measurements behind several decisions are in [`../bench/README.md`](../bench/README.md).
 
@@ -153,18 +153,21 @@ Porting notes from the Python prototype:
 A Hono API on Vercel Functions, Neon Postgres via Drizzle. Endpoint sketch (finalised in MS3):
 
 ```
-POST /api/games                       start a game (colour, difficulty)
-GET  /api/games?status=active         unfinished games, to resume
-GET  /api/games/:id                   saved session state (resume on any device)
-POST /api/games/:id/moves             append moves + events + new session state
-                                      (batched; offline-friendly; rejected if the
-                                      state version is stale, so two devices can't
-                                      overwrite each other)
-POST /api/games/:id/lessons           record a lesson's facts → queues its explanation
-GET  /api/games/:id/lessons/:lessonId explanation (LLM text, or "pending" → use template)
-POST /api/games/:id/lessons/:lessonId/outcome   found cause? hints used? rewound?
-GET  /api/me/progress                 per-principle stats
+GET  /api/config                                  is Google sign-in / are AI explanations available
+GET|POST /api/auth/*                              Better Auth (sign up, sign in, Google, sign out)
+GET  /api/me                                      user + AI explanation allowance
+GET  /api/games?status=active                     recent unfinished games
+POST /api/games                                   create a game (session state)
+GET  /api/games/:id                               load a game (resume on any device)
+PUT  /api/games/:id                               save { state, reveal, finished, expectedVersion };
+                                                  409 if another device saved first
+GET  /api/games/:id/lessons/:lessonId/explanation the stored AI explanation, if any
+POST /api/games/:id/lessons/:lessonId/explanation generate it (from the *saved* lesson), or
+                                                  return the stored one; counts against the allowance
 ```
+
+The client saves the whole session state after every step (one queued, coalesced save at
+a time) rather than posting individual moves: simpler, and the state is small.
 
 **Validation.** The server reconstructs each game from its move list with the same core
 package (no engine) to check legality, and checks that each lesson's facts are consistent
@@ -282,10 +285,34 @@ A playable web app (`apps/web`), deployable to Vercel from `vercel.json`:
 Not yet verified: the actual Vercel deployment (needs the repository connected to your
 Vercel account), and speed on real phones.
 
-## 13. Open questions
+## 13. Milestone 3 (done)
+
+- `apps/api`: Hono API; Better Auth (email + password, Google when configured); Drizzle on
+  Neon's HTTP driver in production and PGlite (Postgres in WebAssembly) locally and in
+  tests, so no database setup is needed to develop.
+- Games saved to the server after every step with optimistic version checks; resume on
+  any device; abandoning a game finishes it.
+- AI explanations: requested when the lesson is *created* (several moves before its
+  reveal), generated from the saved lesson's facts only, guardrail-checked, stored once per
+  lesson, counted against a monthly allowance (default 30) only when successful. Shown
+  above the measured facts; the facts stand alone when there's no AI explanation.
+- `packages/contract`: API schemas in Zod, used for validation and client types.
+- Static landing page at `/`; the app at `/app/`; sign-in screens in the app.
+- `scripts/build-vercel.mjs` writes Vercel's Build Output API format directly;
+  `scripts/serve-vercel-output.mjs` serves that output locally for end-to-end testing.
+- Tests: 12 API integration tests; the end-to-end browser test now runs against the
+  production build.
+
+Not yet verified against the real services: Vercel itself, Neon's HTTP driver (tests use
+PGlite, the same SQL), Google sign-in, and the real Anthropic API (the request shape
+follows the SDK documentation; tests use a fake client).
+
+Deferred: per-principle progress page, password reset (needs an email service), payments.
+
+## 14. Open questions
 
 1. ~~Engine on the device (D2)~~: confirmed.
 2. ~~Next.js vs Vite SPA + Vercel functions (D8)~~: SPA + Hono.
-3. Auth provider: MS3.
+3. ~~Auth provider~~: Better Auth (email + password, Google).
 4. LLM model and price points: after the LLM benchmark runs.
 5. Licensing advice before any paid launch.

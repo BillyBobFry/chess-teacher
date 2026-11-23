@@ -12,8 +12,10 @@
     "smoke": "tsx scripts/smoke.ts"
   },
   "dependencies": {
+    "@chess-teacher/contract": "workspace:*",
     "@chess-teacher/core": "workspace:*",
     "@chess-teacher/engine": "workspace:*",
+    "better-auth": "1.7.27",
     "chess.js": "1.4.0",
     "react": "19.3.1",
     "react-chessboard": "5.12.4",

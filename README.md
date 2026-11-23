@@ -6,39 +6,73 @@ helping you work out which move caused it.
 - Product concept: [`docs/concept.md`](docs/concept.md)
 - Architecture and decisions: [`docs/architecture.md`](docs/architecture.md)
 
-**Status:** Milestone 2 done: a playable web app. Stockfish runs in the browser, the
-teaching opponent levels up to exploit your mistakes, and when one lands you find the
-cause, compare the two futures and can rewind. Games are saved in the browser for now;
-sign-in, the server and LLM explanations are Milestone 3.
+**Status:** Milestone 3 done: accounts (email + password, Google), games saved to the
+server and resumable on any device, AI explanations with a monthly allowance, a landing
+page, and a production build for Vercel + Neon.
 
 ## Layout
 
 | Path | What |
 |---|---|
-| `apps/web` | The web app: Vite + React SPA served under `/app/`, Stockfish WASM in Web Workers. |
+| `apps/web` | The web app: Vite + React SPA served under `/app/`, Stockfish WASM in Web Workers; the static landing page in `apps/web/landing`. |
+| `apps/api` | The API: Hono, Better Auth, Drizzle (Neon in production, embedded PGlite locally), LLM explanations. |
+| `packages/contract` | API request/response schemas (Zod), shared by the API and its clients. |
 | `packages/core` | The teaching logic, in pure TypeScript (runs in the browser, Node and React Native): strategic features, lesson detection, triggers, the teaching opponent, explanations, and the game session as serialisable state. |
 | `packages/engine` | Engine adapters: UCI protocol parser, a replay engine for tests, and a Node adapter for a Stockfish process (`@chess-teacher/engine/node`). |
 | `tools/sim` | Simulation harness, parity tests against the Python prototype, profiling. |
 | `prototype` | The original Python prototype, benchmarks and research tools. Kept as the reference implementation for now. |
 
-## Setup
+## Running locally
 
-Needs Node 22+, pnpm, and [Stockfish](https://stockfishchess.org/) (`apt install stockfish`,
-`brew install stockfish`, or set `STOCKFISH_PATH`).
+Needs Node 22+ and pnpm (`corepack enable pnpm`). No database or API keys needed.
 
 ```bash
 pnpm install
-pnpm --filter @chess-teacher/web dev      # http://localhost:5173/app/
-pnpm check      # typecheck + lint + tests
-pnpm sim -- --games 12 --compare --out ../../reports   # simulated games with real Stockfish
+pnpm dev          # API on :8787, web on http://localhost:5173/app/ (proxies /api)
 ```
 
-## Deploying (Vercel)
+Locally the API uses an embedded Postgres stored in `apps/api/.data` (delete the folder to
+start fresh). Optional settings go in `apps/api/.env`; see `apps/api/.env.example`:
 
-`vercel.json` at the repository root configures everything: pnpm install, the web build,
-`/` → `/app/` redirect, and SPA routing under `/app/`. Import the GitHub repository in
-Vercel with the root directory left as the repository root and framework preset
-"Other"; every pushed branch then gets a preview URL.
+- `ANTHROPIC_API_KEY`: real AI explanations (costs money; see `prototype/bench` for the
+  cost benchmark). Without it the app uses the template explanations.
+- `FAKE_LLM=1`: canned "explanations" with no key and no cost, to try the AI flow.
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`: Google sign-in.
+
+Other commands:
+
+```bash
+pnpm check        # typecheck + lint + all unit, parity and API tests
+pnpm build        # production build in Vercel's format (.vercel/output)
+pnpm serve        # serve that build locally on :3000, API included
+pnpm smoke <dir>  # build, then the end-to-end browser test (needs Playwright + Chromium)
+pnpm sim -- --games 12 --compare --out ../../reports   # simulations (needs native Stockfish)
+```
+
+## Deploying (Vercel + Neon)
+
+1. **Vercel:** import the GitHub repository, root directory = repository root, framework
+   preset "Other". `vercel.json` runs `scripts/build-vercel.mjs`, which writes Vercel's
+   Build Output directly (static site + one API function + routing).
+2. **Database:** add Neon from the Vercel Marketplace (it sets `DATABASE_URL`, and can give
+   each preview deployment its own database branch), or set `DATABASE_URL` yourself.
+   Migrations run automatically during the build whenever `DATABASE_URL` is set.
+3. **Environment variables** (Project → Settings → Environment Variables):
+
+   | Variable | Needed | Value |
+   |---|---|---|
+   | `BETTER_AUTH_SECRET` | yes | a long random string: `openssl rand -base64 32` |
+   | `BETTER_AUTH_URL` | production | your public URL, e.g. `https://chess.example.com` (previews use their own URL automatically) |
+   | `ANTHROPIC_API_KEY` | for AI explanations | from console.anthropic.com → API Keys |
+   | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | for Google sign-in | see below |
+   | `LLM_MODEL` | no | default `claude-opus-5-5` |
+   | `FREE_EXPLANATIONS_PER_MONTH` | no | default `30` |
+
+4. **Google sign-in:** in Google Cloud Console → APIs & Services → Credentials, create an
+   OAuth client ID (Web application) with the authorised redirect URI
+   `<BETTER_AUTH_URL>/api/auth/callback/google`. Preview URLs change per deployment, so
+   Google sign-in is easiest to use on the production domain; email + password works
+   everywhere.
 
 ## Tests
 
@@ -50,11 +84,13 @@ Vercel with the root directory left as the repository root and framework preset
 - **Resume:** the same games, saving and reloading the session state as JSON after every
   step, must produce identical results.
 - Unit tests for the UCI parser, the Stockfish adapter, rewind, and edge cases.
-- **Browser smoke test** (`pnpm --filter @chess-teacher/web build && pnpm --filter
-  @chess-teacher/web smoke <dir>`): plays a move against Stockfish in headless Chromium,
-  resumes after a reload, walks through a reveal (wrong guess → hint → answer →
-  futures → rewind), the review, the licences page and the phone layout, and fails on
-  any console error. Needs Playwright with Chromium installed.
+- **API tests:** the real Hono app with Better Auth on an in-memory Postgres: sign-up and
+  sign-in, privacy between users, saving with version conflicts, illegal-move rejection,
+  explanation caching, the guardrail, and the monthly allowance (with a fake LLM).
+- **End-to-end browser test** (`pnpm smoke <dir>`): runs the *production build* locally and
+  drives it in headless Chromium: landing page, account creation, playing against
+  Stockfish, resuming after a reload, a reveal with the AI explanation and rewind, the
+  review, signing out and in, the phone layout, and no console errors.
 
 To re-record the fixtures (needs the Python prototype set up, see `prototype/README.md`):
 

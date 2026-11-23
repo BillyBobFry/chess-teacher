@@ -1,5 +1,7 @@
 import { lessonLabel, recentUserMoves, type Lesson, type SessionState } from "@chess-teacher/core";
+import type { ExplanationResponse } from "@chess-teacher/contract";
 import type { RevealState } from "../game/storage.ts";
+import { AiExplanation } from "./AiExplanation.tsx";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
 
@@ -8,6 +10,7 @@ interface Props {
   lesson: Lesson;
   reveal: RevealState;
   hint: string | null;
+  loadExplanation: (signal: AbortSignal) => Promise<ExplanationResponse | null>;
   onGuess: (ply: number) => void;
   onShowAnswer: () => void;
   onRewind: () => void;
@@ -15,7 +18,17 @@ interface Props {
 }
 
 /** Find the cause → explanation and the two futures → rewind or carry on. */
-export function Reveal({ state, lesson, reveal, hint, onGuess, onShowAnswer, onRewind, onContinue }: Props) {
+export function Reveal({
+  state,
+  lesson,
+  reveal,
+  hint,
+  loadExplanation,
+  onGuess,
+  onShowAnswer,
+  onRewind,
+  onContinue,
+}: Props) {
   const headline = lesson.kind === "consequence" ? lesson.triggerText : "The chance has gone.";
   const sub =
     lesson.kind === "consequence"
@@ -58,6 +71,7 @@ export function Reveal({ state, lesson, reveal, hint, onGuess, onShowAnswer, onR
       ) : (
         <div className="explain">
           {lesson.foundCause && <p className="found">✓ Yes, that's the one.</p>}
+          <AiExplanation load={loadExplanation} />
           <Explanation lesson={lesson} />
           <Futures lesson={lesson} />
           <div className="actions">
