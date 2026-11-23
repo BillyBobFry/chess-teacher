@@ -146,6 +146,8 @@ async function step(name: string, fn: () => Promise<void>) {
 
 try {
   const context = await browser.newContext({
+    // The copy assertions below are the en-GB catalogue; the phone checks en-US.
+    locale: "en-GB",
     viewport: { width: 1280, height: 860 },
     deviceScaleFactor: scale,
   });
@@ -297,9 +299,13 @@ try {
 
   const phone = await browser.newContext({
     ...devices["iPhone 13"],
+    locale: "en-US",
     storageState: await context.storageState(),
   });
   const mobile = await phone.newPage();
+  // The desktop session saved its detected locale (en-GB) with the sign-in; drop it so this
+  // browser's own language decides.
+  await mobile.addInitScript(() => localStorage.removeItem("PARAGLIDE_LOCALE"));
   mobile.on("pageerror", (e) => unexpected.push(e.message));
   await step("phone layout", async () => {
     await mobile.goto(`${BASE}/app/`);
@@ -310,6 +316,11 @@ try {
     await mobile.reload();
     await mobile.getByText("The better move, then…").first().waitFor({ timeout: 30_000 });
     await mobile.getByText("Your coach", { exact: true }).waitFor({ timeout: 30_000 });
+    // The browser asks for en-US, so the app speaks it (UX-39).
+    await mobile.getByRole("button", { name: "Licenses" }).waitFor();
+    if ((await mobile.evaluate(() => document.documentElement.lang)) !== "en-US") {
+      throw new Error("<html lang> doesn't follow the locale");
+    }
     await mobile.screenshot({ path: join(outDir, "7-phone-reveal.png"), fullPage: true });
     if (await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)) {
       throw new Error("horizontal scroll on phone");

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../api/client.ts";
+import { m } from "../paraglide/messages.js";
 
 /** "Did this make sense?" A thumbs up or down, with an optional comment on a thumbs down. */
 export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId: number }) {
@@ -13,14 +14,14 @@ export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId:
     if (r === 1 || text !== undefined) setSent(true);
   };
 
-  if (sent) return <p className="feedback-thanks muted small">Thanks: that helps us improve the lessons.</p>;
+  if (sent) return <p className="feedback-thanks muted small">{m.feedback_thanks()}</p>;
   return (
     <div className="feedback">
-      <span className="small">Did this lesson make sense?</span>
+      <span className="small">{m.feedback_question()}</span>
       <button
         className={rating === 1 ? "on" : ""}
         aria-pressed={rating === 1}
-        aria-label="Yes, it made sense"
+        aria-label={m.feedback_yes()}
         onClick={() => send(1)}
       >
         👍
@@ -28,7 +29,7 @@ export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId:
       <button
         className={rating === -1 ? "on" : ""}
         aria-pressed={rating === -1}
-        aria-label="No, it didn't make sense"
+        aria-label={m.feedback_no()}
         onClick={() => send(-1)}
       >
         👎
@@ -44,11 +45,11 @@ export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId:
           <input
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="What didn't make sense? (optional)"
+            placeholder={m.feedback_comment_placeholder()}
             maxLength={1000}
-            aria-label="What didn't make sense?"
+            aria-label={m.feedback_comment_label()}
           />
-          <button type="submit">Send</button>
+          <button type="submit">{m.feedback_send()}</button>
         </form>
       )}
     </div>

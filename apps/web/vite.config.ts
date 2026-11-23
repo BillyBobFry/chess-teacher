@@ -1,3 +1,4 @@
+import { paraglideVitePlugin } from "@inlang/paraglide-js";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
@@ -9,7 +10,12 @@ const proxy = { "/api": { target: `http://localhost:${apiPort}`, changeOrigin: f
 // The SPA lives under /app/ so the domain root can hold the landing page (architecture §7.1).
 export default defineConfig({
   base: "/app/",
-  plugins: [react()],
+  plugins: [
+    react(),
+    // Compiles messages/<locale>.json to src/paraglide (generated, git-ignored).
+    // Options: project.inlang/paraglide.config.ts.
+    paraglideVitePlugin({ project: "./project.inlang" }),
+  ],
   build: { outDir: "dist/app", emptyOutDir: true },
   server: { proxy },
   preview: { proxy },

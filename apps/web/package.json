@@ -8,13 +8,15 @@
     "dev": "node scripts/copy-stockfish.mjs && vite",
     "build": "node scripts/copy-stockfish.mjs && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "smoke": "tsx scripts/smoke.ts"
+    "typecheck": "pnpm i18n && tsc --noEmit",
+    "smoke": "tsx scripts/smoke.ts",
+    "i18n": "paraglide-js compile --project ./project.inlang --silent"
   },
   "dependencies": {
     "@chess-teacher/contract": "workspace:*",
     "@chess-teacher/core": "workspace:*",
     "@chess-teacher/engine": "workspace:*",
+    "@inlang/paraglide-js-react": "1.0.4",
     "better-auth": "1.7.27",
     "chess.js": "1.4.0",
     "react": "19.3.1",
@@ -24,6 +26,7 @@
     "stockfish11": "npm:stockfish@11.0.0"
   },
   "devDependencies": {
+    "@inlang/paraglide-js": "3.2.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "6.3.0",

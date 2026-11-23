@@ -3,6 +3,7 @@ import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 import { builtinModules } from "node:module";
+import { uiText } from "./eslint/ui-text.js";
 
 const nodeBuiltins = [...builtinModules, ...builtinModules.map((m) => `node:${m}`)];
 
@@ -13,6 +14,7 @@ export default tseslint.config(
       "prototype/**",
       "**/dist/**",
       "apps/web/public/**",
+      "apps/web/src/paraglide/**",
       ".vercel/**",
       "apps/api/drizzle/**",
     ],
@@ -52,9 +54,9 @@ export default tseslint.config(
   },
   {
     files: ["apps/web/src/**/*.{ts,tsx}"],
-    plugins: { "react-hooks": reactHooks },
+    plugins: { "react-hooks": reactHooks, "ui-text": uiText },
     languageOptions: { globals: globals.browser },
-    rules: reactHooks.configs.recommended.rules,
+    rules: { ...reactHooks.configs.recommended.rules, "ui-text/no-jsx-text": "error" },
   },
   {
     files: [
@@ -65,6 +67,7 @@ export default tseslint.config(
       "apps/api/**/*.ts",
       "scripts/**",
       "**/*.config.*",
+      "eslint/**",
     ],
     languageOptions: { globals: globals.node },
   },

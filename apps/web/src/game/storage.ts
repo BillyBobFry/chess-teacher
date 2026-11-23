@@ -6,6 +6,7 @@
 import type { RevealState } from "@chess-teacher/contract";
 import type { SessionState } from "@chess-teacher/core";
 import { api, HttpError } from "../api/client.ts";
+import { m } from "../paraglide/messages.js";
 
 export type { RevealState };
 
@@ -85,7 +86,7 @@ export class Saver {
         this.latest = null;
         this.onError(
           err instanceof HttpError && err.status === 409
-            ? new ConflictError("This game was changed on another device.")
+            ? new ConflictError(m.error_conflict())
             : err instanceof Error
               ? err
               : new Error(String(err)),

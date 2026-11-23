@@ -1,39 +1,50 @@
+import { ParaglideMessage } from "@inlang/paraglide-js-react";
+import type { ReactNode } from "react";
+import { m } from "../paraglide/messages.js";
+
+// Names and SPDX identifiers: the same in every language.
+const COMPONENTS = [
+  { component: "chess.js", licence: "BSD-2-Clause", note: null },
+  { component: "react-chessboard", licence: "MIT", note: m.licences_item_pieces },
+  { component: "React", licence: "MIT", note: null },
+];
+
+const external = (href: string) =>
+  function ExternalLink({ children }: { children?: ReactNode }) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer">
+        {children}
+      </a>
+    );
+  };
+
 /** Third-party licences. Stockfish is GPL-3.0 and is distributed to the browser, so its
  * licence and a link to its source must be available to every user. */
 export function Licences({ onBack }: { onBack: () => void }) {
   const base = import.meta.env.BASE_URL;
   return (
     <section className="licences">
-      <h1>Licences</h1>
-      <h2>Stockfish</h2>
+      <h1>{m.licences_title()}</h1>
+      <h2>{m.licences_stockfish_heading()}</h2>
       <p>
-        The chess engine running in your browser is Stockfish 19 (the WebAssembly build by the stockfish.js
-        project), licensed under the{" "}
-        <a href={`${base}stockfish/COPYING.txt`} target="_blank" rel="noreferrer">
-          GNU General Public License v3
-        </a>
-        . Source code:{" "}
-        <a href="https://github.com/official-stockfish/Stockfish" target="_blank" rel="noreferrer">
-          Stockfish
-        </a>{" "}
-        and{" "}
-        <a href="https://github.com/nmrugg/stockfish.js" target="_blank" rel="noreferrer">
-          stockfish.js
-        </a>
-        . A second engine, Stockfish 11 (also GPL v3,{" "}
-        <a href={`${base}stockfish11/COPYING.txt`} target="_blank" rel="noreferrer">
-          licence
-        </a>
-        ), is used for its classical evaluation when checking strategic lessons. This app talks to both
-        engines only through the UCI text protocol.
+        <ParaglideMessage
+          message={m.licences_stockfish}
+          inputs={{}}
+          markup={{
+            gpl: external(`${base}stockfish/COPYING.txt`),
+            stockfish: external("https://github.com/official-stockfish/Stockfish"),
+            stockfishjs: external("https://github.com/nmrugg/stockfish.js"),
+            licence11: external(`${base}stockfish11/COPYING.txt`),
+          }}
+        />
       </p>
-      <h2>Other components</h2>
+      <h2>{m.licences_other()}</h2>
       <ul>
-        <li>chess.js: BSD-2-Clause</li>
-        <li>react-chessboard (including its piece set): MIT</li>
-        <li>React: MIT</li>
+        {COMPONENTS.map(({ component, licence, note }) => (
+          <li key={component}>{(note ?? m.licences_item)({ component, licence })}</li>
+        ))}
       </ul>
-      <button onClick={onBack}>Back</button>
+      <button onClick={onBack}>{m.back()}</button>
     </section>
   );
 }

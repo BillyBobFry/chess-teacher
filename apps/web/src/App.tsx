@@ -11,22 +11,22 @@ import { Reveal } from "./components/Reveal.tsx";
 import { Review } from "./components/Review.tsx";
 import { SignIn } from "./components/SignIn.tsx";
 import { useGame, type Busy } from "./game/useGame.ts";
+import { m } from "./paraglide/messages.js";
 
-const BUSY_TEXT: Record<Exclude<Busy, null>, string> = {
-  loading: "Loading your game…",
-  engine: "Starting the engine…",
-  preparing: "Getting ready for your move…",
-  checking: "Thinking about your move…",
-  opponent: "Your opponent is thinking…",
+const BUSY_TEXT: Record<Exclude<Busy, null>, () => string> = {
+  loading: m.busy_loading,
+  engine: m.busy_engine,
+  preparing: m.busy_preparing,
+  checking: m.busy_checking,
+  opponent: m.busy_opponent,
 };
 
 function resultText(game: Game, userColour: "w" | "b"): string {
   const chess = game.chess;
-  if (chess.isCheckmate())
-    return chess.turn() === userColour ? "Checkmate. You lost this one." : "Checkmate. You won!";
-  if (chess.isStalemate()) return "Stalemate: a draw.";
-  if (game.isGameOver()) return "Draw.";
-  return "Game ended.";
+  if (chess.isCheckmate()) return chess.turn() === userColour ? m.result_lost() : m.result_won();
+  if (chess.isStalemate()) return m.result_stalemate();
+  if (game.isGameOver()) return m.result_draw();
+  return m.result_ended();
 }
 
 function Shell({
@@ -42,14 +42,14 @@ function Shell({
     <div className="app">
       <header className="top">
         <a className="brand" href="/app/">
-          <span aria-hidden>♞</span> Chess Teacher
+          <span aria-hidden>♞</span> {m.app_name()}
         </a>
         <nav>{nav}</nav>
       </header>
       {children}
       <footer className="bottom">
         <button className="link" onClick={onLicences}>
-          Licences
+          {m.footer_licences()}
         </button>
       </footer>
     </div>
@@ -81,7 +81,7 @@ export function App() {
   if (session.isPending || !config) {
     return (
       <Shell onLicences={() => setLicences(true)}>
-        <main className="page muted">Loading…</main>
+        <main className="page muted">{m.loading()}</main>
       </Shell>
     );
   }
@@ -143,25 +143,28 @@ function GameApp({
     <>
       {saved && !saved.finished && !choosing && (
         <button onClick={() => g.endGame()} disabled={!!saved.reveal}>
-          End game
+          {m.nav_end_game()}
         </button>
       )}
       {saved && !choosing && (
         <button
           onClick={() => {
-            if (saved.finished || confirm("Abandon this game and start a new one?")) setChoosing(true);
+            if (saved.finished || confirm(m.confirm_abandon())) setChoosing(true);
           }}
         >
-          New game
+          {m.nav_new_game()}
         </button>
       )}
       <details className="account">
-        <summary aria-label="Account">{userName.slice(0, 1).toUpperCase() || "?"}</summary>
+        <summary aria-label={m.account_menu()}>{userName.slice(0, 1).toUpperCase() || "?"}</summary>
         <div className="account-menu">
           <div className="account-name">{userName}</div>
           {g.me?.explanations.enabled && (
             <div className="muted small">
-              {g.me.explanations.remaining} of {g.me.explanations.limit} AI explanations left this month
+              {m.account_allowance({
+                remaining: g.me.explanations.remaining,
+                limit: g.me.explanations.limit,
+              })}
             </div>
           )}
           <button
@@ -170,10 +173,10 @@ function GameApp({
               setShowProgress(true);
             }}
           >
-            Your progress
+            {m.account_progress()}
           </button>
           <button onClick={() => void authClient.signOut().then(() => window.location.reload())}>
-            Sign out
+            {m.account_sign_out()}
           </button>
         </div>
       </details>
@@ -183,7 +186,7 @@ function GameApp({
   if (!g.loaded) {
     return (
       <Shell nav={nav} onLicences={onLicences}>
-        <main className="page muted">{BUSY_TEXT.loading}</main>
+        <main className="page muted">{BUSY_TEXT.loading()}</main>
       </Shell>
     );
   }
@@ -212,7 +215,7 @@ function GameApp({
           />
           {saved && choosing && (
             <button className="link back" onClick={() => setChoosing(false)}>
-              Back to the current game
+              {m.game_back_to_current()}
             </button>
           )}
         </main>
@@ -227,11 +230,11 @@ function GameApp({
   const status = saved.finished
     ? resultText(board.game, state.userColour)
     : saved.reveal
-      ? "Game paused"
+      ? m.status_paused()
       : g.busy
-        ? BUSY_TEXT[g.busy]
+        ? BUSY_TEXT[g.busy]()
         : isUserTurn(state)
-          ? "Your move"
+          ? m.status_your_move()
           : "…";
 
   return (
@@ -252,7 +255,7 @@ function GameApp({
             <div className="error" role="alert">
               {g.error}{" "}
               <button className="link" onClick={g.dismissError}>
-                Dismiss
+                {m.dismiss()}
               </button>
             </div>
           )}
@@ -281,12 +284,9 @@ function GameApp({
             />
           ) : (
             <>
-              <h2 className="panel-title">Moves</h2>
+              <h2 className="panel-title">{m.panel_moves()}</h2>
               <MoveList startFen={state.startFen} moves={state.moves} />
-              <p className="muted small">
-                Play normally. If a mistake comes back to bite you, the game will pause so you can find out
-                why.
-              </p>
+              <p className="muted small">{m.panel_play_hint()}</p>
             </>
           )}
         </aside>

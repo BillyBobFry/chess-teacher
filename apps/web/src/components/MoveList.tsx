@@ -1,5 +1,6 @@
 import { Game, sanOf } from "@chess-teacher/core";
 import { useEffect, useMemo, useRef } from "react";
+import { m } from "../paraglide/messages.js";
 
 /** The game's moves in pairs, scrolled to the latest. */
 export function MoveList({ startFen, moves }: { startFen: string; moves: string[] }) {
@@ -23,8 +24,8 @@ export function MoveList({ startFen, moves }: { startFen: string; moves: string[
   }, [moves.length]);
 
   return (
-    <div className="moves" aria-label="Moves">
-      {rows.length === 0 && <p className="muted">No moves yet.</p>}
+    <div className="moves" aria-label={m.panel_moves()}>
+      {rows.length === 0 && <p className="muted">{m.moves_empty()}</p>}
       <ol>
         {rows.map(([n, w, b]) => (
           <li key={n}>
