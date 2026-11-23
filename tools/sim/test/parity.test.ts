@@ -13,12 +13,15 @@ import {
   newSession,
   opponentMove,
   startUserTurn,
+  upgradeSession,
   userMove,
   type Engines,
   type GameEvent,
+  type SavedSessionState,
   type SessionState,
 } from "@chess-teacher/core";
 import { RecordedEngine } from "@chess-teacher/engine";
+import { detailText, eventText, triggerText } from "../src/prototype-text.ts";
 import { configOf, lessonAsFixture, loadGames, pyEventKind, type FixtureGame } from "./fixtures.ts";
 
 const games = loadGames();
@@ -30,24 +33,24 @@ async function replay(g: FixtureGame, roundTrip: boolean) {
   let state: SessionState = newSession({ userColour: g.userColour, config: configOf(g) });
   const save = (s: SessionState): SessionState =>
     roundTrip ? (JSON.parse(JSON.stringify(s)) as SessionState) : s;
-  const asPy = (events: GameEvent[]) =>
-    events.map((e) => ({ kind: e.kind, lessonId: e.lessonId, text: e.text }));
+  const asPy = (events: GameEvent[], s: SessionState) =>
+    events.map((e) => ({ kind: e.kind, lessonId: e.lessonId, text: eventText(e, s.lessons) }));
 
   for (const [i, step] of g.steps.entries()) {
     const expected = step.events.map((e) => ({ ...e, kind: pyEventKind(e.kind) }));
     const where = `step ${i} (${step.type}${step.move ? " " + step.move : ""})`;
     if (step.type === "startUserTurn") {
       const r = await startUserTurn(state, engines);
-      expect(asPy(r.events), where).toEqual(expected);
+      expect(asPy(r.events, r.state), where).toEqual(expected);
       state = save(r.state);
     } else if (step.type === "userMove") {
       const r = await userMove(state, step.move!, engines);
-      expect(asPy(r.events), where).toEqual(expected);
+      expect(asPy(r.events, r.state), where).toEqual(expected);
       state = save(r.state);
     } else {
       const r = await opponentMove(state, engines);
       expect({ move: r.move, mode: r.mode }, where).toEqual({ move: step.move, mode: step.mode });
-      expect(asPy(r.events), where).toEqual(expected);
+      expect(asPy(r.events, r.state), where).toEqual(expected);
       state = save(r.state);
     }
   }
@@ -64,6 +67,24 @@ describe("game parity with the Python prototype", () => {
         expect(lessons.length).toBe(game.lessons.length);
         lessons.forEach((l, i) => expect(l, `lesson ${i + 1}`).toEqual(game.lessons[i]));
         expect(analyst.unused() + weak.unused(), "every recorded engine call was used").toBe(0);
+      });
+
+      it("upgrades from a version 1 save, where lesson text was English", async () => {
+        const { state } = await replay(game, false);
+        const saved: SavedSessionState = {
+          ...state,
+          version: 1,
+          lessons: state.lessons.map(({ trigger, ...l }) => ({
+            ...l,
+            baselineDetail: detailText(l.baselineDetail),
+            userDetail: detailText(l.userDetail),
+            bestDetail: detailText(l.bestDetail),
+            triggerText: triggerText(trigger),
+          })),
+        };
+        const upgraded = upgradeSession(JSON.parse(JSON.stringify(saved)) as SavedSessionState);
+        const lessons = upgraded.lessons.map((l) => lessonAsFixture(upgraded, l));
+        lessons.forEach((l, i) => expect(l, `lesson ${i + 1}`).toEqual(game.lessons[i]));
       });
 
       it("is unchanged by saving and reloading the state after every step", async () => {

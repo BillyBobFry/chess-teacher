@@ -2,13 +2,12 @@
  * Strategic features measured in code, from one player's point of view.
  *
  * Every feature returns [value, detail]: a number where HIGHER IS BETTER for the player
- * being measured, and a short human-readable detail used in explanations. The LLM never
- * does this analysis; it only phrases what these functions found.
+ * being measured, and the facts behind it (a `Detail`, rendered in the player's language by
+ * the app). The LLM never does this analysis; it only phrases what these functions found.
  */
 
 import {
   FILE_NAMES,
-  PIECE_NAMES,
   Position,
   VALUES,
   fileOf,
@@ -22,16 +21,14 @@ import {
   type Colour,
   type PieceType,
 } from "./board.ts";
+import type { PrincipleId } from "./principles.ts";
+import type { Detail, PieceOn } from "./text.ts";
 
-export type Measurement = [value: number, detail: string];
+export type Measurement = [value: number, detail: Detail];
 
 const CENTRE = [27, 28, 35, 36]; // d4, e4, d5, e5
 
-const pieceDesc = (pos: Position, s: number): string => {
-  const p = pos.pieceAt(s);
-  return p ? `${PIECE_NAMES[p.type]} on ${squareName(s)}` : squareName(s);
-};
-const list = (squares: number[]): string => squares.map(squareName).join(", ");
+const names = (squares: number[]): string[] => squares.map(squareName);
 
 // --------------------------------------------------------------------------- material
 
@@ -218,15 +215,14 @@ export function pawnWeaknessCount(ps: PawnStructure): number {
   return ps.isolated.length + (ps.doubled.length - doubledFiles.size) + ps.backward.length;
 }
 
-export function describePawns(ps: PawnStructure): string {
-  const parts: string[] = [];
-  if (ps.isolated.length) parts.push(`isolated pawn(s) on ${list(ps.isolated)}`);
-  if (ps.doubled.length) {
-    const files = [...new Set(ps.doubled.map((s) => FILE_NAMES[fileOf(s)]!))].sort();
-    parts.push(`doubled pawns on the ${files.map((f) => `${f}-file`).join(", ")}`);
-  }
-  if (ps.backward.length) parts.push(`backward pawn(s) on ${list(ps.backward)}`);
-  return parts.join("; ") || "no pawn weaknesses";
+export function describePawns(ps: PawnStructure, side: "own" | "theirs"): Detail {
+  return {
+    kind: "pawns",
+    side,
+    isolated: names(ps.isolated),
+    doubledFiles: [...new Set(ps.doubled.map((s) => FILE_NAMES.charAt(fileOf(s))))].sort(),
+    backward: names(ps.backward),
+  };
 }
 
 export function outposts(pos: Position, color: Colour): number[] {
@@ -275,12 +271,9 @@ export interface Feature {
   name: FeatureName;
   /** How big a change counts as "one significant step". */
   unit: number;
-  principle: string;
+  principle: PrincipleId;
   measure(pos: Position, color: Colour): Measurement;
 }
-
-const sides = (mine: number[], theirs: number[], label: string): string =>
-  `your ${label}: ${list(mine) || "none"}; theirs: ${list(theirs) || "none"}`;
 
 export const FEATURES: Feature[] = [
   {
@@ -289,7 +282,7 @@ export const FEATURES: Feature[] = [
     principle: "safety",
     measure: (pos, c) => {
       const v = settledBalance(pos.fen, c);
-      return [v, `material balance ${v >= 0 ? "+" : ""}${v}`];
+      return [v, { kind: "material", balance: v }];
     },
   },
   {
@@ -297,14 +290,13 @@ export const FEATURES: Feature[] = [
     unit: 1,
     principle: "develop",
     measure: (pos, c) => {
-      if (pos.fullmoveNumber > 20) return [0, "opening phase over"];
+      if (pos.fullmoveNumber > 20) return [0, { kind: "opening_over" }];
       const u = undeveloped(pos, c);
-      return [
-        neg(u.length),
-        u.length
-          ? `undeveloped: ${u.map((s) => pieceDesc(pos, s)).join(", ")}`
-          : "all minor pieces developed",
-      ];
+      const pieces = u.flatMap((s): PieceOn[] => {
+        const p = pos.pieceAt(s);
+        return p ? [{ piece: p.type, square: squareName(s) }] : [];
+      });
+      return [neg(u.length), { kind: "undeveloped", pieces }];
     },
   },
   {
@@ -314,14 +306,10 @@ export const FEATURES: Feature[] = [
     measure: (pos, c) => {
       // Without the enemy queen a mating attack is unlikely: treat the king as safe,
       // otherwise trading queens would look like a king-safety *loss*.
-      if (pos.pieces("q", opposite(c)).length === 0)
-        return [3, "the enemy queen is gone, so your king is fairly safe"];
+      if (pos.pieces("q", opposite(c)).length === 0) return [3, { kind: "queen_gone" }];
       const shield = kingShield(pos, c);
       const attacks = kingZoneAttacks(pos, c);
-      return [
-        shield - 0.5 * attacks,
-        `${shield} pawn(s) shielding the king, ${attacks} enemy attack(s) on the squares around it`,
-      ];
+      return [shield - 0.5 * attacks, { kind: "king_shelter", shield, attacks }];
     },
   },
   {
@@ -331,7 +319,7 @@ export const FEATURES: Feature[] = [
     measure: (pos, c) => {
       const mine = centreControl(pos, c);
       const theirs = centreControl(pos, opposite(c));
-      return [mine - theirs, `centre control ${mine} vs ${theirs}`];
+      return [mine - theirs, { kind: "centre", mine, theirs }];
     },
   },
   {
@@ -341,7 +329,7 @@ export const FEATURES: Feature[] = [
     measure: (pos, c) => {
       const mine = mobility(pos, c);
       const theirs = mobility(pos, opposite(c));
-      return [(mine - theirs) / 5, `${mine} piece moves available vs opponent's ${theirs}`];
+      return [(mine - theirs) / 5, { kind: "mobility", mine, theirs }];
     },
   },
   {
@@ -350,7 +338,7 @@ export const FEATURES: Feature[] = [
     principle: "pawn_weaknesses",
     measure: (pos, c) => {
       const ps = pawnStructure(pos, c);
-      return [neg(pawnWeaknessCount(ps)), describePawns(ps)];
+      return [neg(pawnWeaknessCount(ps)), describePawns(ps, "own")];
     },
   },
   {
@@ -359,7 +347,7 @@ export const FEATURES: Feature[] = [
     principle: "target_weaknesses",
     measure: (pos, c) => {
       const ps = pawnStructure(pos, opposite(c));
-      return [pawnWeaknessCount(ps), `opponent's pawns: ${describePawns(ps)}`];
+      return [pawnWeaknessCount(ps), describePawns(ps, "theirs")];
     },
   },
   {
@@ -369,7 +357,10 @@ export const FEATURES: Feature[] = [
     measure: (pos, c) => {
       const mine = pawnStructure(pos, c).passed;
       const theirs = pawnStructure(pos, opposite(c)).passed;
-      return [mine.length - theirs.length, sides(mine, theirs, "passed pawns")];
+      return [
+        mine.length - theirs.length,
+        { kind: "passed_pawns", mine: names(mine), theirs: names(theirs) },
+      ];
     },
   },
   {
@@ -379,7 +370,7 @@ export const FEATURES: Feature[] = [
     measure: (pos, c) => {
       const mine = outposts(pos, c);
       const theirs = outposts(pos, opposite(c));
-      return [mine.length - theirs.length, sides(mine, theirs, "knight outposts")];
+      return [mine.length - theirs.length, { kind: "outposts", mine: names(mine), theirs: names(theirs) }];
     },
   },
   {
@@ -389,7 +380,7 @@ export const FEATURES: Feature[] = [
     measure: (pos, c) => {
       const mine = rooksOnOpenFiles(pos, c);
       const theirs = rooksOnOpenFiles(pos, opposite(c));
-      return [mine.length - theirs.length, sides(mine, theirs, "rooks on open files")];
+      return [mine.length - theirs.length, { kind: "open_files", mine: names(mine), theirs: names(theirs) }];
     },
   },
   {
@@ -397,16 +388,15 @@ export const FEATURES: Feature[] = [
     unit: 1,
     principle: "king_activity",
     measure: (pos, c) => {
-      if (!isEndgame(pos)) return [0, "not an endgame yet"];
+      if (!isEndgame(pos)) return [0, { kind: "not_endgame" }];
       const mine = pos.king(c);
       const theirs = pos.king(opposite(c));
-      if (mine === null || theirs === null) return [0, ""];
-      const dMine = centreDistance(mine);
-      const dTheirs = centreDistance(theirs);
+      if (mine === null || theirs === null) return [0, { kind: "none" }];
+      const mineSteps = centreDistance(mine);
+      const theirsSteps = centreDistance(theirs);
       return [
-        dTheirs - dMine,
-        `your king on ${squareName(mine)} is ${dMine} step(s) from the centre; ` +
-          `theirs on ${squareName(theirs)} is ${dTheirs}`,
+        theirsSteps - mineSteps,
+        { kind: "king_activity", mine: squareName(mine), mineSteps, theirs: squareName(theirs), theirsSteps },
       ];
     },
   },

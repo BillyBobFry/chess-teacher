@@ -1,38 +1,25 @@
 /**
- * Turn a lesson's measured facts into words.
+ * A lesson's measured facts, as data.
  *
- * `facts()` is the structured payload an LLM is allowed to see (the server sends only
- * this). `templateExplanation()` always works, offline included, and is the fallback
- * whenever an LLM explanation isn't available or fails the guardrail.
+ * `facts()` is the structured payload an explanation is built from: the app renders it in
+ * the player's language, and the server renders it for the LLM (the server sends only
+ * this). Nothing here is a sentence.
  */
 
-import { PIECE_NAMES, Position, parseSquare } from "./board.ts";
+import { Position, parseSquare } from "./board.ts";
 import { variationSan, uciParts } from "./game.ts";
 import {
-  CONSEQUENCE,
-  MATE_FEATURE,
   lessonBestSan,
   lessonGap,
+  lessonMove,
   lessonMoveNumber,
   lessonUserSan,
   type Lesson,
+  type LessonFeature,
+  type LessonKind,
 } from "./lessons.ts";
-import { PRINCIPLES } from "./principles.ts";
-
-const FEATURE_LABELS: Record<string, string> = {
-  material: "material",
-  development: "development",
-  king_safety: "king safety",
-  centre: "control of the centre",
-  mobility: "piece activity",
-  own_pawns: "your pawn structure",
-  their_pawns: "your opponent's pawn weaknesses",
-  passed_pawns: "passed pawns",
-  outposts: "knight outposts",
-  open_files: "rooks on open files",
-  king_activity: "king activity",
-  [MATE_FEATURE]: "king safety",
-};
+import type { PrincipleId } from "./principles.ts";
+import type { Detail, Hint, Trigger, Undefended } from "./text.ts";
 
 /** Round like Python's round(x, digits): correctly rounded, ties to even. */
 export function pyRound(x: number, digits: number): number {
@@ -61,21 +48,22 @@ export interface LessonFacts {
   your_line: string;
   better_line: string;
   evaluation_cost_in_pawns: number;
-  lesson_type: string;
-  what_happened_in_the_game: string;
-  key_factor: string;
-  before_your_move: string;
-  end_of_your_line: string;
-  end_of_better_line: string;
+  lesson_type: LessonKind;
+  what_happened_in_the_game: Trigger | null;
+  key_factor: LessonFeature;
+  before_your_move: Detail;
+  end_of_your_line: Detail;
+  end_of_better_line: Detail;
   lines_diverge_after_ply: number;
-  pieces_left_undefended_by_your_move: string[];
-  principle: { title: string; explanation: string };
+  /** Pieces left undefended, the piece that moved last. */
+  pieces_left_undefended_by_your_move: Undefended[];
+  principle: PrincipleId;
 }
 
 export function facts(l: Lesson): LessonFacts {
-  const p = PRINCIPLES[l.principle]!;
   const before = new Position(l.fenBefore);
-  const to = uciParts(l.userMove).to;
+  const { from, to } = uciParts(l.userMove);
+  const pieceOn = (square: string) => before.pieceAt(parseSquare(square))?.type ?? "p";
   return {
     move_number: lessonMoveNumber(l),
     player_colour: l.userColour === "w" ? "white" : "black",
@@ -84,12 +72,9 @@ export function facts(l: Lesson): LessonFacts {
     your_line: lineSan(l, l.userLine),
     better_line: lineSan(l, l.bestLine),
     evaluation_cost_in_pawns: pyRound(lessonGap(l) / 100, 1),
-    lesson_type:
-      l.kind === CONSEQUENCE
-        ? "something went wrong because of this move"
-        : "a better opportunity was missed",
-    what_happened_in_the_game: l.triggerText,
-    key_factor: FEATURE_LABELS[l.feature]!,
+    lesson_type: l.kind,
+    what_happened_in_the_game: l.trigger,
+    key_factor: l.feature,
     before_your_move: l.baselineDetail,
     end_of_your_line: l.userDetail,
     end_of_better_line: l.bestDetail,
@@ -97,49 +82,17 @@ export function facts(l: Lesson): LessonFacts {
     pieces_left_undefended_by_your_move: [
       ...l.hangingAfter
         .filter((s) => s !== to)
-        .map((s) => `${PIECE_NAMES[before.pieceAt(parseSquare(s))?.type ?? "p"]} on ${s}`),
-      ...(l.hangingAfter.includes(to) ? [`the piece you moved, now on ${to}`] : []),
+        .map((square) => ({ piece: pieceOn(square), square, moved: false })),
+      ...(l.hangingAfter.includes(to) ? [{ piece: pieceOn(from), square: to, moved: true }] : []),
     ],
-    principle: { title: p.title, explanation: p.text },
+    principle: l.principle,
   };
 }
 
-export function hints(l: Lesson): string[] {
+export function hints(l: Lesson): Hint[] {
   const before = new Position(l.fenBefore);
   const { from, to } = uciParts(l.userMove);
-  const piece = before.pieceAt(parseSquare(from))!;
-  const castling = piece.type === "k" && Math.abs(from.charCodeAt(0) - to.charCodeAt(0)) === 2;
-  return [
-    castling ? "It was when you castled." : `It was a ${PIECE_NAMES[piece.type]} move.`,
-    `Look at move ${lessonMoveNumber(l)}, when you played ${lessonUserSan(l)}.`,
-  ];
-}
-
-export function templateExplanation(l: Lesson): string {
-  const p = PRINCIPLES[l.principle]!;
-  const f = FEATURE_LABELS[l.feature]!;
-  const userSan = lessonUserSan(l);
-  const bestSan = lessonBestSan(l);
-  const lines = [
-    `On move ${lessonMoveNumber(l)} you played ${userSan}. ${bestSan} was better.`,
-    "",
-    `  What you played:  ${lineSan(l, l.userLine)}`,
-    `  What was better:  ${lineSan(l, l.bestLine)}`,
-    "",
-  ];
-  if (l.feature === MATE_FEATURE) {
-    lines.push("After your move, your opponent had a forced checkmate.");
-  } else if (l.kind === CONSEQUENCE) {
-    lines.push(`The difference is ${f}. Before your move: ${l.baselineDetail}.`);
-    lines.push(`After your line: ${l.userDetail}. After the better line: ${l.bestDetail}.`);
-  } else {
-    lines.push(`Your move wasn't a disaster, but ${bestSan} would have improved ${f}.`);
-    lines.push(`After the better line: ${l.bestDetail}. After yours: ${l.userDetail}.`);
-  }
-  const undefended = facts(l).pieces_left_undefended_by_your_move;
-  if (l.principle === "hanging" && undefended.length) {
-    lines.push(`Your move left this undefended: ${undefended.join(", ")}.`);
-  }
-  lines.push("", `Principle: ${p.title}. ${p.text}`);
-  return lines.join("\n");
+  const piece = before.pieceAt(parseSquare(from))?.type ?? "p";
+  const castling = piece === "k" && Math.abs(from.charCodeAt(0) - to.charCodeAt(0)) === 2;
+  return [castling ? { kind: "castled" } : { kind: "piece", piece }, { kind: "move", move: lessonMove(l) }];
 }

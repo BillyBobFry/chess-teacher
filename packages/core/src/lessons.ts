@@ -1,6 +1,6 @@
 /** Mistake detection, lessons, and the checks that trigger them. */
 
-import { PIECE_NAMES, Position, neg, opposite, squareName, type Colour, type PieceType } from "./board.ts";
+import { Position, neg, opposite, squareName, type Colour, type PieceType } from "./board.ts";
 import { MATE_SCORE, type Candidate } from "./engine.ts";
 import {
   FEATURES,
@@ -12,6 +12,8 @@ import {
   type Measurements,
 } from "./features.ts";
 import { Game, cleanLine, fullmoveOf, plyOf, sanOf, uciParts } from "./game.ts";
+import type { PrincipleId } from "./principles.ts";
+import type { Detail, MoveRef, PieceCount, Trigger } from "./text.ts";
 
 /** The user's move makes something measurably worse. */
 export const CONSEQUENCE = "consequence";
@@ -87,7 +89,7 @@ export interface Lesson {
   bestScore: number;
   userScore: number;
   feature: LessonFeature;
-  principle: string;
+  principle: PrincipleId;
   kind: LessonKind;
   baseline: number;
   /** Feature value at the end of the user's line. */
@@ -101,14 +103,15 @@ export interface Lesson {
   userValues: number[];
   bestValues: number[];
   divergence: number;
-  baselineDetail: string;
-  userDetail: string;
-  bestDetail: string;
+  baselineDetail: Detail;
+  userDetail: Detail;
+  bestDetail: Detail;
   /** User pieces left hanging after the move (squares, h8 → a1 order). */
   hangingAfter: string[];
   status: LessonStatus;
   resolvedPly: number | null;
-  triggerText: string;
+  /** What happened when the lesson was triggered (null until then). */
+  trigger: Trigger | null;
   /** Triggered at the same time as another lesson; shown in the review instead. */
   deferred: boolean;
   foundCause: boolean | null;
@@ -121,8 +124,12 @@ export const lessonGap = (l: Lesson): number => l.bestScore - l.userScore;
 export const lessonMoveNumber = (l: Lesson): number => fullmoveOf(l.fenBefore);
 export const lessonUserSan = (l: Lesson): string => sanOf(l.fenBefore, l.userMove);
 export const lessonBestSan = (l: Lesson): string => sanOf(l.fenBefore, l.bestMove);
-export const lessonLabel = (l: Lesson): string =>
-  `${lessonMoveNumber(l)}${l.userColour === "w" ? "." : "..."} ${lessonUserSan(l)}`;
+/** The user's mistake, as a move to show ("12. Nf3"). */
+export const lessonMove = (l: Lesson): MoveRef => ({
+  moveNumber: lessonMoveNumber(l),
+  colour: l.userColour,
+  san: lessonUserSan(l),
+});
 
 // --------------------------------------------------------------------------- detection
 
@@ -184,7 +191,7 @@ export function detectMistake(
     hangingAfter,
     status: "pending" as LessonStatus,
     resolvedPly: null,
-    triggerText: "",
+    trigger: null,
     deferred: false,
     foundCause: null,
     chanceMove: null,
@@ -204,9 +211,9 @@ export function detectMistake(
       userValues: [],
       bestValues: [],
       divergence: n - 1,
-      baselineDetail: "",
-      userDetail: "your king gets checkmated",
-      bestDetail: "no mate",
+      baselineDetail: { kind: "none" },
+      userDetail: { kind: "checkmated" },
+      bestDetail: { kind: "no_mate" },
     };
   }
 
@@ -261,7 +268,7 @@ export function detectMistake(
     triggerAt = userV;
   }
 
-  let principle = feat.principle;
+  let principle: PrincipleId = feat.principle;
   if (chosen === "material") {
     const oppReply = userLine[1];
     principle = oppReply !== undefined && hangingAfter.includes(uciParts(oppReply).to) ? "hanging" : "safety";
@@ -293,46 +300,32 @@ export function consequenceLanded(lesson: Lesson, game: Game): boolean {
   return value <= lesson.triggerAt;
 }
 
-export function describeConsequence(lesson: Lesson, game: Game): string {
+export function describeConsequence(lesson: Lesson, game: Game): Trigger {
   const c = lesson.userColour;
-  if (lesson.feature === MATE_FEATURE) return "You've been checkmated.";
+  if (lesson.feature === MATE_FEATURE) return { kind: "checkmated" };
   const now = new Position(game.fen);
   if (lesson.feature === "material") {
     const before = new Position(lesson.fenBefore);
-    const changes = (color: Colour): string => {
-      const out: string[] = [];
-      for (const pt of ["q", "r", "b", "n", "p"] as PieceType[]) {
-        const d = before.pieces(pt, color).length - now.pieces(pt, color).length;
-        if (d > 0) out.push(d > 1 ? `${d} ${PIECE_NAMES[pt]}s` : `a ${PIECE_NAMES[pt]}`);
+    const changes = (color: Colour): PieceCount[] => {
+      const out: PieceCount[] = [];
+      for (const piece of ["q", "r", "b", "n", "p"] as PieceType[]) {
+        const count = before.pieces(piece, color).length - now.pieces(piece, color).length;
+        if (count > 0) out.push({ piece, count });
       }
-      return out.join(", ");
+      return out;
     };
-    const lost = changes(c);
-    const taken = changes(opposite(c));
     const balance = (p: Position) => material(p, c) - material(p, opposite(c));
     const net = balance(before) - balance(now);
+    if (net <= 0) return { kind: "losing_material" };
     const [settled] = FEATURES_BY_NAME.material.measure(now, c);
-    const more = lesson.baseline - settled > net;
-    const worth = `${net} pawn${net !== 1 ? "s" : ""}`;
-    if (net <= 0) return "You're about to lose material.";
-    const text =
-      lost && taken
-        ? `Since that move you've lost ${lost} and taken ${taken}: overall you're ${worth} down.`
-        : `You've lost ${lost}: you're ${worth} worse off than before.`;
-    return text + (more ? " And more is about to fall." : "");
+    return {
+      kind: "lost_material",
+      lost: changes(c),
+      taken: changes(opposite(c)),
+      net,
+      more: lesson.baseline - settled > net,
+    };
   }
   const [, detail] = FEATURES_BY_NAME[lesson.feature].measure(now, c);
-  const openers: Record<string, string> = {
-    development: "You've fallen behind in development",
-    king_safety: "Your king has come under fire",
-    centre: "Your opponent has taken over the centre",
-    mobility: "Your pieces have run short of squares",
-    own_pawns: "Your pawn structure has been damaged",
-    their_pawns: "Your opponent has fixed their pawn weaknesses",
-    passed_pawns: "Your opponent now has the more dangerous passed pawns",
-    outposts: "Your opponent's knight has found a strong outpost",
-    open_files: "Your opponent's rook has taken an open file",
-    king_activity: "Your opponent's king has become more active than yours",
-  };
-  return `${openers[lesson.feature] ?? "Something went wrong"} (${detail}).`;
+  return { kind: "feature", feature: lesson.feature, detail };
 }

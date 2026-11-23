@@ -1,9 +1,13 @@
-/** Every strategic feature, measured on ~270 positions, must match the Python prototype exactly. */
+/**
+ * Every strategic feature, measured on ~270 positions, must match the Python prototype
+ * exactly: the value, and the detail as the prototype worded it.
+ */
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { Position, hanging, measureAll, settledBalance, squareName, type Colour } from "@chess-teacher/core";
+import { detailText } from "../src/prototype-text.ts";
 import { FIXTURES } from "./fixtures.ts";
 
 interface Row {
@@ -25,7 +29,8 @@ describe("feature parity with the Python prototype", () => {
         const expected = row[colour];
         const actual = measureAll(pos, colour);
         for (const [name, value] of Object.entries(expected.features)) {
-          const got = actual[name as keyof typeof actual];
+          const [v, detail] = actual[name as keyof typeof actual];
+          const got = [v, detailText(detail)];
           if (JSON.stringify(got) !== JSON.stringify(value)) {
             mismatches.push(
               `${row.fen} ${name}: expected ${JSON.stringify(value)}, got ${JSON.stringify(got)}`,

@@ -8,11 +8,12 @@
 
 import { Position, type Colour } from "./board.ts";
 import type { Candidate, Engines } from "./engine.ts";
-import { FEATURES_BY_NAME } from "./features.ts";
-import { Game, STANDARD_START, isLegal, plyOf, sanOf } from "./game.ts";
+import { FEATURES_BY_NAME, type Measurement } from "./features.ts";
+import { Game, STANDARD_START, fullmoveOf, isLegal, plyOf, sanOf } from "./game.ts";
 import {
   CONSEQUENCE,
   DEFAULT_CONFIG,
+  MATE_FEATURE,
   MISSED_CHANCE,
   consequenceLanded,
   describeConsequence,
@@ -25,9 +26,11 @@ import {
   type TeachingConfig,
 } from "./lessons.ts";
 import { chooseOpponentMove, type OpponentMode } from "./opponent.ts";
+import type { Detail, MoveRef } from "./text.ts";
 import { verifyLesson } from "./validate.ts";
 
-export const SESSION_STATE_VERSION = 1;
+/** 2: lessons hold their details and trigger as data, not English text. */
+export const SESSION_STATE_VERSION = 2;
 
 export interface SessionState {
   version: number;
@@ -46,10 +49,10 @@ export interface SessionState {
 
 export type GameEventKind = "created" | "warning" | "triggered" | "chanceGone" | "fixed" | "expired";
 
+/** Something that happened to a lesson. What to say about it is the app's choice. */
 export interface GameEvent {
   kind: GameEventKind;
   lessonId: number;
-  text: string;
 }
 
 export interface StepResult {
@@ -89,11 +92,7 @@ const resolve = (l: Lesson, status: LessonStatus, game: Game): void => {
   l.resolvedPly = game.ply;
 };
 
-const event = (kind: GameEventKind, lesson: Lesson, text = ""): GameEvent => ({
-  kind,
-  lessonId: lesson.id,
-  text,
-});
+const event = (kind: GameEventKind, lesson: Lesson): GameEvent => ({ kind, lessonId: lesson.id });
 
 /** The lesson the opponent is currently trying to demonstrate (the biggest pending one). */
 export function activeLesson(s: SessionState): Lesson | null {
@@ -146,8 +145,8 @@ export async function startUserTurn(state: SessionState, engines: Engines): Prom
       lesson.chanceMove = cands[0]!.move;
     } else {
       resolve(lesson, "triggered", game);
-      lesson.triggerText = "The chance has gone.";
-      events.push(event("chanceGone", lesson, lesson.triggerText));
+      lesson.trigger = { kind: "chance_gone" };
+      events.push(event("chanceGone", lesson));
     }
   }
   return { state: s, events };
@@ -198,7 +197,7 @@ export async function userMove(state: SessionState, move: string, engines: Engin
     s.lessons.push(lesson);
     events.push(event("created", lesson));
     if (s.config.easy && lesson.kind === CONSEQUENCE && s.config.levelUp) {
-      events.push(event("warning", lesson, "Your opponent has spotted something…"));
+      events.push(event("warning", lesson));
     }
   }
   s.analysis = null;
@@ -239,9 +238,9 @@ function checkConsequences(s: SessionState, game: Game): GameEvent[] {
   landed.sort((a, b) => lessonGap(b) - lessonGap(a));
   landed.forEach((lesson, i) => {
     resolve(lesson, "triggered", game);
-    lesson.triggerText = describeConsequence(lesson, game);
+    lesson.trigger = describeConsequence(lesson, game);
     lesson.deferred = i > 0;
-    events.push(event("triggered", lesson, lesson.triggerText));
+    events.push(event("triggered", lesson));
   });
   return events;
 }
@@ -278,15 +277,17 @@ export function recordFoundCause(state: SessionState, lessonId: number, found: b
 export const isGameOver = (s: SessionState): boolean => gameOf(s).isGameOver();
 export const isUserTurn = (s: SessionState): boolean => gameOf(s).turn === s.userColour;
 
-/** [ply, label] for the user's recent moves, always including the lesson's mistake. */
-export function recentUserMoves(s: SessionState, lesson: Lesson): [number, string][] {
+/** [ply, move] for the user's recent moves, always including the lesson's mistake. */
+export function recentUserMoves(s: SessionState, lesson: Lesson): [number, MoveRef][] {
   const replay = new Game(s.startFen);
-  const out: [number, string][] = [];
+  const out: [number, MoveRef][] = [];
   s.moves.forEach((move, i) => {
     if (replay.turn === s.userColour) {
       const fen = replay.fen;
-      const number = Number(fen.split(" ")[5]);
-      out.push([plyOf(s.startFen) + i, `${number}${s.userColour === "w" ? "." : "..."} ${sanOf(fen, move)}`]);
+      out.push([
+        plyOf(s.startFen) + i,
+        { moveNumber: fullmoveOf(fen), colour: s.userColour, san: sanOf(fen, move) },
+      ]);
     }
     replay.push(move);
   });
@@ -312,4 +313,60 @@ export function playedLine(s: SessionState, lesson: Lesson, maxPlies = 16): stri
   const start = lesson.ply - plyOf(s.startFen);
   const end = (lesson.resolvedPly ?? gameOf(s).ply) - plyOf(s.startFen);
   return s.moves.slice(start, Math.min(end, start + maxPlies, s.moves.length));
+}
+
+// ------------------------------------------------------------------ saved games
+
+/** A lesson as version 1 saved it: details and trigger as English text. */
+type LessonV1 = Omit<Lesson, "baselineDetail" | "userDetail" | "bestDetail" | "trigger"> & {
+  baselineDetail: string;
+  userDetail: string;
+  bestDetail: string;
+  triggerText: string;
+};
+
+/** A session as any version saved it. */
+export type SavedSessionState = Omit<SessionState, "lessons"> & { lessons: (Lesson | LessonV1)[] };
+
+/**
+ * Bring a saved session up to the current version. Details are measured again from the
+ * lesson's own positions, so they come out exactly as they would have been. A version 1
+ * consequence's trigger can't always be rebuilt (the game may have been rewound past it),
+ * so it keeps its saved text.
+ */
+export function upgradeSession(saved: SavedSessionState): SessionState {
+  if (saved.version >= SESSION_STATE_VERSION) return saved as SessionState;
+  const lessons = (saved.lessons as LessonV1[]).map((old): Lesson => {
+    const { triggerText, ...rest } = old;
+    return {
+      ...rest,
+      ...upgradedDetails(old),
+      trigger:
+        old.status !== "triggered"
+          ? null
+          : old.kind === MISSED_CHANCE
+            ? { kind: "chance_gone" }
+            : { kind: "legacy", text: triggerText },
+    };
+  });
+  return { ...saved, version: SESSION_STATE_VERSION, lessons };
+}
+
+function upgradedDetails(l: LessonV1): Pick<Lesson, "baselineDetail" | "userDetail" | "bestDetail"> {
+  if (l.feature === MATE_FEATURE) {
+    return {
+      baselineDetail: { kind: "none" },
+      userDetail: { kind: "checkmated" },
+      bestDetail: { kind: "no_mate" },
+    };
+  }
+  const feature = FEATURES_BY_NAME[l.feature];
+  const measure = (moves: string[]): Detail => {
+    const [, detail]: Measurement = feature.measure(
+      new Position(new Game(l.fenBefore, moves).fen),
+      l.userColour,
+    );
+    return detail;
+  };
+  return { baselineDetail: measure([]), userDetail: measure(l.userLine), bestDetail: measure(l.bestLine) };
 }
