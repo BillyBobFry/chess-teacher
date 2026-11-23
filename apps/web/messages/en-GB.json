@@ -17,7 +17,18 @@
   "result_ended": "Game ended.",
   "nav_end_game": "End game",
   "nav_new_game": "New game",
-  "confirm_abandon": "Abandon this game and start a new one?",
+  "confirm_abandon_title": "Abandon this game?",
+  "confirm_abandon_body": [
+    {
+      "declarations": ["input moveNumber", "local moveCount = moveNumber: number"],
+      "selectors": [],
+      "match": {
+        "": "You're on move {moveCount}. Starting a new game ends this one for good."
+      }
+    }
+  ],
+  "confirm_abandon_confirm": "Abandon game",
+  "confirm_abandon_cancel": "Keep playing",
   "account_menu": "Account",
   "account_allowance": [
     {
@@ -254,5 +265,44 @@
   "licences_other": "Other components",
   "licences_item": "{component}: {licence}",
   "licences_stockfish_heading": "Stockfish",
-  "licences_item_pieces": "{component} (including its piece set): {licence}"
+  "licences_item_pieces": "{component} (including its piece set): {licence}",
+  "board_game": "Game board",
+  "board_keyboard_hint": "With a keyboard: {#kbd}Tab{/kbd} to the board, the {#kbd}arrow keys{/kbd} to move between squares, and {#kbd}Enter{/kbd} to pick up a piece and put it down.",
+  "board_empty": "empty",
+  "board_mark_last_move": "last move",
+  "board_mark_target": "you can move here",
+  "board_mark_capture": "you can capture here",
+  "board_mark_lesson": "part of the lesson",
+  "board_last_move_white": "White's last move: {move}",
+  "board_last_move_black": "Black's last move: {move}",
+  "board_selected": "Picked up {piece} on {square}. It can move to {targets}.",
+  "board_selected_stuck": "Picked up {piece} on {square}. It has no legal moves.",
+  "board_put_down": "Put the piece down.",
+  "board_pick_own": "Pick up one of your own pieces first.",
+  "piece_white_pawn": "white pawn",
+  "piece_white_knight": "white knight",
+  "piece_white_bishop": "white bishop",
+  "piece_white_rook": "white rook",
+  "piece_white_queen": "white queen",
+  "piece_white_king": "white king",
+  "piece_black_pawn": "black pawn",
+  "piece_black_knight": "black knight",
+  "piece_black_bishop": "black bishop",
+  "piece_black_rook": "black rook",
+  "piece_black_queen": "black queen",
+  "piece_black_king": "black king",
+  "piece_pawn": "pawn",
+  "piece_knight": "knight",
+  "piece_bishop": "bishop",
+  "piece_rook": "rook",
+  "piece_queen": "queen",
+  "piece_king": "king",
+  "move_spoken": "{piece} to {square}",
+  "move_spoken_capture": "{piece} takes {captured} on {square}",
+  "move_spoken_promotion": "pawn to {square}, promotes to {promoted}",
+  "move_spoken_capture_promotion": "pawn takes {captured} on {square}, promotes to {promoted}",
+  "move_spoken_castle_kingside": "castles kingside",
+  "move_spoken_castle_queenside": "castles queenside",
+  "move_spoken_check": "{move}, check",
+  "move_spoken_checkmate": "{move}, checkmate"
 }
