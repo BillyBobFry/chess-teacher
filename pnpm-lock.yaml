@@ -56,6 +56,9 @@ importers:
       '@chess-teacher/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@chess-teacher/lesson-text':
+        specifier: workspace:*
+        version: link:../../packages/lesson-text
       '@electric-sql/pglite':
         specifier: 0.6.0
         version: 0.6.0

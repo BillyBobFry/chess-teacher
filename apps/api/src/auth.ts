@@ -4,6 +4,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import type { Db } from "./db/client.ts";
 import { account, session, user, verification } from "./db/schema.ts";
+import { PASSWORD_MIN_LENGTH } from "@chess-teacher/contract";
 import { isLocalOrigin, type Env } from "./env.ts";
 
 export function createAuth(db: Db, env: Env) {
@@ -25,7 +26,7 @@ export function createAuth(db: Db, env: Env) {
       schema: { user, session, account, verification },
       transaction: false,
     }),
-    emailAndPassword: { enabled: true, minPasswordLength: 8, autoSignIn: true },
+    emailAndPassword: { enabled: true, minPasswordLength: PASSWORD_MIN_LENGTH, autoSignIn: true },
     socialProviders: env.google ? { google: env.google } : {},
     session: { expiresIn: 60 * 60 * 24 * 30, updateAge: 60 * 60 * 24 },
     telemetry: { enabled: false },

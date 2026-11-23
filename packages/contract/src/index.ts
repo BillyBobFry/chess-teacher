@@ -108,11 +108,31 @@ export interface ConfigResponse {
   llmEnabled: boolean;
 }
 
+/** Shortest password Better Auth accepts (the client says so when one is too short). */
+export const PASSWORD_MIN_LENGTH = 8;
+
+/** What went wrong, as a code: the client words it in the player's language. */
+export const API_ERROR_CODES = [
+  "internal",
+  "not_signed_in",
+  "invalid_request",
+  "game_too_large",
+  "illegal_move",
+  "not_found",
+  "conflict",
+  "malformed_lesson",
+] as const;
+export type ApiErrorCode = (typeof API_ERROR_CODES)[number];
+
 export interface ApiError {
-  error: string;
+  error: ApiErrorCode;
   /** For 409s: the version currently on the server. */
   stateVersion?: number;
 }
+
+/** Asking for an AI explanation: the player's locale, which it's written in (BCP 47, e.g. en-GB). */
+export const ExplanationBody = z.object({ locale: z.string().max(35) });
+export type ExplanationBody = z.infer<typeof ExplanationBody>;
 
 export const FeedbackBody = z.object({
   rating: z.union([z.literal(1), z.literal(-1)]),

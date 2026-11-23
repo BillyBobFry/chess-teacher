@@ -1,0 +1,1 @@
+ALTER TABLE "explanations" ADD COLUMN "locale" text DEFAULT 'en-GB' NOT NULL;

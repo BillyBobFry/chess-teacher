@@ -26,6 +26,7 @@ import {
 } from "@chess-teacher/core";
 import { hintText, moveText } from "@chess-teacher/lesson-text";
 import { api } from "../api/client.ts";
+import { errorText } from "../api/errors.ts";
 import { getEngines } from "../engine/engines.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -77,7 +78,8 @@ export function useGame(opts: { llmEnabled: boolean }) {
       const key = `${gameId}/${lessonId}`;
       if (!explanations.current.has(key)) {
         const p = api
-          .requestExplanation(gameId, lessonId)
+          // Written in the player's language (UX-41).
+          .requestExplanation(gameId, lessonId, { locale: getLocale() })
           .catch((): ExplanationResponse => ({ status: "error", remaining: 0 }));
         explanations.current.set(key, p);
         void p.then(refreshMe);
@@ -106,7 +108,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
   const attachSaver = useCallback(
     (g: SavedGame) => {
       saver.current = new Saver(g.stateVersion, onSaved, (err) => {
-        setError(err.message);
+        setError(err instanceof ConflictError ? err.message : errorText(err));
         if (err instanceof ConflictError) {
           // Another device moved on: load the latest version instead of overwriting it.
           void loadActiveGame().then((latest) => {
@@ -195,7 +197,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorText(err));
     } finally {
       running.current = false;
       setBusy(null);
@@ -218,7 +220,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : String(err));
+        setError(errorText(err));
         setLoaded(true);
         setBusy(null);
       });
@@ -244,7 +246,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
             commit(handle({ ...gameRef.current, state: r.state }, r.events));
           }
         } catch (err) {
-          setError(err instanceof Error ? err.message : String(err));
+          setError(errorText(err));
         } finally {
           running.current = false;
           setPendingMove(null);

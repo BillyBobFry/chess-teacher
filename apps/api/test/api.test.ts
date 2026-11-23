@@ -21,6 +21,7 @@ import type { LlmClient } from "../src/explain.ts";
 import { createServer } from "../src/server.ts";
 
 const ORIGIN = "http://localhost:5173";
+const EN_GB = { locale: "en-GB" };
 
 /** A game state with several lessons, from a recorded game. */
 async function stateWithLessons(): Promise<SessionState> {
@@ -226,9 +227,9 @@ describe("explanations", () => {
     const url = `/api/games/${game.id}/lessons/${lessonIds[0]}/explanation`;
 
     expect(await (await call(url, { cookie })).json()).toMatchObject({ status: "pending" });
-    const first = await (await call(url, { method: "POST", cookie })).json();
+    const first = await (await call(url, { method: "POST", cookie, json: EN_GB })).json();
     expect(first).toEqual({ status: "ready", parts: llm.parts, remaining: 29 });
-    const again = await (await call(url, { method: "POST", cookie })).json();
+    const again = await (await call(url, { method: "POST", cookie, json: EN_GB })).json();
     expect(again).toEqual({ status: "ready", parts: llm.parts, remaining: 29 });
     expect(llm.calls).toBe(1);
     expect(await (await call(url, { cookie })).json()).toMatchObject({ status: "ready" });
@@ -243,7 +244,11 @@ describe("explanations", () => {
       await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
     ).json();
     const res = await (
-      await call(`/api/games/${game.id}/lessons/${lessonIds[0]}/explanation`, { method: "POST", cookie })
+      await call(`/api/games/${game.id}/lessons/${lessonIds[0]}/explanation`, {
+        method: "POST",
+        cookie,
+        json: EN_GB,
+      })
     ).json();
     expect(res).toEqual({ status: "rejected", remaining: 30 });
   });
@@ -256,7 +261,7 @@ describe("explanations", () => {
     ).json();
     const post = (id: number) =>
       Promise.resolve(
-        call(`/api/games/${game.id}/lessons/${id}/explanation`, { method: "POST", cookie }),
+        call(`/api/games/${game.id}/lessons/${id}/explanation`, { method: "POST", cookie, json: EN_GB }),
       ).then((r) => r.json());
     expect((await post(lessonIds[0]!)).status).toBe("ready");
     expect(await post(lessonIds[1]!)).toEqual({ status: "quota", remaining: 0 });
@@ -269,7 +274,11 @@ describe("explanations", () => {
       await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
     ).json();
     const res = await (
-      await call(`/api/games/${game.id}/lessons/${lessonIds[0]}/explanation`, { method: "POST", cookie })
+      await call(`/api/games/${game.id}/lessons/${lessonIds[0]}/explanation`, {
+        method: "POST",
+        cookie,
+        json: EN_GB,
+      })
     ).json();
     expect(res.status).toBe("unavailable");
   });
@@ -281,7 +290,8 @@ describe("explanations", () => {
       await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
     ).json();
     expect(
-      (await call(`/api/games/${game.id}/lessons/999/explanation`, { method: "POST", cookie })).status,
+      (await call(`/api/games/${game.id}/lessons/999/explanation`, { method: "POST", cookie, json: EN_GB }))
+        .status,
     ).toBe(404);
   });
 });
@@ -388,6 +398,102 @@ describe("AI prompt facts", () => {
     expect(f).not.toHaveProperty("what_happened_in_the_game");
     expect(SYSTEM_PROMPT).toMatch(/have NOT happened/);
   });
+
+  it("words the facts in en-GB from the catalogue", async () => {
+    const { promptFacts } = await import("../src/explain.ts");
+    const { facts } = await import("@chess-teacher/core");
+    const f = promptFacts(facts(recorded.lessons[0]!));
+    for (const value of [f.key_factor, f.before_your_move, f.end_of_your_line, f.principle.title]) {
+      expect(typeof value).toBe("string");
+      expect(value).not.toBe("");
+    }
+  });
+});
+
+describe("explanation language", () => {
+  const capture = () => {
+    const llm = fakeLlm();
+    const seen: { system?: string } = {};
+    const create = llm.beta.messages.create;
+    llm.beta.messages.create = async (b?: unknown) => {
+      Object.assign(seen, b);
+      return create();
+    };
+    return { llm, seen };
+  };
+
+  it("asks the model to write in the player's locale", async () => {
+    const { llm, seen } = capture();
+    const { call, signUp } = await setup({ llm });
+    const cookie = await signUp("una@example.com");
+    const game = await (
+      await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
+    ).json();
+    const url = `/api/games/${game.id}/lessons/${recorded.lessons[0]!.id}/explanation`;
+    await call(url, { method: "POST", cookie, json: { locale: "en-US" } });
+    expect(seen.system).toMatch(/American English \(en-US\)/);
+  });
+
+  it("falls back to en-GB for a locale we don't ship", async () => {
+    const { llm, seen } = capture();
+    const { call, signUp } = await setup({ llm });
+    const cookie = await signUp("vic@example.com");
+    const game = await (
+      await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
+    ).json();
+    const url = `/api/games/${game.id}/lessons/${recorded.lessons[0]!.id}/explanation`;
+    await call(url, { method: "POST", cookie, json: { locale: "tlh" } });
+    expect(seen.system).toMatch(/British English \(en-GB\)/);
+  });
+
+  it("explains lessons from games saved before lesson text was data", async () => {
+    const llm = fakeLlm();
+    const { call, signUp } = await setup({ llm });
+    const cookie = await signUp("wes@example.com");
+    // Version 1 kept details and triggers as English text.
+    const v1 = {
+      ...recorded,
+      version: 1,
+      lessons: recorded.lessons.map(({ trigger, ...l }) => ({
+        ...l,
+        baselineDetail: "material balance +0",
+        userDetail: "material balance -3",
+        bestDetail: "material balance +0",
+        triggerText: trigger ? "You've lost a knight: you're 3 pawns worse off than before." : "",
+      })),
+    };
+    const game = await (
+      await call("/api/games", { method: "POST", cookie, json: newGameBody(v1 as never) })
+    ).json();
+    const res = await (
+      await call(`/api/games/${game.id}/lessons/${recorded.lessons[0]!.id}/explanation`, {
+        method: "POST",
+        cookie,
+        json: EN_GB,
+      })
+    ).json();
+    expect(res.status).toBe("ready");
+  });
+});
+
+describe("errors", () => {
+  it("are codes, for the client to word in the player's language", async () => {
+    const { call, signUp } = await setup();
+    const cookie = await signUp("xan@example.com");
+    expect(await (await call("/api/me")).json()).toEqual({ error: "not_signed_in" });
+    const illegal = { ...newSession({ userColour: "w" }), moves: ["e2e5"] };
+    expect(
+      await (await call("/api/games", { method: "POST", cookie, json: newGameBody(illegal) })).json(),
+    ).toEqual({ error: "illegal_move" });
+    expect(
+      await (await call("/api/games", { method: "POST", cookie, json: { nonsense: true } })).json(),
+    ).toEqual({
+      error: "invalid_request",
+    });
+    expect(await (await call("/api/games/00000000-0000-0000-0000-000000000000", { cookie })).json()).toEqual({
+      error: "not_found",
+    });
+  });
 });
 
 describe("structured explanations", () => {
@@ -403,6 +509,7 @@ describe("structured explanations", () => {
       await call(`/api/games/${game.id}/lessons/${recorded.lessons[0]!.id}/explanation`, {
         method: "POST",
         cookie,
+        json: EN_GB,
       })
     ).json();
     expect(res).toEqual({ status: "error", remaining: 30 });
@@ -418,7 +525,7 @@ describe("structured explanations", () => {
     };
     const { explainLesson } = await import("../src/explain.ts");
     const { facts } = await import("@chess-teacher/core");
-    const r = await explainLesson(llm as never, "claude-opus-5-5", facts(recorded.lessons[0]!));
+    const r = await explainLesson(llm as never, "claude-opus-5-5", facts(recorded.lessons[0]!), "en-GB");
     expect(body.output_config?.format?.type).toBe("json_schema");
     expect(r.parts?.headline).toBe("Your move left a weakness");
   });

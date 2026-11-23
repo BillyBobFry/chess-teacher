@@ -3,8 +3,10 @@
  * Vercel Function in production. Everything lives under /api.
  */
 
-import { CreateGameBody, FeedbackBody, SaveGameBody } from "@chess-teacher/contract";
+import { CreateGameBody, ExplanationBody, FeedbackBody, SaveGameBody } from "@chess-teacher/contract";
 import type {
+  ApiError,
+  ApiErrorCode,
   ConfigResponse,
   ExplanationResponse,
   GameRecord,
@@ -13,8 +15,16 @@ import type {
   PrincipleProgress,
   ProgressResponse,
 } from "@chess-teacher/contract";
-import { Game, facts, isPrincipleId, upgradeSession, type Lesson } from "@chess-teacher/core";
-import { zValidator } from "@hono/zod-validator";
+import {
+  Game,
+  facts,
+  isPrincipleId,
+  upgradeSession,
+  type Lesson,
+  type SavedSessionState,
+} from "@chess-teacher/core";
+import { baseLocale, isLocale } from "@chess-teacher/lesson-text";
+import { zValidator as validator } from "@hono/zod-validator";
 import { and, desc, eq, lt, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
@@ -38,6 +48,15 @@ type Vars = { Variables: { userId: string; user: { id: string; name: string; ema
 
 const PENDING_TIMEOUT_MS = 2 * 60 * 1000;
 
+/** Errors are codes; the client words them in the player's language. */
+const failure = (error: ApiErrorCode, extra: Omit<ApiError, "error"> = {}): ApiError => ({ error, ...extra });
+
+/** Request validation that answers with an error code, not Zod's English issues. */
+const zValidator = <T extends Parameters<typeof validator>[1]>(target: "json", schema: T) =>
+  validator(target, schema, (result, c) => {
+    if (!result.success) return c.json(failure("invalid_request"), 400);
+  });
+
 export function createApp(deps: AppDeps) {
   const { db, auth, env, llm } = deps;
   const now = deps.now ?? (() => new Date());
@@ -47,7 +66,7 @@ export function createApp(deps: AppDeps) {
 
   app.onError((err, c) => {
     console.error(err);
-    return c.json({ error: "internal error" }, 500);
+    return c.json(failure("internal"), 500);
   });
 
   app.get("/health", (c) => c.json({ ok: true }));
@@ -59,7 +78,7 @@ export function createApp(deps: AppDeps) {
 
   const requireUser = createMiddleware<Vars>(async (c, next) => {
     const s = await auth.api.getSession({ headers: c.req.raw.headers });
-    if (!s) return c.json({ error: "not signed in" }, 401);
+    if (!s) return c.json(failure("not_signed_in"), 401);
     c.set("userId", s.user.id);
     c.set("user", { id: s.user.id, name: s.user.name, email: s.user.email });
     await next();
@@ -68,7 +87,7 @@ export function createApp(deps: AppDeps) {
   app.use("/me/*", requireUser);
   app.use("/games", requireUser);
   app.use("/games/*", requireUser);
-  const limit = bodyLimit({ maxSize: 512 * 1024, onError: (c) => c.json({ error: "game too large" }, 413) });
+  const limit = bodyLimit({ maxSize: 512 * 1024, onError: (c) => c.json(failure("game_too_large"), 413) });
 
   // ------------------------------------------------------------------ helpers
 
@@ -83,12 +102,12 @@ export function createApp(deps: AppDeps) {
   const remaining = (used: number) => Math.max(0, env.explanationsPerMonth - used);
 
   /** Moves must be legal from the start position; the server can check that much. */
-  function checkMoves(state: { startFen: string; moves: string[] }): string | null {
+  function checkMoves(state: { startFen: string; moves: string[] }): ApiErrorCode | null {
     try {
       new Game(state.startFen, state.moves);
       return null;
     } catch {
-      return "the game contains an illegal move";
+      return "illegal_move";
     }
   }
 
@@ -201,7 +220,7 @@ export function createApp(deps: AppDeps) {
   app.post("/games", limit, zValidator("json", CreateGameBody), async (c) => {
     const body = c.req.valid("json");
     const problem = checkMoves(body.state);
-    if (problem) return c.json({ error: problem }, 400);
+    if (problem) return c.json(failure(problem), 400);
     const [row] = await db
       .insert(games)
       .values({
@@ -217,7 +236,7 @@ export function createApp(deps: AppDeps) {
 
   app.get("/games/:id", async (c) => {
     const row = await ownGame(c.get("userId"), c.req.param("id"));
-    return row ? c.json<GameRecord>(toRecord(row)) : c.json({ error: "not found" }, 404);
+    return row ? c.json<GameRecord>(toRecord(row)) : c.json(failure("not_found"), 404);
   });
 
   app.put("/games/:id", limit, zValidator("json", SaveGameBody), async (c) => {
@@ -225,8 +244,8 @@ export function createApp(deps: AppDeps) {
     const userId = c.get("userId");
     const id = c.req.param("id");
     const problem = checkMoves(body.state);
-    if (problem) return c.json({ error: problem }, 400);
-    if (!/^[0-9a-f-]{36}$/.test(id)) return c.json({ error: "not found" }, 404);
+    if (problem) return c.json(failure(problem), 400);
+    if (!/^[0-9a-f-]{36}$/.test(id)) return c.json(failure("not_found"), 404);
     // Only saves based on the latest version succeed, so two devices can't overwrite each other.
     const [row] = await db
       .update(games)
@@ -242,8 +261,8 @@ export function createApp(deps: AppDeps) {
       .returning({ stateVersion: games.stateVersion });
     if (row) return c.json({ stateVersion: row.stateVersion });
     const existing = await ownGame(userId, id);
-    if (!existing) return c.json({ error: "not found" }, 404);
-    return c.json({ error: "this game was changed elsewhere", stateVersion: existing.stateVersion }, 409);
+    if (!existing) return c.json(failure("not_found"), 404);
+    return c.json(failure("conflict", { stateVersion: existing.stateVersion }), 409);
   });
 
   // ------------------------------------------------------------------ explanations
@@ -251,8 +270,9 @@ export function createApp(deps: AppDeps) {
   async function lessonOf(userId: string, gameId: string, lessonId: number) {
     const game = await ownGame(userId, gameId);
     if (!game) return null;
-    const state = game.state as { lessons: Lesson[] };
-    const lesson = state.lessons.find((l) => l.id === lessonId);
+    // Games saved by an older version hold lesson text in English; bring them up to date.
+    const state = upgradeSession(game.state as SavedSessionState);
+    const lesson = state.lessons.find((l: Lesson) => l.id === lessonId);
     return lesson ? { game, lesson } : null;
   }
 
@@ -278,7 +298,7 @@ export function createApp(deps: AppDeps) {
   app.get("/games/:id/lessons/:lessonId/explanation", async (c) => {
     const userId = c.get("userId");
     const found = await lessonOf(userId, c.req.param("id"), Number(c.req.param("lessonId")));
-    if (!found) return c.json({ error: "not found" }, 404);
+    if (!found) return c.json(failure("not_found"), 404);
     const row = await existing(found.game.id, found.lesson.id);
     return c.json(respond(row, await usedThisMonth(userId)));
   });
@@ -287,7 +307,7 @@ export function createApp(deps: AppDeps) {
   app.put("/games/:id/lessons/:lessonId/feedback", zValidator("json", FeedbackBody), async (c) => {
     const userId = c.get("userId");
     const found = await lessonOf(userId, c.req.param("id"), Number(c.req.param("lessonId")));
-    if (!found) return c.json({ error: "not found" }, 404);
+    if (!found) return c.json(failure("not_found"), 404);
     const { rating, comment } = c.req.valid("json");
     const { lesson } = found;
     await db
@@ -312,12 +332,15 @@ export function createApp(deps: AppDeps) {
   /**
    * Generate the explanation for a lesson in a saved game. The client calls this as soon
    * as the lesson is created, several moves before the reveal, so it's usually ready in time.
-   * The facts come from the saved game, not from the request.
+   * The facts come from the saved game, not from the request; the request only says which
+   * language to write in. An explanation is written once, in the locale first asked for.
    */
-  app.post("/games/:id/lessons/:lessonId/explanation", async (c) => {
+  app.post("/games/:id/lessons/:lessonId/explanation", zValidator("json", ExplanationBody), async (c) => {
     const userId = c.get("userId");
+    const requested = c.req.valid("json").locale;
+    const locale = isLocale(requested) ? requested : baseLocale;
     const found = await lessonOf(userId, c.req.param("id"), Number(c.req.param("lessonId")));
-    if (!found) return c.json({ error: "not found" }, 404);
+    if (!found) return c.json(failure("not_found"), 404);
     const { game, lesson } = found;
     let used = await usedThisMonth(userId);
     if (!llm) return c.json<ExplanationResponse>({ status: "unavailable", remaining: remaining(used) });
@@ -332,15 +355,15 @@ export function createApp(deps: AppDeps) {
     try {
       lessonFacts = facts(lesson);
     } catch {
-      return c.json({ error: "lesson is malformed" }, 400);
+      return c.json(failure("malformed_lesson"), 400);
     }
-    const factsHash = await sha256(JSON.stringify(lessonFacts) + PROMPT_VERSION);
+    const factsHash = await sha256(JSON.stringify(lessonFacts) + PROMPT_VERSION + locale);
 
     // Claim the work: insert a pending row, or take over a stale one.
     const claimed = current
       ? await db
           .update(explanations)
-          .set({ status: "pending", updatedAt: now() })
+          .set({ status: "pending", locale, factsHash, updatedAt: now() })
           .where(
             and(
               eq(explanations.id, current.id),
@@ -358,13 +381,14 @@ export function createApp(deps: AppDeps) {
             status: "pending",
             promptVersion: PROMPT_VERSION,
             factsHash,
+            locale,
           })
           .onConflictDoNothing()
           .returning({ id: explanations.id });
     if (!claimed.length) return c.json(respond(await existing(game.id, lesson.id), used));
     const rowId = claimed[0]!.id;
 
-    const result = await explainLesson(llm, env.llmModel, lessonFacts);
+    const result = await explainLesson(llm, env.llmModel, lessonFacts, locale);
     await db
       .update(explanations)
       .set({
