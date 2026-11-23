@@ -330,11 +330,13 @@ drive-by changes in an unrelated PR:
 - UX-15: "New game" during a game uses `window.confirm`.
 - UX-31: emoji and symbol glyphs as icons (👍 👎 ⚠ ⏳ ✓ and the stepper's ⏮ ◀ ▶ ⏭); there is no icon
   set yet.
-- UX-32 and UX-41: lesson text, principles, hints and triggers come from `packages/core` in
-  English; API and auth errors come from the server in English; AI explanations are written in
-  English whatever the locale; the landing page is static English HTML. Only `apps/web`'s own
-  strings are in the catalogue.
+- UX-32: the landing page (`apps/web/landing/`) is static English HTML. The sample explanation
+  that the fake LLM writes in development (`FAKE_LLM=1`) is English whatever the locale.
+- UX-41: an AI explanation is written once, in the locale it was first asked for; changing
+  locale later doesn't rewrite it. Lessons in games saved before lesson text moved to the
+  catalogue keep their trigger sentence in English when the game was rewound past it.
 - UX-60: some existing copy says "please" in errors; reword it when you touch it.
 - UX-100: moves can't be made with a keyboard, and the board isn't described to screen readers.
-- UX-106: move text in lessons is built in `packages/core`, outside the formatter, and has no
-  spoken form.
+- UX-106: moves have no spoken form yet. Lesson moves go through `moveText()` in
+  `@chess-teacher/lesson-text`, but the move list, the futures boards and the lines sent to the
+  LLM still use SAN from `packages/core` directly.
