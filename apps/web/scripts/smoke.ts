@@ -176,7 +176,23 @@ try {
   await step("start a game and play 1. e4", async () => {
     await page.getByRole("button", { name: "Start game" }).click();
     await page.getByRole("status").filter({ hasText: "Your move" }).waitFor({ timeout: 60_000 });
+    // Select the pawn and wait until its legal-move dots show, then move. (A click that lands
+    // as the board finishes preparing can be ignored, so retry once.)
+    const selected = () =>
+      page
+        .waitForFunction(
+          () =>
+            (document.querySelector("#main-square-e4 > div")?.getAttribute("style") ?? "").includes("radial"),
+          null,
+          { timeout: 5_000 },
+        )
+        .then(() => true)
+        .catch(() => false);
     await page.locator("#main-square-e2").click();
+    if (!(await selected())) {
+      await page.locator("#main-square-e2").click();
+      if (!(await selected())) throw new Error("couldn't select the e2 pawn");
+    }
     await page.locator("#main-square-e4").click();
     await opponentReplied(page);
     await page.getByRole("status").filter({ hasText: "Your move" }).waitFor({ timeout: 30_000 });
@@ -216,6 +232,13 @@ try {
     await shot("4-reveal-explain", true);
   });
 
+  await step("rate the lesson", async () => {
+    await page.getByRole("button", { name: "No, it didn't make sense" }).click();
+    await page.getByLabel("What didn't make sense?").fill("smoke test comment");
+    await page.getByRole("button", { name: "Send" }).click();
+    await page.getByText(/Thanks: that helps/).waitFor();
+  });
+
   await step("rewind to before the mistake", async () => {
     await page.getByRole("button", { name: /^Rewind to before/ }).click();
     await page.getByRole("status").filter({ hasText: "Your move" }).waitFor({ timeout: 60_000 });
@@ -239,7 +262,17 @@ try {
     await shot("6-account");
   });
 
+  await step("progress page, from the account menu", async () => {
+    await page.locator(".account-menu").getByRole("button", { name: "Your progress" }).click();
+    await page.getByRole("heading", { name: "Your progress" }).waitFor();
+    await page.getByText("Your focus").waitFor();
+    if (await page.locator(".account[open]").count()) throw new Error("account menu still open");
+    await shot("6b-progress", true);
+    await page.getByRole("button", { name: "Back" }).click();
+  });
+
   await step("sign out and back in", async () => {
+    await page.locator(".account summary").click();
     await page.getByRole("button", { name: "Sign out" }).click();
     await page.getByRole("heading", { name: "Welcome back" }).waitFor({ timeout: 30_000 });
     await page.getByLabel("Email").fill(EMAIL);

@@ -5,9 +5,11 @@ import type {
   ConfigResponse,
   CreateGameBody,
   ExplanationResponse,
+  FeedbackBody,
   GameRecord,
   GameSummary,
   MeResponse,
+  ProgressResponse,
   SaveGameBody,
   SaveGameResponse,
 } from "@chess-teacher/contract";
@@ -41,6 +43,7 @@ async function request<T>(path: string, init: RequestInit & { json?: unknown } =
 export const api = {
   config: () => request<ConfigResponse>("/config"),
   me: () => request<MeResponse>("/me"),
+  progress: () => request<ProgressResponse>("/me/progress"),
   activeGames: () => request<GameSummary[]>("/games?status=active"),
   game: (id: string) => request<GameRecord>(`/games/${id}`),
   createGame: (body: CreateGameBody) => request<GameRecord>("/games", { method: "POST", json: body }),
@@ -48,6 +51,8 @@ export const api = {
     request<SaveGameResponse>(`/games/${id}`, { method: "PUT", json: body }),
   explanation: (gameId: string, lessonId: number) =>
     request<ExplanationResponse>(`/games/${gameId}/lessons/${lessonId}/explanation`),
+  feedback: (gameId: string, lessonId: number, body: FeedbackBody) =>
+    request<{ ok: true }>(`/games/${gameId}/lessons/${lessonId}/feedback`, { method: "PUT", json: body }),
   requestExplanation: (gameId: string, lessonId: number) =>
     request<ExplanationResponse>(`/games/${gameId}/lessons/${lessonId}/explanation`, { method: "POST" }),
 };

@@ -4,7 +4,8 @@
  * Platform-independent: transports are supplied by the caller.
  */
 
-import type { Candidate, Engine } from "@chess-teacher/core";
+import type { Candidate, ClassicalEval, Engine, EvalTrace } from "@chess-teacher/core";
+import { parseEvalTrace } from "./eval-trace.ts";
 import { AnalysisCollector } from "./uci.ts";
 
 export interface UciTransport {
@@ -17,12 +18,13 @@ export interface UciTransport {
 export interface UciEngineOptions {
   /** Stockfish "Skill Level" (0–20); omit for full strength. */
   skill?: number;
+  /** Search threads; omit to keep the engine's default (1 for Stockfish). */
   threads?: number;
   /** Hash table size in MB (keep small in browsers). */
   hashMb?: number;
 }
 
-export class UciEngine implements Engine {
+export class UciEngine implements Engine, ClassicalEval {
   private readonly waiters: { match: (line: string) => boolean; resolve: (line: string) => void }[] = [];
   private listener: ((line: string) => void) | null = null;
   private queue: Promise<unknown> = Promise.resolve();
@@ -40,7 +42,8 @@ export class UciEngine implements Engine {
     const engine = new UciEngine(transport);
     engine.transport.send("uci");
     await engine.waitFor((l) => l === "uciok");
-    engine.transport.send(`setoption name Threads value ${opts.threads ?? 1}`);
+    // Only when asked: some builds (e.g. single-threaded JavaScript ones) hang on it.
+    if (opts.threads !== undefined) engine.transport.send(`setoption name Threads value ${opts.threads}`);
     if (opts.hashMb !== undefined) engine.transport.send(`setoption name Hash value ${opts.hashMb}`);
     if (opts.skill !== undefined) engine.transport.send(`setoption name Skill Level value ${opts.skill}`);
     engine.transport.send("isready");
@@ -68,6 +71,20 @@ export class UciEngine implements Engine {
       this.transport.send(`go movetime ${opts.movetimeMs}`);
       const line = await this.waitFor((l) => l.startsWith("bestmove"));
       return line.split(/\s+/)[1]!;
+    });
+  }
+
+  /** Stockfish's `eval` command (classical engines only). */
+  evalTrace(fen: string): Promise<EvalTrace | null> {
+    return this.serial(async () => {
+      const lines: string[] = [];
+      this.listener = (line) => lines.push(line);
+      this.transport.send(`position fen ${fen}`);
+      this.transport.send("eval");
+      this.transport.send("isready");
+      await this.waitFor((l) => l === "readyok");
+      this.listener = null;
+      return parseEvalTrace(lines);
     });
   }
 

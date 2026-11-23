@@ -25,6 +25,7 @@ import {
   type TeachingConfig,
 } from "./lessons.ts";
 import { chooseOpponentMove, type OpponentMode } from "./opponent.ts";
+import { verifyLesson } from "./validate.ts";
 
 export const SESSION_STATE_VERSION = 1;
 
@@ -39,6 +40,8 @@ export interface SessionState {
   opponentModes: OpponentMode[];
   /** Analysis of the current position, if already done (saves re-analysing on resume). */
   analysis: { fen: string; candidates: Candidate[] } | null;
+  /** Strategic lessons not taught because the classical evaluation disagreed. */
+  unverified?: number;
 }
 
 export type GameEventKind = "created" | "warning" | "triggered" | "chanceGone" | "fixed" | "expired";
@@ -177,7 +180,17 @@ export async function userMove(state: SessionState, move: string, engines: Engin
     }
   }
 
-  const lesson = detectMistake(s.lessons.length + 1, fenBefore, move, game, cands, after, s.config);
+  let lesson = detectMistake(s.lessons.length + 1, fenBefore, move, game, cands, after, s.config);
+  if (lesson && engines.classical && s.config.verifyStrategic !== false) {
+    const verdict = await verifyLesson(lesson, engines.classical);
+    if (verdict.reason !== "not a strategic feature") {
+      if (verdict.agrees) lesson.verification = verdict.reason;
+      else {
+        s.unverified = (s.unverified ?? 0) + 1;
+        lesson = null;
+      }
+    }
+  }
   if (lesson) {
     // Credit assignment: once a newer mistake affects the same factor, we can no longer
     // tell which move caused what, so the older lesson goes to the review.

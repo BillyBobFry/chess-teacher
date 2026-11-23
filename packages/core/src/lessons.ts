@@ -54,6 +54,8 @@ export interface TeachingConfig {
   opponentMargin: number;
   /** Opponent: plies of each candidate's line checked for lesson progress. */
   opponentLookahead: number;
+  /** Only teach strategic lessons the classical evaluation agrees with (when available). */
+  verifyStrategic: boolean;
 }
 
 export const DEFAULT_CONFIG: TeachingConfig = {
@@ -71,6 +73,7 @@ export const DEFAULT_CONFIG: TeachingConfig = {
   opponentMultipv: 5,
   opponentMargin: 60,
   opponentLookahead: 4,
+  verifyStrategic: true,
 };
 
 /** A lesson is plain data, so a game in progress can be saved and resumed anywhere. */
@@ -110,6 +113,8 @@ export interface Lesson {
   deferred: boolean;
   foundCause: boolean | null;
   chanceMove: string | null;
+  /** Why the classical evaluation agreed with this strategic lesson (if it was checked). */
+  verification?: string;
 }
 
 export const lessonGap = (l: Lesson): number => l.bestScore - l.userScore;

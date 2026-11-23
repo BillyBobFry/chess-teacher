@@ -6,6 +6,7 @@ import { Board } from "./components/Board.tsx";
 import { Licences } from "./components/Licences.tsx";
 import { MoveList } from "./components/MoveList.tsx";
 import { NewGame } from "./components/NewGame.tsx";
+import { Progress } from "./components/Progress.tsx";
 import { Reveal } from "./components/Reveal.tsx";
 import { Review } from "./components/Review.tsx";
 import { SignIn } from "./components/SignIn.tsx";
@@ -114,6 +115,7 @@ function GameApp({
 }) {
   const g = useGame({ llmEnabled });
   const [choosing, setChoosing] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
   const saved = g.game;
 
   const board = useMemo(() => {
@@ -162,6 +164,14 @@ function GameApp({
               {g.me.explanations.remaining} of {g.me.explanations.limit} AI explanations left this month
             </div>
           )}
+          <button
+            onClick={(e) => {
+              e.currentTarget.closest("details")?.removeAttribute("open");
+              setShowProgress(true);
+            }}
+          >
+            Your progress
+          </button>
           <button onClick={() => void authClient.signOut().then(() => window.location.reload())}>
             Sign out
           </button>
@@ -174,6 +184,16 @@ function GameApp({
     return (
       <Shell nav={nav} onLicences={onLicences}>
         <main className="page muted">{BUSY_TEXT.loading}</main>
+      </Shell>
+    );
+  }
+
+  if (showProgress) {
+    return (
+      <Shell nav={nav} onLicences={onLicences}>
+        <main className="page">
+          <Progress onBack={() => setShowProgress(false)} />
+        </main>
       </Shell>
     );
   }
@@ -240,12 +260,15 @@ function GameApp({
         <aside className="panel">
           {saved.finished ? (
             <Review
+              gameId={saved.id}
               state={state}
               result={resultText(board.game, state.userColour)}
               onNewGame={() => setChoosing(true)}
+              onProgress={() => setShowProgress(true)}
             />
           ) : revealLesson && saved.reveal ? (
             <Reveal
+              gameId={saved.id}
               state={state}
               lesson={revealLesson}
               reveal={saved.reveal}

@@ -29,6 +29,7 @@ import {
   type SessionState,
 } from "@chess-teacher/core";
 import { NodeUciEngine, findStockfish } from "@chess-teacher/engine/node";
+import { createRequire } from "node:module";
 
 const { values: args } = parseArgs({
   options: {
@@ -39,6 +40,7 @@ const { values: args } = parseArgs({
     depth: { type: "string", default: "10" },
     "max-moves": { type: "string", default: "50" },
     compare: { type: "boolean", default: false },
+    verify: { type: "boolean", default: false },
     engine: { type: "string" },
     out: { type: "string", default: "reports" },
   },
@@ -158,7 +160,13 @@ async function main() {
   const analyst = await NodeUciEngine.start(command);
   const weak = await NodeUciEngine.start(command, { skill: Number(args["opponent-skill"]) });
   const student = await NodeUciEngine.start(command, { skill: Number(args["student-skill"]) });
-  const engines: Engines = { analyst, weak };
+  // --verify: Stockfish 11's classical evaluation checks strategic lessons (as in the app).
+  const classical = args.verify
+    ? await NodeUciEngine.start(
+        `node ${createRequire(import.meta.url).resolve("stockfish11/src/stockfish.asm.js")}`,
+      )
+    : undefined;
+  const engines: Engines = classical ? { analyst, weak, classical } : { analyst, weak };
   const configs: [string, boolean][] = [["teaching opponent", true]];
   if (args.compare) configs.push(["no level-up (control)", false]);
 
@@ -172,7 +180,7 @@ async function main() {
       console.log(`[${name}] game ${g + 1}/${args.games}: ${row.plies} plies, ${row.lessons.length} lessons`);
     }
   }
-  await Promise.all([analyst.close(), weak.close(), student.close()]);
+  await Promise.all([analyst.close(), weak.close(), student.close(), classical?.close()]);
   const seconds = (performance.now() - started) / 1000;
 
   const summaries = Object.fromEntries(Object.entries(runs).map(([k, v]) => [k, summarise(v)]));
@@ -192,7 +200,9 @@ async function main() {
     "",
     `${args.games} games per configuration. Student: Stockfish skill ${args["student-skill"]} ` +
       `(${args["student-movetime"]} ms/move). Opponent normal mode: skill ${args["opponent-skill"]}. ` +
-      `Analysis depth ${args.depth}. Max ${args["max-moves"]} moves per game. Took ${seconds.toFixed(0)} s.`,
+      `Analysis depth ${args.depth}. Max ${args["max-moves"]} moves per game. ` +
+      `Strategic lessons ${args.verify ? "checked by the classical evaluation" : "not checked"}. ` +
+      `Took ${seconds.toFixed(0)} s.`,
     "",
     `| Metric | ${names.join(" | ")} |`,
     `|---|${names.map(() => "---|").join("")}`,

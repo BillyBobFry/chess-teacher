@@ -4,13 +4,14 @@
  * for analysis, one weakened for the opponent's normal moves.
  */
 
-import type { Engines } from "@chess-teacher/core";
+import type { ClassicalEval, Engines } from "@chess-teacher/core";
 import { UciEngine, type UciTransport } from "@chess-teacher/engine";
 
 const SCRIPT = `${import.meta.env.BASE_URL}stockfish/stockfish-19-lite-single.js`;
+const SCRIPT_11 = `${import.meta.env.BASE_URL}stockfish11/stockfish.js`;
 
-function workerTransport(): UciTransport {
-  const worker = new Worker(SCRIPT);
+function workerTransport(script = SCRIPT): UciTransport {
+  const worker = new Worker(script);
   return {
     send: (command) => worker.postMessage(command),
     onLine: (handler) => {
@@ -40,6 +41,18 @@ async function startAnalyst(): Promise<{ engine: UciEngine; depth: number }> {
   return { engine, depth: ms > 1500 ? 10 : 12 };
 }
 
+/**
+ * Stockfish 11's classical evaluation, the second opinion on strategic lessons. Started on
+ * first use (most games need it a few times at most), so its 3.7 MB only loads when needed.
+ */
+let classicalEngine: Promise<UciEngine> | null = null;
+const classical: ClassicalEval = {
+  evalTrace: async (fen) => {
+    classicalEngine ??= UciEngine.start(workerTransport(SCRIPT_11));
+    return (await classicalEngine).evalTrace(fen);
+  },
+};
+
 export async function getEngines(opponentSkill: number): Promise<{ engines: Engines; depth: number }> {
   analyst ??= startAnalyst();
   if (!weak || weak.skill !== opponentSkill) {
@@ -51,5 +64,5 @@ export async function getEngines(opponentSkill: number): Promise<{ engines: Engi
     if (previous) void previous.engine.then((e) => e.close());
   }
   const [{ engine, depth }, weakEngine] = await Promise.all([analyst, weak.engine]);
-  return { engines: { analyst: engine, weak: weakEngine }, depth };
+  return { engines: { analyst: engine, weak: weakEngine, classical }, depth };
 }

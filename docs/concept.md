@@ -203,8 +203,46 @@ game, with largely templated explanations. This app differs by:
    cause yourself.
 3. **Strategic explanations grounded in measured features**, tied to a named principle.
 4. **Rewind and retry** from the mistake.
+5. **Open source and free at its core** (§9): competing AI-teacher apps are closed,
+   subscription services.
 
-## 9. Risks and open questions
+## 9. Business model
+
+Competing apps sell AI chess teachers by subscription. This one differentiates by being
+**open source** and **free at its core**, with paid usage only for the part that costs
+money to run: the AI coach.
+
+| | Self-hosted | Hosted (web and mobile app) |
+|---|---|---|
+| Price | Free | Free, plus optional pay-as-you-go bundles |
+| Playing, teaching opponent, find-the-cause, both futures, rewind, review, facts-based explanations | ✓ | ✓, unlimited |
+| AI coach (explanations, "ask the coach") | ✓ with your own Anthropic API key | **N free coached games every month**, then bundles of coached games |
+
+- **Licence:** AGPL-3.0, so anyone running a modified version as a service must publish
+  their changes (a competitor can't run a closed fork). Compatible with Stockfish's GPL.
+  Contributors sign a CLA, keeping the option of other licensing later.
+- **Why it's sustainable:** the engine and teaching logic run on the player's device, so a
+  free game costs almost nothing to serve. The only real running cost is the LLM, and
+  that's what's metered.
+- **The unit is a coached game,** not tokens or credits: easy to understand. A coached
+  game is counted when its first AI explanation appears, so a clean game costs nothing.
+  AI explanations per game are capped (around 8) to bound the cost of a messy game.
+- **Free coached games every month** (a small number) let every user experience the coach:
+  product-led growth. Purchased games don't expire. Free games are used first.
+- **"Ask the coach":** in a coached game the player can ask follow-up questions ("why can't
+  I just take that pawn?"), answered from engine analysis. This is what an LLM uniquely
+  adds, and the main reason to pay, beyond nicer wording of the free explanation.
+- **The mobile app offers exactly what the hosted web app does,** with the same account
+  and the same balance of coached games.
+- **Payments:** Stripe on the web; app-store in-app purchases on mobile (required for
+  digital goods). Balances live on the server so purchases work across devices. Smallest
+  bundle around $5+ so card fees don't eat it.
+- **Pricing** comes from the LLM cost benchmark: price per coached game ≥ AI cost per game ÷
+  (1 − payment and store fees) × margin. The model choice changes the AI cost per game by
+  10–40×, so the benchmark has to run first. N (free per month) and $X (bundle price) are
+  set from it.
+
+## 10. Risks and open questions
 
 | Risk | Why it matters | How to test |
 |---|---|---|
@@ -214,8 +252,10 @@ game, with largely templated explanations. This app differs by:
 | **Strategic signal at low ratings** | Below ~1200, games are decided mostly by tactics; strategic lessons may rarely trigger | Count lesson types across real games |
 | **Small eval gaps** | Engine preferences of <0.5 are often inexplicable | Threshold tuning; only teach when a feature explains the gap |
 | **Cost / latency** | Engine analysis every move plus LLM calls | LLM only at reveals; engine runs in the browser (Stockfish WASM) or on a server |
+| **Will people pay?** | The free tier is the whole core product; the paid part must be worth it | Usage of free coached games vs bundle conversion; "ask the coach" is the strongest paid draw |
+| **App-store rules** | In-app purchase requirements and fees, GPL + App Store | Follow the Lichess precedent (GPL app with Stockfish on both stores); consumable in-app purchases for bundles |
 
-## 10. Plan
+## 11. Plan
 
 1. **Prototype 1 (command line):** play against a teaching opponent in the terminal.
    Detect mistakes, record pending lessons with checkable conditions, level the opponent
@@ -227,9 +267,14 @@ game, with largely templated explanations. This app differs by:
 4. **Maia** for the normal-mode opponent and the realistic simulated lines.
 5. **Progress tracking** per principle and the difficulty ladder.
 
+The engineering milestones (see `architecture.md`): 1 TypeScript core ✓ · 2 playable web
+app ✓ · 3 accounts, server, AI explanations ✓ · **4 lesson quality** · 5 open-source ready
+(licence, CLA, self-hosting) · 6 coached-game credits and payments, "ask the coach" ·
+7 mobile app.
+
 ---
 
-## 11. Prototype 1 findings (Nov 2026)
+## 12. Prototype 1 findings (Nov 2026)
 
 A command-line prototype (`prototype/play.py`, `prototype/simulate.py`) implements the core loop: mistake
 detection, feature comparison across the two futures, pending lessons with checkable

@@ -13,4 +13,12 @@ for (const f of ["stockfish-19-lite-single.js", "stockfish-19-lite-single.wasm"]
   copyFileSync(join(pkg, "bin", f), join(out, f));
 }
 copyFileSync(join(pkg, "Copying.txt"), join(out, "COPYING.txt"));
-console.log(`Stockfish copied to ${out}`);
+
+// Stockfish 11: its classical evaluation gives the term-by-term second opinion on strategic
+// lessons (packages/core/src/validate.ts). Loaded only when first needed.
+const sf11 = dirname(require.resolve("stockfish11/package.json"));
+const out11 = join(import.meta.dirname, "..", "public", "stockfish11");
+mkdirSync(out11, { recursive: true });
+for (const f of ["stockfish.js", "stockfish.wasm"]) copyFileSync(join(sf11, "src", f), join(out11, f));
+copyFileSync(join(sf11, "Copying.txt"), join(out11, "COPYING.txt"));
+console.log(`Stockfish 19 and 11 copied to public/`);
