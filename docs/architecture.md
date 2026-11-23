@@ -10,10 +10,12 @@ the measurements behind several decisions are in [`../bench/README.md`](../bench
 
 | | |
 |---|---|
-| Scale | Hobby project with room to grow; a paid tier for teaching games later |
+| Scale | Hobby project with room to grow |
+| Model | Open source (AGPL-3.0), free to self-host. Hosted version: free play, N free coached games a month, pay-as-you-go bundles of coached games (concept §9) |
 | Platforms | Web first; native mobile apps later, without a rewrite |
 | Offline | Not needed now, but the design must not rule it out |
 | Accounts | Sign-in from day one (LLM explanations cost money; no anonymous play) |
+| Self-hosting | One server process plus Postgres (or the embedded database), no Vercel required |
 | Hosting | Vercel (web + functions) and Neon (Postgres), already in use |
 | Cost | Server cost per game should be close to zero; LLM cost bounded per user |
 
@@ -26,11 +28,14 @@ the measurements behind several decisions are in [`../bench/README.md`](../bench
 | D3 | **A pure, portable teaching core** | One package holds all chess teaching logic, with no DOM, Node or network dependencies. It is tested in Node, runs in the browser, and later in React Native, unchanged. |
 | D4 | **The server is the trust boundary** | It owns what must be trusted: identity, saved games and lessons, spending LLM tokens, quotas and (later) billing. It never runs Stockfish. |
 | D5 | **Explanations are generated in the background, before the reveal** | A lesson is created several moves before it is revealed, so the LLM explanation can be generated while the game continues. The template is shown if it isn't ready. |
-| D6 | **Per-user explanation quotas** | The server can't verify the device's engine analysis, so LLM spend is bounded per user instead. Free and paid tiers become different quotas. |
+| D6 | **Per-user metering of the AI coach** | The server can't verify the device's engine analysis, so LLM spend is bounded per user instead: by coached games (D13). |
 | D7 | **Neon Postgres + Drizzle ORM** | Already in use; serverless driver works from Vercel functions; Drizzle gives typed queries and migrations in TypeScript. |
 | D8 | **A Vite + React single-page app, with a Hono API on Vercel Functions** | The game runs entirely on the device, so server rendering would add complexity without helping the core screen. A static SPA keeps offline (service worker) and React Native reuse simple. The API is written with Hono, which is independent of the web framework, so the API that mobile apps depend on isn't tied to it. Server-rendered public pages are handled separately (see §7.1). |
 | D9 | **API schemas defined once with Zod** | Types for every TypeScript client come from the schemas; OpenAPI is generated from them for any future Swift/Kotlin app. |
 | D10 | **Game sessions are plain, serialisable state, saved after every move** | The engine is stateless (position in, analysis out), so everything needed to continue a game is the session state: moves, pending lessons with their trigger conditions, resolved lessons and settings. Saved to the server after each move, any game can be resumed later on any device by loading the state and starting a fresh engine (~0.15 s). |
+| D11 | **AGPL-3.0, with a CLA** | Free to use and self-host; anyone running a modified version as a service must publish it, so a competitor can't run a closed fork. Compatible with Stockfish's GPL, which also settles shipping Stockfish to browsers and app stores (Lichess's GPL app is on both stores). The CLA keeps other licensing options open. |
+| D12 | **One codebase, two modes: hosted and self-hosted** | A setting, not a fork. Self-hosted: no billing, the operator's own API key, coached games unlimited or limited by config. Hosted: monthly free coached games and paid bundles. Self-hosting ships as a Docker image (one Node process serving the static app and the API) with Postgres or the embedded database. |
+| D13 | **Coached games as the unit, with a server-side ledger** | A user-facing unit that's easy to understand. A game becomes "coached" when its first AI explanation is generated, and that's when one is consumed (free monthly allowance first, then purchased). AI explanations per game are capped. Balances live in one ledger on the server so Stripe purchases (web) and in-app purchases (mobile) share it. |
 
 ## 3. Overview
 
@@ -228,13 +233,13 @@ while offline.
 state logic. It needs a Stockfish native module (or WASM in a WebView) behind the same
 `Engine` interface.
 
-## 10. Licensing (needs proper advice before charging)
+## 10. Licensing
 
-Stockfish is **GPL-3.0**. Sending the WASM build to browsers, or bundling it in an app,
-is distribution: include the licence and make Stockfish's source available. The app's own
-code talks to the engine only over the UCI text protocol, which is generally considered
-separate from it, but the App Store's terms and the GPL have a contentious history. chess.js
-is BSD-2-Clause.
+The app is **AGPL-3.0** (D11), with a CLA for contributors. Stockfish is **GPL-3.0** and
+is distributed to browsers (and later bundled in the mobile app); its licence ships next to
+the engine and the Licences screen links to its source. GPL-3.0 and AGPL-3.0 are
+compatible. chess.js is BSD-2-Clause; react-chessboard and React are MIT. Worth a proper
+legal check before charging money, particularly for the app stores.
 
 ## 11. Milestone 1 (done)
 
@@ -314,5 +319,18 @@ Deferred: per-principle progress page, password reset (needs an email service), 
 1. ~~Engine on the device (D2)~~: confirmed.
 2. ~~Next.js vs Vite SPA + Vercel functions (D8)~~: SPA + Hono.
 3. ~~Auth provider~~: Better Auth (email + password, Google).
-4. LLM model and price points: after the LLM benchmark runs.
-5. Licensing advice before any paid launch.
+4. LLM model, N (free coached games a month), bundle sizes and prices: after the LLM
+   benchmark runs.
+5. Legal check before any paid launch (AGPL + app stores, CLA wording).
+
+## 15. Next milestones
+
+4. **Lesson quality.** Only teach a strategic factor when it demonstrably explains the
+   engine's preference; a rating button on every lesson; re-run simulations and grading to
+   measure the change; a per-principle progress page.
+5. **Open-source ready.** Licence and CLA, contributor guide, Docker image and
+   self-hosting docs, hosted/self-hosted mode (D12), bring-your-own API key.
+6. **Coached games and payments.** Ledger (D13), monthly free coached games, Stripe
+   Checkout for bundles, per-game cap on AI explanations, "ask the coach".
+7. **Mobile app.** Expo, sharing the core and API client; native Stockfish; in-app
+   purchases feeding the same ledger.
