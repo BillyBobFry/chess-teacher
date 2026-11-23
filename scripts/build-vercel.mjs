@@ -70,7 +70,7 @@ writeFileSync(
     {
       version: 3,
       routes: [
-        { src: "^/app/(assets|stockfish)/(.*)$", headers: immutable, continue: true },
+        { src: "^/app/(assets|stockfish|stockfish11)/(.*)$", headers: immutable, continue: true },
         { src: "^/app$", status: 308, headers: { Location: "/app/" } },
         { handle: "filesystem" },
         // One function serves the whole API; __path carries the original path along.

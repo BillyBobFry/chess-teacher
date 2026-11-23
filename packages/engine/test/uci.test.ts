@@ -43,3 +43,29 @@ describe("AnalysisCollector", () => {
     ]);
   });
 });
+
+describe("parseEvalTrace", () => {
+  it("reads Stockfish 11's eval breakdown", async () => {
+    const { parseEvalTrace } = await import("../src/eval-trace.ts");
+    const trace = parseEvalTrace([
+      "     Term    |    White    |    Black    |    Total   ",
+      "             |   MG    EG  |   MG    EG  |   MG    EG ",
+      " ------------+-------------+-------------+------------",
+      "    Material |  ----  ---- |  ----  ---- |  0.00  0.00",
+      "    Mobility | -0.28 -0.14 | -0.10  0.14 | -0.18 -0.28",
+      " King safety |  0.55 -0.08 |  0.55 -0.08 |  0.00  0.00",
+      "       Total |  ----  ---- |  ----  ---- | -0.13 -0.23",
+      "",
+      "Total evaluation: -0.04 (white side)",
+    ]);
+    expect(trace).toEqual({
+      terms: {
+        Material: { mg: 0, eg: 0 },
+        Mobility: { mg: -0.18, eg: -0.28 },
+        "King safety": { mg: 0, eg: 0 },
+      },
+      total: -0.04,
+    });
+    expect(parseEvalTrace(["Total evaluation: none (in check)"])).toBeNull();
+  });
+});

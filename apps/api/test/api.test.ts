@@ -320,3 +320,54 @@ describe("trusted origins", () => {
     expect(await signUpFrom(prod, "http://localhost:5178")).toBe(403);
   });
 });
+
+describe("lesson feedback", () => {
+  it("records a rating, replaces it on re-rating, and 404s for other users", async () => {
+    const { server, call, signUp } = await setup({ llm: null });
+    const cookie = await signUp("rita@example.com");
+    const other = await signUp("otto@example.com");
+    const game = await (
+      await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
+    ).json();
+    const url = `/api/games/${game.id}/lessons/${recorded.lessons[0]!.id}/feedback`;
+
+    expect(
+      (await call(url, { method: "PUT", cookie, json: { rating: -1, comment: "unclear" } })).status,
+    ).toBe(200);
+    expect((await call(url, { method: "PUT", cookie, json: { rating: 1 } })).status).toBe(200);
+    expect((await call(url, { method: "PUT", cookie, json: { rating: 5 } })).status).toBe(400);
+    expect((await call(url, { method: "PUT", cookie: other, json: { rating: 1 } })).status).toBe(404);
+
+    const { lessonFeedback } = await import("../src/db/schema.ts");
+    const rows = await server.db.select().from(lessonFeedback);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ rating: 1, comment: null, feature: recorded.lessons[0]!.feature });
+  });
+});
+
+describe("progress", () => {
+  it("counts lessons by principle across the user's games", async () => {
+    const { call, signUp } = await setup({ llm: null });
+    const cookie = await signUp("pia@example.com");
+    expect(await (await call("/api/me/progress", { cookie })).json()).toEqual({
+      games: 0,
+      lessons: 0,
+      principles: [],
+    });
+
+    const found = structuredClone(recorded);
+    found.lessons[0]!.status = "triggered";
+    found.lessons[0]!.foundCause = true;
+    await call("/api/games", { method: "POST", cookie, json: newGameBody(found) });
+    await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) });
+
+    const progress = await (await call("/api/me/progress", { cookie })).json();
+    expect(progress.games).toBe(2);
+    const counted = recorded.lessons.filter((l) => l.status !== "rewound").length;
+    expect(progress.lessons).toBe(2 * counted);
+    const first = progress.principles.find((p: { id: string }) => p.id === recorded.lessons[0]!.principle);
+    expect(first.foundYourself).toBeGreaterThanOrEqual(1);
+    expect(first.recentGames).toBe(2);
+    expect((await call("/api/me/progress")).status).toBe(401);
+  });
+});

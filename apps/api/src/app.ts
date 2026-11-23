@@ -3,15 +3,17 @@
  * Vercel Function in production. Everything lives under /api.
  */
 
-import { CreateGameBody, SaveGameBody } from "@chess-teacher/contract";
+import { CreateGameBody, FeedbackBody, SaveGameBody } from "@chess-teacher/contract";
 import type {
   ConfigResponse,
   ExplanationResponse,
   GameRecord,
   GameSummary,
   MeResponse,
+  PrincipleProgress,
+  ProgressResponse,
 } from "@chess-teacher/contract";
-import { Game, facts, type Lesson } from "@chess-teacher/core";
+import { Game, PRINCIPLES, facts, type Lesson } from "@chess-teacher/core";
 import { zValidator } from "@hono/zod-validator";
 import { and, desc, eq, lt, sql } from "drizzle-orm";
 import { Hono } from "hono";
@@ -19,7 +21,7 @@ import { bodyLimit } from "hono/body-limit";
 import { createMiddleware } from "hono/factory";
 import type { Auth } from "./auth.ts";
 import type { Db } from "./db/client.ts";
-import { explanations, games, usage } from "./db/schema.ts";
+import { explanations, games, lessonFeedback, usage } from "./db/schema.ts";
 import type { Env } from "./env.ts";
 import { PROMPT_VERSION, explainLesson, type LlmClient } from "./explain.ts";
 
@@ -63,6 +65,7 @@ export function createApp(deps: AppDeps) {
     await next();
   });
   app.use("/me", requireUser);
+  app.use("/me/*", requireUser);
   app.use("/games", requireUser);
   app.use("/games/*", requireUser);
   const limit = bodyLimit({ maxSize: 512 * 1024, onError: (c) => c.json({ error: "game too large" }, 413) });
@@ -121,6 +124,50 @@ export function createApp(deps: AppDeps) {
         limit: env.explanationsPerMonth,
         remaining: remaining(used),
       },
+    });
+  });
+
+  /** Lessons by principle across the user's recent games (most common first). */
+  app.get("/me/progress", async (c) => {
+    const rows = await db
+      .select({ state: games.state })
+      .from(games)
+      .where(eq(games.userId, c.get("userId")))
+      .orderBy(desc(games.updatedAt))
+      .limit(50);
+    const byPrinciple = new Map<string, PrincipleProgress>();
+    let lessons = 0;
+    rows.forEach((row, gameIndex) => {
+      const seenInGame = new Set<string>();
+      for (const l of (row.state as { lessons: Lesson[] }).lessons ?? []) {
+        if (l.status === "rewound" || !PRINCIPLES[l.principle]) continue;
+        lessons += 1;
+        const p =
+          byPrinciple.get(l.principle) ??
+          ({
+            id: l.principle,
+            title: PRINCIPLES[l.principle]!.title,
+            lessons: 0,
+            foundYourself: 0,
+            revealed: 0,
+            fixed: 0,
+            recentGames: 0,
+          } satisfies PrincipleProgress);
+        p.lessons += 1;
+        if (l.status === "triggered" && l.foundCause !== null) p.revealed += 1;
+        if (l.foundCause === true) p.foundYourself += 1;
+        if (l.status === "fixed") p.fixed += 1;
+        if (gameIndex < 5 && !seenInGame.has(l.principle)) {
+          p.recentGames += 1;
+          seenInGame.add(l.principle);
+        }
+        byPrinciple.set(l.principle, p);
+      }
+    });
+    return c.json<ProgressResponse>({
+      games: rows.length,
+      lessons,
+      principles: [...byPrinciple.values()].sort((a, b) => b.lessons - a.lessons),
     });
   });
 
@@ -230,6 +277,32 @@ export function createApp(deps: AppDeps) {
     if (!found) return c.json({ error: "not found" }, 404);
     const row = await existing(found.game.id, found.lesson.id);
     return c.json(respond(row, await usedThisMonth(userId)));
+  });
+
+  /** "Did this lesson make sense?" Rating again replaces the earlier rating. */
+  app.put("/games/:id/lessons/:lessonId/feedback", zValidator("json", FeedbackBody), async (c) => {
+    const userId = c.get("userId");
+    const found = await lessonOf(userId, c.req.param("id"), Number(c.req.param("lessonId")));
+    if (!found) return c.json({ error: "not found" }, 404);
+    const { rating, comment } = c.req.valid("json");
+    const { lesson } = found;
+    await db
+      .insert(lessonFeedback)
+      .values({
+        userId,
+        gameId: found.game.id,
+        lessonId: lesson.id,
+        rating,
+        comment: comment ?? null,
+        feature: String(lesson.feature),
+        principle: String(lesson.principle),
+        kind: String(lesson.kind),
+      })
+      .onConflictDoUpdate({
+        target: [lessonFeedback.gameId, lessonFeedback.lessonId],
+        set: { rating, comment: comment ?? null, updatedAt: now() },
+      });
+    return c.json({ ok: true });
   });
 
   /**

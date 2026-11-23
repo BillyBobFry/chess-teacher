@@ -103,3 +103,31 @@ export interface ApiError {
   /** For 409s: the version currently on the server. */
   stateVersion?: number;
 }
+
+export const FeedbackBody = z.object({
+  rating: z.union([z.literal(1), z.literal(-1)]),
+  comment: z.string().max(1000).optional(),
+});
+export type FeedbackBody = z.infer<typeof FeedbackBody>;
+
+export interface PrincipleProgress {
+  id: string;
+  title: string;
+  /** Lessons about this principle across the recent games. */
+  lessons: number;
+  /** Revealed during a game and the user found the cause themselves. */
+  foundYourself: number;
+  /** Revealed during a game (found or not). */
+  revealed: number;
+  /** The user fixed the weakness before it cost them. */
+  fixed: number;
+  /** Of the games counted, how many of the most recent 5 had a lesson on this. */
+  recentGames: number;
+}
+
+export interface ProgressResponse {
+  /** Games counted (the most recent ones). */
+  games: number;
+  lessons: number;
+  principles: PrincipleProgress[];
+}

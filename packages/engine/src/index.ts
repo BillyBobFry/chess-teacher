@@ -2,3 +2,4 @@
 export * from "./recorded.ts";
 export * from "./uci.ts";
 export * from "./uci-engine.ts";
+export * from "./eval-trace.ts";

@@ -1,6 +1,6 @@
 # Chess Teacher — Architecture
 
-Status: **agreed** (Milestones 1–3 complete). Records the decisions made so far, why they
+Status: **agreed** (Milestones 1–4 complete). Records the decisions made so far, why they
 were made, and what is still open. The product concept is in [`concept.md`](concept.md);
 the measurements behind several decisions are in [`../bench/README.md`](../bench/README.md).
 
@@ -36,6 +36,7 @@ the measurements behind several decisions are in [`../bench/README.md`](../bench
 | D11 | **AGPL-3.0, with a CLA** | Free to use and self-host; anyone running a modified version as a service must publish it, so a competitor can't run a closed fork. Compatible with Stockfish's GPL, which also settles shipping Stockfish to browsers and app stores (Lichess's GPL app is on both stores). The CLA keeps other licensing options open. |
 | D12 | **One codebase, two modes: hosted and self-hosted** | A setting, not a fork. Self-hosted: no billing, the operator's own API key, coached games unlimited or limited by config. Hosted: monthly free coached games and paid bundles. Self-hosting ships as a Docker image (one Node process serving the static app and the API) with Postgres or the embedded database. |
 | D13 | **Coached games as the unit, with a server-side ledger** | A user-facing unit that's easy to understand. A game becomes "coached" when its first AI explanation is generated, and that's when one is consumed (free monthly allowance first, then purchased). AI explanations per game are capped. Balances live in one ledger on the server so Stripe purchases (web) and in-app purchases (mobile) share it. |
+| D14 | **Strategic lessons need a second opinion** | Our features say *what* differs between the two lines; Stockfish 11's classical evaluation says which of its terms account for the difference. A strategic lesson is only taught when its feature's term is a main reason. Stockfish 11 runs as a third, lazily loaded worker (3.7 MB, ~175 ms to start); when absent, lessons aren't checked. |
 
 ## 3. Overview
 
@@ -314,7 +315,46 @@ follows the SDK documentation; tests use a fake client).
 
 Deferred: per-principle progress page, password reset (needs an email service), payments.
 
-## 14. Open questions
+## 14. Milestone 4 (done): lesson quality
+
+**The classical-evaluation check (D14).** For each strategic lesson, Stockfish 11's `eval`
+breakdown is taken at the end of both lines (stepping back past positions in check),
+blended between middlegame and endgame by material as Stockfish does, and compared term by
+term from the user's side. Features map to terms: pawn structure → Pawns, passed pawns →
+Passed, outposts → Knights/Bishops, open files → Rooks, activity and development →
+Mobility (+ Knights/Bishops), king safety → King safety, centre → Space/Mobility. King
+activity has no matching term and can't be verified. A lesson is kept only if its terms
+gain ≥ 0.10 pawns, rank in the top two gains, and aren't dwarfed (> 3×) by another term.
+
+**What it does** (judged by hand on 88 simulated strategic lessons, two samples; see
+`reports/classical-check.md`):
+
+- It removes most rationalisations: of the rejected lessons, roughly 4 in 5 were really
+  about tactics or a king attack with a strategic story attached.
+- It isn't a complete fix: about 1 in 5 kept lessons is still wrong (typically the better
+  line simply wins a pawn a little later), and a few real lessons are lost (e.g. a
+  development lesson alongside a larger king-safety swing).
+- It's strict: in one 12-game simulation, strategic lessons fell from 19 to 5; material
+  lessons were unaffected, and 75% of consequences still landed.
+
+**Also in this milestone:**
+- "Did this lesson make sense? 👍 👎" on every explanation (in the reveal and the review),
+  with an optional comment on 👎, stored in `lesson_feedback` with the lesson's feature
+  and principle for analysis.
+- A per-principle progress page (`GET /api/me/progress`): lessons by principle across the
+  last 50 games, how often the user found the cause themselves, fixed a weakness in time,
+  and how many of their last five games it came up in. Reachable from the account menu
+  and the game review.
+- `pnpm sim -- --verify` runs simulations with the check; `tools/sim/src/validate-lessons.ts`
+  produces the kept/rejected report for grading.
+
+**Next for lesson quality** (data-driven, from the ratings):
+- Relabel instead of drop: many rejected lessons were really about king safety; teaching
+  the dominant term's principle could turn them into correct lessons.
+- Treat "the better line wins material a few moves later" as a material lesson.
+- Tune the thresholds against 👍/👎 data and a strong player's grading of the report.
+
+## 15. Open questions
 
 1. ~~Engine on the device (D2)~~: confirmed.
 2. ~~Next.js vs Vite SPA + Vercel functions (D8)~~: SPA + Hono.
@@ -323,11 +363,8 @@ Deferred: per-principle progress page, password reset (needs an email service), 
    benchmark runs.
 5. Legal check before any paid launch (AGPL + app stores, CLA wording).
 
-## 15. Next milestones
+## 16. Next milestones
 
-4. **Lesson quality.** Only teach a strategic factor when it demonstrably explains the
-   engine's preference; a rating button on every lesson; re-run simulations and grading to
-   measure the change; a per-principle progress page.
 5. **Open-source ready.** Licence and CLA, contributor guide, Docker image and
    self-hosting docs, hosted/self-hosted mode (D12), bring-your-own API key.
 6. **Coached games and payments.** Ledger (D13), monthly free coached games, Stripe

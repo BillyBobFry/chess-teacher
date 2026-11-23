@@ -137,3 +137,28 @@ export const usage = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.period] })],
 );
+
+/** "Did this lesson make sense?" ratings, for measuring and improving lesson quality. */
+export const lessonFeedback = pgTable(
+  "lesson_feedback",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    gameId: uuid("game_id")
+      .notNull()
+      .references(() => games.id, { onDelete: "cascade" }),
+    lessonId: integer("lesson_id").notNull(),
+    /** 1 = made sense, -1 = didn't. */
+    rating: integer("rating").notNull(),
+    comment: text("comment"),
+    /** Copied from the lesson, so ratings can be analysed by feature without unpacking games. */
+    feature: text("feature").notNull(),
+    principle: text("principle").notNull(),
+    kind: text("kind").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("lesson_feedback_game_lesson_idx").on(t.gameId, t.lessonId)],
+);

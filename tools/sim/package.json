@@ -11,5 +11,8 @@
     "@chess-teacher/core": "workspace:*",
     "@chess-teacher/engine": "workspace:*",
     "chess.js": "1.4.0"
+  },
+  "devDependencies": {
+    "stockfish11": "npm:stockfish@11.0.0"
   }
 }

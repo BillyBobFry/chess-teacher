@@ -2,6 +2,7 @@ import { PRINCIPLES, lessonLabel, type Lesson, type SessionState } from "@chess-
 import { useState } from "react";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
+import { LessonFeedback } from "./LessonFeedback.tsx";
 
 function outcome(l: Lesson): string {
   if (l.status === "fixed") return "You fixed it in time ✓";
@@ -16,13 +17,17 @@ function outcome(l: Lesson): string {
 
 /** Post-game review: every lesson, with its explanation and futures on demand. */
 export function Review({
+  gameId,
   state,
   result,
   onNewGame,
+  onProgress,
 }: {
+  gameId: string;
   state: SessionState;
   result: string;
   onNewGame: () => void;
+  onProgress?: () => void;
 }) {
   const lessons = state.lessons.filter((l) => l.status !== "rewound");
   const [open, setOpen] = useState<number | null>(null);
@@ -49,15 +54,19 @@ export function Review({
                 <div className="review-detail">
                   <Explanation lesson={l} />
                   <Futures lesson={l} />
+                  <LessonFeedback gameId={gameId} lessonId={l.id} />
                 </div>
               )}
             </li>
           ))}
         </ul>
       )}
-      <button className="primary" onClick={onNewGame}>
-        New game
-      </button>
+      <div className="actions">
+        <button className="primary" onClick={onNewGame}>
+          New game
+        </button>
+        {onProgress && <button onClick={onProgress}>Your progress</button>}
+      </div>
     </section>
   );
 }

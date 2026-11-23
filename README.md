@@ -6,9 +6,11 @@ helping you work out which move caused it.
 - Product concept: [`docs/concept.md`](docs/concept.md)
 - Architecture and decisions: [`docs/architecture.md`](docs/architecture.md)
 
-**Status:** Milestone 3 done: accounts (email + password, Google), games saved to the
-server and resumable on any device, AI explanations with a monthly allowance, a landing
-page, and a production build for Vercel + Neon.
+**Status:** Milestone 4 done: strategic lessons are checked against Stockfish 11's classical
+evaluation before they're taught, every lesson can be rated 👍/👎, and there's a
+per-principle progress page. Earlier: accounts, server-saved games, AI explanations, a
+landing page, and a production build for Vercel + Neon. Next: open-source readiness, then
+coached-game bundles (see `docs/concept.md` §9).
 
 ## Layout
 
@@ -49,6 +51,9 @@ pnpm build        # production build in Vercel's format (.vercel/output)
 pnpm serve        # serve that build locally on :3000, API included
 pnpm smoke <dir>  # build, then the end-to-end browser test (needs Playwright + Chromium)
 pnpm sim -- --games 12 --compare --out ../../reports   # simulations (needs native Stockfish)
+pnpm sim -- --games 12 --verify                        # …with the classical-evaluation check
+pnpm --filter @chess-teacher/sim exec tsx src/validate-lessons.ts --games 24 --out ../../reports
+                                                       # kept/rejected strategic lessons, for grading
 ```
 
 ## Deploying (Vercel + Neon)
@@ -85,7 +90,9 @@ pnpm sim -- --games 12 --compare --out ../../reports   # simulations (needs nati
   and every lesson (facts, explanation text, hints) must match exactly.
 - **Resume:** the same games, saving and reloading the session state as JSON after every
   step, must produce identical results.
-- Unit tests for the UCI parser, the Stockfish adapter, rewind, and edge cases.
+- Unit tests for the UCI parser, the eval-breakdown parser, the Stockfish adapter, rewind,
+  the classical-evaluation verdict rules, and a recorded game where a strategic lesson is
+  kept or dropped depending on the second opinion.
 - **API tests:** the real Hono app with Better Auth on an in-memory Postgres: sign-up and
   sign-in, privacy between users, saving with version conflicts, illegal-move rejection,
   explanation caching, the guardrail, and the monthly allowance (with a fake LLM).

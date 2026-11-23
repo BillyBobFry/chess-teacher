@@ -4,8 +4,10 @@ import type { RevealState } from "../game/storage.ts";
 import { AiExplanation } from "./AiExplanation.tsx";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
+import { LessonFeedback } from "./LessonFeedback.tsx";
 
 interface Props {
+  gameId: string;
   state: SessionState;
   lesson: Lesson;
   reveal: RevealState;
@@ -19,6 +21,7 @@ interface Props {
 
 /** Find the cause → explanation and the two futures → rewind or carry on. */
 export function Reveal({
+  gameId,
   state,
   lesson,
   reveal,
@@ -74,6 +77,7 @@ export function Reveal({
           <AiExplanation load={loadExplanation} />
           <Explanation lesson={lesson} />
           <Futures lesson={lesson} />
+          <LessonFeedback gameId={gameId} lessonId={lesson.id} />
           <div className="actions">
             <button className="primary" onClick={onRewind}>
               Rewind to before {lessonLabel(lesson)}

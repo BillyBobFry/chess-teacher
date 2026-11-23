@@ -20,7 +20,12 @@ export function Licences({ onBack }: { onBack: () => void }) {
         <a href="https://github.com/nmrugg/stockfish.js" target="_blank" rel="noreferrer">
           stockfish.js
         </a>
-        . This app talks to the engine only through the UCI text protocol.
+        . A second engine, Stockfish 11 (also GPL v3,{" "}
+        <a href={`${base}stockfish11/COPYING.txt`} target="_blank" rel="noreferrer">
+          licence
+        </a>
+        ), is used for its classical evaluation when checking strategic lessons. This app talks to both
+        engines only through the UCI text protocol.
       </p>
       <h2>Other components</h2>
       <ul>

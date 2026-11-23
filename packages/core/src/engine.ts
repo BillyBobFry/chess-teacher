@@ -18,8 +18,26 @@ export interface Engine {
   play(fen: string, opts: { movetimeMs: number }): Promise<string>;
 }
 
-/** The two engines a game needs: full-strength analysis, and a weakened opponent. */
+/** The engines a game needs: full-strength analysis, and a weakened opponent. */
 export interface Engines {
   analyst: Engine;
   weak: Engine;
+  /** Optional second opinion on strategic lessons (see validate.ts). */
+  classical?: ClassicalEval;
+}
+
+/** A classical evaluation broken down by term, in pawns from White's point of view. */
+export interface EvalTrace {
+  /** e.g. "Mobility" → { mg: -0.18, eg: -0.28 } */
+  terms: Record<string, { mg: number; eg: number }>;
+  total: number;
+}
+
+/**
+ * An engine with a classical, term-by-term static evaluation (Stockfish 11 and earlier).
+ * Used as a second opinion on *why* one line is better than another. Returns null when no
+ * breakdown is available (e.g. the side to move is in check).
+ */
+export interface ClassicalEval {
+  evalTrace(fen: string): Promise<EvalTrace | null>;
 }
