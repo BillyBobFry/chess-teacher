@@ -3,3 +3,7 @@ prototype/
 pnpm-lock.yaml
 tools/sim/fixtures/
 **/reports/
+apps/web/public/stockfish/
+apps/web/public/stockfish11/
+apps/api/.data/
+apps/api/drizzle/
