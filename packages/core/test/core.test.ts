@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { Game, newSession, pyRound, settledBalance, variationSan } from "../src/index.ts";
+import {
+  Game,
+  newSession,
+  peekLesson,
+  pyRound,
+  settledBalance,
+  spottedLesson,
+  variationSan,
+  type Lesson,
+} from "../src/index.ts";
 
 describe("pyRound", () => {
   it("rounds like Python's round(), including ties to even", () => {
@@ -45,5 +54,26 @@ describe("newSession", () => {
   it("produces plain JSON state", () => {
     const s = newSession({ userColour: "w" });
     expect(JSON.parse(JSON.stringify(s))).toEqual(s);
+  });
+});
+
+describe("spottedLesson", () => {
+  const lesson = (id: number, gap: number, kind: Lesson["kind"] = "consequence"): Lesson =>
+    ({ id, kind, status: "pending", bestScore: gap, userScore: 0 }) as Lesson;
+
+  it("is the biggest pending consequence, in easy mode only", () => {
+    const s = newSession({ userColour: "w", config: { easy: true } });
+    s.lessons = [lesson(1, 100), lesson(2, 300), lesson(3, 500, "missed_chance")];
+    expect(spottedLesson(s)?.id).toBe(2);
+    expect(spottedLesson({ ...s, config: { ...s.config, easy: false } })).toBeNull();
+    expect(spottedLesson({ ...s, config: { ...s.config, levelUp: false } })).toBeNull();
+  });
+
+  it("can be peeked at without changing the original state", () => {
+    const s = newSession({ userColour: "w", config: { easy: true } });
+    s.lessons = [lesson(1, 100)];
+    const peeked = peekLesson(s, 1);
+    expect(peeked.lessons[0]!.peeked).toBe(true);
+    expect(s.lessons[0]!.peeked).toBeUndefined();
   });
 });

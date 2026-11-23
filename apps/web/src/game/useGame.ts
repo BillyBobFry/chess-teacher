@@ -16,6 +16,7 @@ import {
   lessonLabel,
   newSession,
   opponentMove,
+  peekLesson,
   recordFoundCause,
   rewind,
   startUserTurn,
@@ -140,15 +141,19 @@ export function useGame(opts: { llmEnabled: boolean }) {
   const handle = useCallback(
     (g: SavedGame, events: GameEvent[]): SavedGame => {
       let reveal = g.reveal;
+      let state = g.state;
       for (const e of events) {
         const lesson = g.state.lessons.find((l) => l.id === e.lessonId);
         if (!lesson) continue;
         if (e.kind === "created") {
           wantExplanation.current.add(lesson.id);
         } else if ((e.kind === "triggered" || e.kind === "chanceGone") && !lesson.deferred && !reveal) {
-          // Asking "which move caused it?" is pointless when it was obviously the last one.
+          // Asking "which move caused it?" is pointless when it was obviously the last one,
+          // or when the user already asked what their opponent had spotted.
           const obvious = e.kind === "chanceGone" && userMovesAgo(g.state, lesson) === 1;
-          reveal = { lessonId: e.lessonId, step: obvious ? "explain" : "find", attempts: 0, wrong: [] };
+          if (lesson.peeked) state = recordFoundCause(state, lesson.id, false);
+          const skipFind = obvious || !!lesson.peeked;
+          reveal = { lessonId: e.lessonId, step: skipFind ? "explain" : "find", attempts: 0, wrong: [] };
         } else if (e.kind === "fixed") {
           toast(
             lesson.kind === "consequence"
@@ -160,7 +165,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
           toast(e.text);
         }
       }
-      return { ...g, reveal };
+      return { ...g, state, reveal };
     },
     [toast],
   );
@@ -320,6 +325,16 @@ export function useGame(opts: { llmEnabled: boolean }) {
     });
   }, [commit]);
 
+  /** Easy mode: show what the opponent has spotted. Not while a move is being worked out. */
+  const peek = useCallback(
+    (lessonId: number) => {
+      const g = gameRef.current;
+      if (!g || running.current || g.reveal || g.finished) return;
+      commit({ ...g, state: peekLesson(g.state, lessonId) });
+    },
+    [commit],
+  );
+
   const closeReveal = useCallback(() => {
     const g = gameRef.current;
     if (!g) return;
@@ -384,6 +399,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
     newGame,
     guess,
     showAnswer,
+    peek,
     closeReveal,
     rewindTo,
     endGame,

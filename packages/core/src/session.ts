@@ -102,6 +102,14 @@ export function activeLesson(s: SessionState): Lesson | null {
   return best;
 }
 
+/**
+ * Easy mode: the lesson behind "Your opponent has spotted something…", i.e. the one the
+ * opponent is going for. Null outside easy mode or when nothing is pending.
+ */
+export function spottedLesson(s: SessionState): Lesson | null {
+  return s.config.easy && s.config.levelUp ? activeLesson(s) : null;
+}
+
 async function analysis(s: SessionState, game: Game, engines: Engines): Promise<Candidate[]> {
   if (s.analysis?.fen !== game.fen) {
     const candidates = game.isGameOver()
@@ -272,6 +280,14 @@ export function recordFoundCause(state: SessionState, lessonId: number, found: b
   const s = clone(state);
   const lesson = s.lessons.find((l) => l.id === lessonId);
   if (lesson) lesson.foundCause = found;
+  return s;
+}
+
+/** Easy mode: the user asks what their opponent has spotted. */
+export function peekLesson(state: SessionState, lessonId: number): SessionState {
+  const s = clone(state);
+  const lesson = s.lessons.find((l) => l.id === lessonId);
+  if (lesson) lesson.peeked = true;
   return s;
 }
 

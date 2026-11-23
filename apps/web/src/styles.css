@@ -303,6 +303,30 @@ main.game {
   color: var(--muted);
 }
 
+/* ---------- easy mode: what the opponent spotted */
+
+.spotted {
+  background: var(--warn-bg);
+  border-radius: 8px;
+  padding: 0.7rem 0.8rem;
+  margin-bottom: 1rem;
+}
+.spotted-title {
+  font-weight: 600;
+  color: var(--warn);
+  margin: 0;
+}
+.spotted > p {
+  margin: 0.3rem 0 0.6rem;
+}
+details.spotted > summary {
+  cursor: pointer;
+}
+details.spotted[open] {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
 /* ---------- reveal */
 
 .reveal h2 {

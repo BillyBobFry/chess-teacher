@@ -1,5 +1,5 @@
 import type { ConfigResponse } from "@chess-teacher/contract";
-import { gameOf, isUserTurn, uciParts, type Game } from "@chess-teacher/core";
+import { gameOf, isUserTurn, spottedLesson, uciParts, type Game } from "@chess-teacher/core";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, authClient } from "./api/client.ts";
 import { Board } from "./components/Board.tsx";
@@ -10,6 +10,7 @@ import { Progress } from "./components/Progress.tsx";
 import { Reveal } from "./components/Reveal.tsx";
 import { Review } from "./components/Review.tsx";
 import { SignIn } from "./components/SignIn.tsx";
+import { Spotted } from "./components/Spotted.tsx";
 import { useGame, type Busy } from "./game/useGame.ts";
 
 const BUSY_TEXT: Record<Exclude<Busy, null>, string> = {
@@ -137,6 +138,13 @@ function GameApp({
   const loadExplanation = useCallback(
     (signal: AbortSignal) => (revealId === undefined ? Promise.resolve(null) : explanation(revealId, signal)),
     [explanation, revealId],
+  );
+  const spotted = saved && !saved.finished && !saved.reveal ? spottedLesson(saved.state) : null;
+  const spottedId = spotted?.id;
+  const loadSpottedExplanation = useCallback(
+    (signal: AbortSignal) =>
+      spottedId === undefined ? Promise.resolve(null) : explanation(spottedId, signal),
+    [explanation, spottedId],
   );
 
   const nav = (
@@ -281,6 +289,15 @@ function GameApp({
             />
           ) : (
             <>
+              {spotted && (
+                <Spotted
+                  key={spotted.id}
+                  lesson={spotted}
+                  canPeek={!g.busy && !g.pendingMove}
+                  loadExplanation={loadSpottedExplanation}
+                  onPeek={() => g.peek(spotted.id)}
+                />
+              )}
               <h2 className="panel-title">Moves</h2>
               <MoveList startFen={state.startFen} moves={state.moves} />
               <p className="muted small">

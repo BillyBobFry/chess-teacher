@@ -115,6 +115,8 @@ export interface Lesson {
   chanceMove: string | null;
   /** Why the classical evaluation agreed with this strategic lesson (if it was checked). */
   verification?: string;
+  /** Easy mode: the user asked what their opponent had spotted before it landed. */
+  peeked?: boolean;
 }
 
 export const lessonGap = (l: Lesson): number => l.bestScore - l.userScore;

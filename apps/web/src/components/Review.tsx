@@ -5,7 +5,11 @@ import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
 
 function outcome(l: Lesson): string {
-  if (l.status === "fixed") return "You fixed it in time ✓";
+  if (l.status === "fixed")
+    return l.peeked
+      ? "You fixed it in time, after asking what your opponent had spotted ✓"
+      : "You fixed it in time ✓";
+  if (l.status === "triggered" && l.peeked && !l.deferred) return "You asked what your opponent had spotted";
   if (l.status === "triggered" && l.deferred) return "Happened at the same time as another lesson";
   if (l.status === "triggered" && l.foundCause === true) return "Found it yourself ✓";
   if (l.status === "triggered" && l.foundCause === false) return "Revealed during the game";

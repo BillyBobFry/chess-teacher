@@ -49,7 +49,9 @@ export function Reveal({
         : "The chance has gone.";
   const sub =
     lesson.kind === "consequence"
-      ? "The cause was one of your recent moves."
+      ? lesson.peeked
+        ? `This is what your opponent had spotted after ${lessonLabel(lesson)}.`
+        : "The cause was one of your recent moves."
       : ago === 1
         ? `Instead of ${lessonLabel(lesson)}, there was a clearly better move.`
         : `${ago} moves ago, with ${lessonLabel(lesson)}, you had a clearly better option.`;
