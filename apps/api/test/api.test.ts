@@ -54,13 +54,17 @@ const recorded = await stateWithLessons();
 function fakeLlm() {
   const fake = {
     calls: 0,
-    reply: "Your move left a weakness. Remember the principle.",
+    parts: {
+      headline: "Your move left a weakness",
+      what_it_allowed: "It let your opponent improve.",
+      why_better: "The better move kept things solid.",
+    },
     beta: {
       messages: {
         create: async () => {
           fake.calls += 1;
           return {
-            content: [{ type: "text", text: fake.reply }],
+            content: [{ type: "text", text: JSON.stringify(fake.parts) }],
             stop_reason: "end_turn",
             model: "claude-opus-5-5",
             usage: { input_tokens: 400, output_tokens: 150 },
@@ -223,16 +227,16 @@ describe("explanations", () => {
 
     expect(await (await call(url, { cookie })).json()).toMatchObject({ status: "pending" });
     const first = await (await call(url, { method: "POST", cookie })).json();
-    expect(first).toEqual({ status: "ready", text: llm.reply, remaining: 29 });
+    expect(first).toEqual({ status: "ready", parts: llm.parts, remaining: 29 });
     const again = await (await call(url, { method: "POST", cookie })).json();
-    expect(again).toEqual({ status: "ready", text: llm.reply, remaining: 29 });
+    expect(again).toEqual({ status: "ready", parts: llm.parts, remaining: 29 });
     expect(llm.calls).toBe(1);
     expect(await (await call(url, { cookie })).json()).toMatchObject({ status: "ready" });
   });
 
   it("rejects explanations that mention squares not in the facts, without charging", async () => {
     const llm = fakeLlm();
-    llm.reply = "The knight on h7 was the problem.";
+    llm.parts = { ...llm.parts, why_better: "The knight on h7 was the problem." };
     const { call, signUp } = await setup({ llm });
     const cookie = await signUp("fay@example.com");
     const game = await (
@@ -383,5 +387,39 @@ describe("AI prompt facts", () => {
     expect(f).not.toHaveProperty("your_line");
     expect(f).not.toHaveProperty("what_happened_in_the_game");
     expect(SYSTEM_PROMPT).toMatch(/have NOT happened/);
+  });
+});
+
+describe("structured explanations", () => {
+  it("treats a reply that isn't the three-part JSON as an error, and doesn't charge", async () => {
+    const llm = fakeLlm();
+    (llm as unknown as { parts: unknown }).parts = "just a paragraph";
+    const { call, signUp } = await setup({ llm });
+    const cookie = await signUp("sal@example.com");
+    const game = await (
+      await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
+    ).json();
+    const res = await (
+      await call(`/api/games/${game.id}/lessons/${recorded.lessons[0]!.id}/explanation`, {
+        method: "POST",
+        cookie,
+      })
+    ).json();
+    expect(res).toEqual({ status: "error", remaining: 30 });
+  });
+
+  it("asks the API for the three-part structure", async () => {
+    let body: { output_config?: { format?: { type: string } } } = {};
+    const llm = fakeLlm();
+    const create = llm.beta.messages.create;
+    llm.beta.messages.create = async (b?: unknown) => {
+      body = b as typeof body;
+      return create();
+    };
+    const { explainLesson } = await import("../src/explain.ts");
+    const { facts } = await import("@chess-teacher/core");
+    const r = await explainLesson(llm as never, "claude-opus-5-5", facts(recorded.lessons[0]!));
+    expect(body.output_config?.format?.type).toBe("json_schema");
+    expect(r.parts?.headline).toBe("Your move left a weakness");
   });
 });

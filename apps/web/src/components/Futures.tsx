@@ -19,11 +19,17 @@ function walk(fenBefore: string, line: string[]): Line {
   return { fens, sans };
 }
 
-/** "What you played" and "What was better", side by side, stepped through together. */
-export function Futures({ lesson }: { lesson: Lesson }) {
-  const mine = useMemo(() => walk(lesson.fenBefore, lesson.userLine), [lesson]);
+/**
+ * What actually happened after the mistake, beside how the better move could have gone,
+ * stepped through together. `played` is the real moves from the game, starting with the
+ * mistake; without it (e.g. nothing played yet) the engine's prediction is shown instead.
+ */
+export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] }) {
+  const real = !!played && played.length > 0;
+  const yourMoves = real ? played! : lesson.userLine;
+  const mine = useMemo(() => walk(lesson.fenBefore, yourMoves), [lesson, yourMoves]);
   const better = useMemo(() => walk(lesson.fenBefore, lesson.bestLine), [lesson]);
-  const plies = Math.max(lesson.userLine.length, lesson.bestLine.length);
+  const plies = Math.max(yourMoves.length, lesson.bestLine.length);
   const [step, setStep] = useState(0);
   const orientation = lesson.userColour === "w" ? "white" : "black";
 
@@ -37,7 +43,7 @@ export function Futures({ lesson }: { lesson: Lesson }) {
       arrows: i === 0 ? [{ from: first.from, to: first.to, color: colour }] : [],
     };
   };
-  const a = view(mine, lesson.userLine, "#c2552b");
+  const a = view(mine, yourMoves, "#c2552b");
   const b = view(better, lesson.bestLine, "#2f8f5f");
 
   const sanLine = (sans: string[]) => (
@@ -53,11 +59,13 @@ export function Futures({ lesson }: { lesson: Lesson }) {
   return (
     <div className="futures">
       <p className="futures-note muted small">
-        How each could have gone: the engine's prediction, not moves from your game.
+        {real
+          ? "Left: what actually happened in your game. Right: how the better move could have gone (the engine's prediction)."
+          : "How each could have gone: the engine's prediction, not moves from your game."}
       </p>
       <div className="futures-boards">
         <figure>
-          <figcaption>Your move, then…</figcaption>
+          <figcaption>{real ? "What happened" : "Your move, then…"}</figcaption>
           <Board
             id={`yours-${lesson.id}`}
             fen={a.fen}
@@ -88,9 +96,7 @@ export function Futures({ lesson }: { lesson: Lesson }) {
         <button onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0} aria-label="Back">
           ◀
         </button>
-        <span className="step-label">
-          {step === 0 ? "Before the move" : `Predicted move ${step} of ${plies}`}
-        </span>
+        <span className="step-label">{step === 0 ? "Before the move" : `Move ${step} of ${plies}`}</span>
         <button
           onClick={() => setStep((s) => Math.min(plies, s + 1))}
           disabled={step === plies}

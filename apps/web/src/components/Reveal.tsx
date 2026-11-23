@@ -1,4 +1,6 @@
 import {
+  lessonBestSan,
+  playedLine,
   lessonLabel,
   recentUserMoves,
   userMovesAgo,
@@ -88,9 +90,13 @@ export function Reveal({
       ) : (
         <div className="explain">
           {lesson.foundCause && <p className="found">✓ Yes, that's the one.</p>}
-          <AiExplanation load={loadExplanation} />
+          <AiExplanation
+            load={loadExplanation}
+            betterMove={lessonBestSan(lesson)}
+            missedChance={lesson.kind === "missed_chance"}
+          />
           <Explanation lesson={lesson} />
-          <Futures lesson={lesson} />
+          <Futures lesson={lesson} played={playedLine(state, lesson)} />
           <LessonFeedback gameId={gameId} lessonId={lesson.id} />
           <div className="actions">
             <button className="primary" onClick={onRewind}>

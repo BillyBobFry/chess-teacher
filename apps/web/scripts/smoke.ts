@@ -226,7 +226,9 @@ try {
       await page.getByRole("button", { name: "Show me the answer" }).click();
     }
     await page.getByText("Your coach", { exact: true }).waitFor({ timeout: 30_000 });
-    await page.getByText(/Sample explanation/).waitFor();
+    await page.locator(".ai-headline").filter({ hasText: "(Sample)" }).waitFor();
+    await page.getByText(/What it (allowed|missed)/).waitFor();
+    await page.locator("figcaption").filter({ hasText: "What happened" }).waitFor();
     await page.getByRole("button", { name: "Forward" }).click();
     await page.getByRole("button", { name: "Forward" }).click();
     await shot("4-reveal-explain", true);

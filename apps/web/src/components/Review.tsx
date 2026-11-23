@@ -1,4 +1,4 @@
-import { PRINCIPLES, lessonLabel, type Lesson, type SessionState } from "@chess-teacher/core";
+import { PRINCIPLES, lessonLabel, playedLine, type Lesson, type SessionState } from "@chess-teacher/core";
 import { useState } from "react";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
@@ -54,7 +54,7 @@ export function Review({
               {open === l.id && (
                 <div className="review-detail">
                   <Explanation lesson={l} />
-                  <Futures lesson={l} />
+                  <Futures lesson={l} played={playedLine(state, l)} />
                   <LessonFeedback gameId={gameId} lessonId={l.id} />
                 </div>
               )}

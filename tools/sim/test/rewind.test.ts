@@ -6,6 +6,7 @@ import {
   isUserTurn,
   newSession,
   opponentMove,
+  playedLine,
   recentUserMoves,
   rewind,
   startUserTurn,
@@ -42,6 +43,12 @@ describe("rewind", () => {
     expect(triggeredId).not.toBeNull();
     const lesson = state.lessons.find((l) => l.id === triggeredId)!;
     expect(recentUserMoves(state, lesson).some(([ply]) => ply === lesson.ply)).toBe(true);
+
+    // "What happened": the real moves from the mistake to the reveal, not the prediction.
+    const played = playedLine(state, lesson);
+    expect(played[0]).toBe(lesson.userMove);
+    expect(played).toEqual(state.moves.slice(lesson.ply, lesson.resolvedPly!));
+    expect(played.at(-1)).toBe(state.moves.at(-1));
 
     const rewound = rewind(state, lesson.id);
     expect(gameOf(rewound).fen).toBe(lesson.fenBefore);
