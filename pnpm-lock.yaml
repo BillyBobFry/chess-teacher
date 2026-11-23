@@ -102,6 +102,9 @@ importers:
       '@chess-teacher/engine':
         specifier: workspace:*
         version: link:../../packages/engine
+      '@chess-teacher/lesson-text':
+        specifier: workspace:*
+        version: link:../../packages/lesson-text
       '@inlang/paraglide-js-react':
         specifier: 1.0.4
         version: 1.0.4(@inlang/paraglide-js@3.2.1(eslint@10.15.0(jiti@2.7.0))(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)))(react@19.3.1)

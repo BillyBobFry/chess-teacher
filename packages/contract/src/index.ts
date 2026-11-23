@@ -121,8 +121,8 @@ export const FeedbackBody = z.object({
 export type FeedbackBody = z.infer<typeof FeedbackBody>;
 
 export interface PrincipleProgress {
+  /** A principle id from the core's curriculum; the client shows its title in the player's locale. */
   id: string;
-  title: string;
   /** Lessons about this principle across the recent games. */
   lessons: number;
   /** Revealed during a game and the user found the cause themselves. */

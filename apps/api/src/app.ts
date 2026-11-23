@@ -13,7 +13,7 @@ import type {
   PrincipleProgress,
   ProgressResponse,
 } from "@chess-teacher/contract";
-import { Game, PRINCIPLES, facts, type Lesson } from "@chess-teacher/core";
+import { Game, facts, isPrincipleId, upgradeSession, type Lesson } from "@chess-teacher/core";
 import { zValidator } from "@hono/zod-validator";
 import { and, desc, eq, lt, sql } from "drizzle-orm";
 import { Hono } from "hono";
@@ -140,13 +140,12 @@ export function createApp(deps: AppDeps) {
     rows.forEach((row, gameIndex) => {
       const seenInGame = new Set<string>();
       for (const l of (row.state as { lessons: Lesson[] }).lessons ?? []) {
-        if (l.status === "rewound" || !PRINCIPLES[l.principle]) continue;
+        if (l.status === "rewound" || !isPrincipleId(l.principle)) continue;
         lessons += 1;
         const p =
           byPrinciple.get(l.principle) ??
           ({
             id: l.principle,
-            title: PRINCIPLES[l.principle]!.title,
             lessons: 0,
             foundYourself: 0,
             revealed: 0,

@@ -13,7 +13,7 @@ import {
   isGameOver,
   isLegal,
   isUserTurn,
-  lessonLabel,
+  lessonMove,
   newSession,
   opponentMove,
   recordFoundCause,
@@ -24,9 +24,11 @@ import {
   type Colour,
   type GameEvent,
 } from "@chess-teacher/core";
+import { hintText, moveText } from "@chess-teacher/lesson-text";
 import { api } from "../api/client.ts";
 import { getEngines } from "../engine/engines.ts";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import { ConflictError, Saver, createGame, loadActiveGame, type SavedGame } from "./storage.ts";
 
 export type Busy = null | "loading" | "engine" | "preparing" | "checking" | "opponent";
@@ -153,12 +155,12 @@ export function useGame(opts: { llmEnabled: boolean }) {
         } else if (e.kind === "fixed") {
           toast(
             lesson.kind === "consequence"
-              ? m.toast_fixed({ move: lessonLabel(lesson) })
-              : m.toast_found_chance({ move: lessonLabel(lesson) }),
+              ? m.toast_fixed({ move: moveText(lessonMove(lesson), getLocale()) })
+              : m.toast_found_chance({ move: moveText(lessonMove(lesson), getLocale()) }),
             "good",
           );
         } else if (e.kind === "warning") {
-          toast(e.text);
+          toast(m.toast_opponent_spotted());
         }
       }
       return { ...g, reveal };
@@ -369,7 +371,8 @@ export function useGame(opts: { llmEnabled: boolean }) {
     const g = game;
     if (!g?.reveal || g.reveal.attempts === 0) return null;
     const lesson = g.state.lessons.find((l) => l.id === g.reveal!.lessonId);
-    return lesson ? (hints(lesson)[g.reveal.attempts - 1] ?? null) : null;
+    const hint = lesson ? hints(lesson)[g.reveal.attempts - 1] : undefined;
+    return hint ? hintText(hint, getLocale()) : null;
   })();
 
   return {

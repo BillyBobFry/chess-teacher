@@ -4,7 +4,7 @@
  */
 
 import type { RevealState } from "@chess-teacher/contract";
-import type { SessionState } from "@chess-teacher/core";
+import { upgradeSession, type SavedSessionState, type SessionState } from "@chess-teacher/core";
 import { api, HttpError } from "../api/client.ts";
 import { m } from "../paraglide/messages.js";
 
@@ -30,7 +30,8 @@ export async function loadActiveGame(): Promise<SavedGame | null> {
     version: 1,
     id: g.id,
     stateVersion: g.stateVersion,
-    state: g.state as unknown as SessionState,
+    // Games saved by an older version are brought up to date here, once, on load.
+    state: upgradeSession(g.state as unknown as SavedSessionState),
     opponentSkill: g.opponentSkill,
     reveal: g.reveal,
     finished: g.finished,
