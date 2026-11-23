@@ -30,6 +30,7 @@ the measurements behind several decisions are in [`../bench/README.md`](../bench
 | D7 | **Neon Postgres + Drizzle ORM** | Already in use; serverless driver works from Vercel functions; Drizzle gives typed queries and migrations in TypeScript. |
 | D8 | **Next.js on Vercel for the web app and API** *(confirm in MS2)* | One deploy for the UI and the API route handlers; mature auth options. The game screen is a client component, so it would port to React Native as well as a Vite app would. |
 | D9 | **API schemas defined once with Zod** | Types for every TypeScript client come from the schemas; OpenAPI is generated from them for any future Swift/Kotlin app. |
+| D10 | **Game sessions are plain, serialisable state, saved after every move** | The engine is stateless (position in, analysis out), so everything needed to continue a game is the session state: moves, pending lessons with their trigger conditions, resolved lessons and settings. Saved to the server after each move, any game can be resumed later on any device by loading the state and starting a fresh engine (~0.15 s). |
 
 ## 3. Overview
 
@@ -99,6 +100,28 @@ type GameEvent =
   | { type: "expired"; lessonId: string };
 ```
 
+**Serialisable state (D10).** The session is a plain JSON-compatible object, never a live
+board or engine handle:
+
+```ts
+interface SessionState {
+  version: number;              // schema version, for migrating saved games
+  startFen: string;
+  moves: string[];              // UCI, the source of truth for the position
+  userColour: "w" | "b";
+  config: TeachingConfig;
+  lessons: Lesson[];            // pending ones included, with their trigger conditions
+  opponentModes: ("normal" | "levelled")[];
+}
+
+function step(state: SessionState, input: Input, engine: Engine): Promise<{ state: SessionState; events: GameEvent[] }>;
+```
+
+Every step returns a new state, which the client saves (locally first, then to the
+server). Resuming is `load state → create engine → continue`. Rewind is a state
+transition like any other, so it is saved and resumable too. Tests check that
+save → load → continue gives exactly the same events as never stopping.
+
 Thresholds (eval gap, line length, expiry, cause window) live in a `TeachingConfig` object
 so they can be tuned, and later served from the server for experiments, without an app
 release.
@@ -129,7 +152,12 @@ Next.js route handlers on Vercel, Neon Postgres via Drizzle. Endpoint sketch (fi
 
 ```
 POST /api/games                       start a game (colour, difficulty)
-POST /api/games/:id/moves             append moves + events (batched; offline-friendly)
+GET  /api/games?status=active         unfinished games, to resume
+GET  /api/games/:id                   saved session state (resume on any device)
+POST /api/games/:id/moves             append moves + events + new session state
+                                      (batched; offline-friendly; rejected if the
+                                      state version is stale, so two devices can't
+                                      overwrite each other)
 POST /api/games/:id/lessons           record a lesson's facts → queues its explanation
 GET  /api/games/:id/lessons/:lessonId explanation (LLM text, or "pending" → use template)
 POST /api/games/:id/lessons/:lessonId/outcome   found cause? hints used? rewound?
@@ -147,7 +175,7 @@ the cost of anyone faking them.
 | Table | Key columns |
 |---|---|
 | `users` | id, email, plan, created_at |
-| `games` | id, user_id, colour, settings (json), moves (SAN[]), result, created_at |
+| `games` | id, user_id, colour, settings (json), moves (UCI[]), state (json, the latest `SessionState`), state_version, status (active/finished), result, created_at, updated_at |
 | `lessons` | id, game_id, ply, principle, feature, kind, facts (json), status, found_cause, hints_used, rewound |
 | `explanations` | lesson_id, model, prompt_version, text, input_tokens, output_tokens, cost_usd, guardrail_ok |
 | `usage` | user_id, period, explanations_used |
