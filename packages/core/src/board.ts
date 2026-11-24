@@ -16,14 +16,6 @@ export interface Piece {
 }
 
 export const VALUES: Record<PieceType, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
-export const PIECE_NAMES: Record<PieceType, string> = {
-  p: "pawn",
-  n: "knight",
-  b: "bishop",
-  r: "rook",
-  q: "queen",
-  k: "king",
-};
 export const FILE_NAMES = "abcdefgh";
 
 export const opposite = (c: Colour): Colour => (c === "w" ? "b" : "w");

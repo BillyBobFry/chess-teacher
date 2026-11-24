@@ -1,9 +1,11 @@
-import { PRINCIPLES, lessonLabel, playedLine, type Lesson, type SessionState } from "@chess-teacher/core";
+import { lessonMove, playedLine, type Lesson, type SessionState } from "@chess-teacher/core";
+import { moveText, principleTitle } from "@chess-teacher/lesson-text";
 import { useState } from "react";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 
 /** What became of a lesson; `tick` marks the outcomes the player can be pleased with. */
 function outcome(l: Lesson): { text: string; tick: boolean } {
@@ -35,6 +37,7 @@ export function Review({
 }) {
   const lessons = state.lessons.filter((l) => l.status !== "rewound");
   const [open, setOpen] = useState<number | null>(null);
+  const locale = getLocale();
   return (
     <section className="review">
       <h2>{m.review_title()}</h2>
@@ -52,8 +55,8 @@ export function Review({
                   aria-expanded={open === l.id}
                   onClick={() => setOpen(open === l.id ? null : l.id)}
                 >
-                  <span className="review-move">{lessonLabel(l)}</span>
-                  <span className="review-principle">{PRINCIPLES[l.principle]!.title}</span>
+                  <span className="review-move">{moveText(lessonMove(l), locale)}</span>
+                  <span className="review-principle">{principleTitle(l.principle, locale)}</span>
                   <span className="review-outcome">
                     {o.text}
                     {o.tick && <span aria-hidden> ✓</span>}

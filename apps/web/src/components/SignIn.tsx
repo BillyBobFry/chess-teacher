@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { authClient } from "../api/client.ts";
+import { authErrorText } from "../api/errors.ts";
 import { m } from "../paraglide/messages.js";
 
 export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
@@ -19,7 +20,7 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
         ? await authClient.signUp.email({ name: name || email.split("@")[0]!, email, password })
         : await authClient.signIn.email({ email, password });
     setBusy(false);
-    if (error) setError(error.message ?? m.error_generic());
+    if (error) setError(authErrorText(error));
   };
 
   const google = () =>

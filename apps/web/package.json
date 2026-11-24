@@ -16,6 +16,7 @@
     "@chess-teacher/contract": "workspace:*",
     "@chess-teacher/core": "workspace:*",
     "@chess-teacher/engine": "workspace:*",
+    "@chess-teacher/lesson-text": "workspace:*",
     "@inlang/paraglide-js-react": "1.0.4",
     "better-auth": "1.7.27",
     "chess.js": "1.4.0",

@@ -47,6 +47,18 @@ added later.
 - **Adding a string:** add the key to every `messages/<locale>.json` (identical text where the
   locales agree), then `import { m } from "../paraglide/messages.js"` and render `{m.key()}`.
   Never index `m` dynamically (`m[key]`); it defeats tree-shaking and type checks.
+- **Lesson text:** `packages/core` never writes a sentence. It returns ids and values
+  (`Detail`, `Trigger`, `Hint`, `MoveRef`, principle ids; see `packages/core/src/text.ts`), and
+  `@chess-teacher/lesson-text` (`packages/lesson-text`) renders them from the same catalogue,
+  with the locale passed explicitly: the web app passes `getLocale()`, the API passes en-GB for
+  the facts it sends the LLM. That package compiles its own copy of the catalogue
+  (`pnpm i18n`, generated and git-ignored like `apps/web/src/paraglide/`). A new kind of
+  lesson text is a new variant in `text.ts`, a key per locale, and a case in the renderer; the
+  parity tests word it as the Python prototype did, in `tools/sim/src/prototype-text.ts`.
+- **Server errors:** the API answers with a code (`ApiErrorCode` in `packages/contract`), never
+  a sentence; `apps/web/src/api/errors.ts` words codes and Better Auth's error codes.
+- **AI explanations:** the client sends the player's locale; the server tells the model to
+  write in it (and stores it with the explanation). The facts the model reads stay in en-GB.
 - **Locale:** `localStorage` (`PARAGLIDE_LOCALE`), then the browser's preferred languages, then
   en-GB; never in the URL. The locale detected on a first visit is saved, so it stays the same
   until the player changes it. `main.tsx` sets `<html lang>`. Read the locale with `getLocale()`
@@ -55,7 +67,5 @@ added later.
 - **Adding a locale:** add `messages/<locale>.json` with every key, register it in `locales` in
   `settings.json`, check the layout in the longest locale (UX-40), review that language's
   punctuation and wording items (UX-31), and decide how moves are written (UX-106).
-- **Not in the catalogue yet:** text generated outside `apps/web` (lessons, principles, hints
-  and triggers from `packages/core`; API and auth errors; AI explanations, which are written in
-  English) and the static landing page `apps/web/landing/`. See Known gaps in
+- **Not in the catalogue yet:** the static landing page `apps/web/landing/`. See Known gaps in
   [`ux-principles.md`](ux-principles.md).

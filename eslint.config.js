@@ -15,6 +15,7 @@ export default tseslint.config(
       "**/dist/**",
       "apps/web/public/**",
       "apps/web/src/paraglide/**",
+      "packages/lesson-text/src/paraglide/**",
       ".vercel/**",
       "apps/api/drizzle/**",
     ],

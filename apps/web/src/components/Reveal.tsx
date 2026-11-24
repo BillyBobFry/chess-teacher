@@ -1,19 +1,21 @@
 import {
   lessonBestSan,
+  lessonMove,
   playedLine,
-  lessonLabel,
   recentUserMoves,
   userMovesAgo,
   type Lesson,
   type SessionState,
 } from "@chess-teacher/core";
 import type { ExplanationResponse } from "@chess-teacher/contract";
+import { moveText, triggerText } from "@chess-teacher/lesson-text";
 import type { RevealState } from "../game/storage.ts";
 import { AiExplanation } from "./AiExplanation.tsx";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 
 interface Props {
   gameId: string;
@@ -41,10 +43,12 @@ export function Reveal({
   onRewind,
   onContinue,
 }: Props) {
+  const locale = getLocale();
   const ago = userMovesAgo(state, lesson);
+  const move = moveText(lessonMove(lesson), locale);
   const headline =
-    lesson.kind === "consequence"
-      ? lesson.triggerText
+    lesson.kind === "consequence" && lesson.trigger
+      ? triggerText(lesson.trigger, locale)
       : ago === 1
         ? m.reveal_missed_last()
         : m.reveal_chance_gone();
@@ -52,8 +56,8 @@ export function Reveal({
     lesson.kind === "consequence"
       ? m.reveal_cause_recent()
       : ago === 1
-        ? m.reveal_missed_last_detail({ move: lessonLabel(lesson) })
-        : m.reveal_missed_ago_detail({ ago, move: lessonLabel(lesson) });
+        ? m.reveal_missed_last_detail({ move })
+        : m.reveal_missed_ago_detail({ ago, move });
 
   return (
     <section className="reveal" aria-live="polite">
@@ -71,14 +75,14 @@ export function Reveal({
         <div className="find">
           <p className="prompt">{m.reveal_find()}</p>
           <div className="choices">
-            {recentUserMoves(state, lesson).map(([ply, label]) => (
+            {recentUserMoves(state, lesson).map(([ply, choice]) => (
               <button
                 key={ply}
                 className="choice"
                 disabled={reveal.wrong.includes(ply)}
                 onClick={() => onGuess(ply)}
               >
-                {label}
+                {moveText(choice, locale)}
               </button>
             ))}
           </div>
@@ -105,7 +109,7 @@ export function Reveal({
           <LessonFeedback gameId={gameId} lessonId={lesson.id} />
           <div className="actions">
             <button className="primary" onClick={onRewind}>
-              {m.reveal_rewind({ move: lessonLabel(lesson) })}
+              {m.reveal_rewind({ move })}
             </button>
             <button onClick={onContinue}>{m.reveal_carry_on()}</button>
           </div>

@@ -114,6 +114,8 @@ export const explanations = pgTable(
     model: text("model"),
     promptVersion: integer("prompt_version").notNull(),
     factsHash: text("facts_hash").notNull(),
+    /** The locale the explanation is written in (BCP 47). */
+    locale: text("locale").notNull().default("en-GB"),
     text: text("text"),
     inputTokens: integer("input_tokens"),
     outputTokens: integer("output_tokens"),

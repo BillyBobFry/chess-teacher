@@ -22,6 +22,7 @@ if (process.env.DATABASE_URL) {
   run("pnpm --filter @chess-teacher/api db:migrate");
 }
 
+run("pnpm --filter @chess-teacher/lesson-text i18n");
 run("pnpm --filter @chess-teacher/web build");
 
 rmSync(out, { recursive: true, force: true });
