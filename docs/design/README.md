@@ -4,12 +4,14 @@ How the layers fit, highest precedence first. On conflict the higher layer wins.
 
 1. [`ux-principles.md`](ux-principles.md): behaviour. Numbered rules (UX-1...) for structure,
    saving, feedback, forms, motion, copy, accessibility, localisation and the board.
-2. Brand: the colour, radius and shadow tokens on `:root` in `apps/web/src/styles.css`, with
-   their dark values. There is no separate brand document yet; use the tokens, never a raw
-   colour.
-3. The `modern-web-guidance` skill (`.claude/skills/`): how to build it on the web platform
-   (native dialogs and popovers, forms, CSS, performance). Browser support target: Baseline
-   Widely available.
+2. [`components.md`](components.md): how the UI is built (D15). Controls are primitives in
+   `apps/web/src/ui/` wrapping React Aria Components, styled with Tailwind and the semantic
+   tokens in `apps/web/src/theme.css` (colour, radius, shadow, with their dark values). There is
+   no separate brand document yet; use the tokens, never a raw colour.
+3. The `modern-web-guidance` skill (`.claude/skills/`): how to build on the web platform where
+   React Aria doesn't (layout, CSS, non-interactive HTML, performance). For controls React Aria
+   provides, React Aria wins, even where the skill prefers a native element. Browser support
+   target: Baseline Widely available.
 4. Browser defaults: only where none of the above says anything.
 
 Enforcement: where a rule is checkable, a script enforces it in `pnpm check`, which CI runs:
@@ -17,6 +19,9 @@ Enforcement: where a rule is checkable, a script enforces it in `pnpm check`, wh
 - `pnpm lint`: no words written directly in JSX text or in `aria-label`, `title`,
   `placeholder` or `alt` (`eslint/ui-text.js`, UX-32). It sees JSX only; strings built in hooks
   and helpers are left to review.
+- `pnpm lint` (`eslint/ui-components.js`, components.md): no raw `<button>`, `<input>`,
+  `<select>`, `<textarea>` or `<dialog>` and no `react-aria-components` import outside
+  `apps/web/src/ui/` (UX-37); no arbitrary colour utilities such as `bg-[#b42318]`.
 - `pnpm test` (`apps/web/test/messages.test.ts`): every locale has every key and placeholder of
   the en-GB catalogue, and en-GB has no em dashes or emoji (UX-31).
 - `pnpm smoke`: the main journey in en-GB, and the phone layout in en-US.
@@ -66,6 +71,8 @@ added later.
   setting in the UI yet (UX-54: it appears when a second language does).
 - **Adding a locale:** add `messages/<locale>.json` with every key, register it in `locales` in
   `settings.json`, check the layout in the longest locale (UX-40), review that language's
-  punctuation and wording items (UX-31), and decide how moves are written (UX-106).
+  punctuation and wording items (UX-31), and decide how moves are written (UX-106). React Aria
+  picks up the new language from `settings.json`; check its own strings read well in it
+  (components.md).
 - **Not in the catalogue yet:** the static landing page `apps/web/landing/`. See Known gaps in
   [`ux-principles.md`](ux-principles.md).

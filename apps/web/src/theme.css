@@ -1,0 +1,88 @@
+/* The web app's stylesheet entry: Tailwind, the semantic tokens, and the legacy styles
+   (docs/design/components.md). */
+
+/* Legacy styles sit below Tailwind's utilities, so a utility always wins over them. */
+@layer theme, base, legacy, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+/* No preflight (Tailwind's base reset) yet: the legacy styles rely on browser defaults for
+   headings, lists and spacing. It comes in with the change that deletes the last of them. */
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "./styles.css" layer(legacy);
+
+/* Static, so every token is a CSS variable even when no utility uses it: the legacy styles
+   read them directly. */
+@theme static {
+  /* Only semantic colours exist: no palette to reach for. */
+  --color-*: initial;
+  --color-canvas: #f6f4ef;
+  --color-surface: #ffffff;
+  --color-surface-muted: #efece4;
+  --color-fg: #22201c;
+  --color-fg-muted: #6b665c;
+  --color-border: #dcd7cb;
+  --color-primary: #2f6f4f;
+  --color-on-primary: #ffffff;
+  --color-critical: #b42318;
+  --color-on-critical: #ffffff;
+  --color-warning: #b5541c;
+  --color-warning-subtle: #fbeadf;
+  --color-success: #2f6f4f;
+  --color-success-subtle: #e2f1e8;
+  --color-chance: #6a4fb3;
+  --color-chance-subtle: #ece7f8;
+
+  /* UX-46: hover and pressed step towards the viewer, darker in light (and lighter in dark). */
+  --color-primary-hover: color-mix(in srgb, var(--color-primary) 88%, black);
+  --color-primary-pressed: color-mix(in srgb, var(--color-primary) 78%, black);
+  --color-critical-hover: color-mix(in srgb, var(--color-critical) 88%, black);
+  --color-critical-pressed: color-mix(in srgb, var(--color-critical) 78%, black);
+
+  --radius-*: initial;
+  --radius-inline: 4px;
+  --radius-control: 8px;
+  --radius-panel: 10px;
+
+  /* Behind a modal dialog, in light and dark. */
+  --color-backdrop: rgb(0 0 0 / 0.45);
+
+  --shadow-*: initial;
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 14px rgb(0 0 0 / 0.06);
+
+  /* UX-25: utility chrome settles, it doesn't bounce. */
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer theme {
+  :root {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --color-canvas: #171614;
+      --color-surface: #211f1c;
+      --color-surface-muted: #2b2925;
+      --color-fg: #ece8e1;
+      --color-fg-muted: #a39d92;
+      --color-border: #3a3732;
+      --color-primary: #5fb88a;
+      --color-on-primary: #10231a;
+      --color-critical: #f97066;
+      --color-on-critical: #2a0d0a;
+      --color-warning: #f0965f;
+      --color-warning-subtle: #3a2518;
+      --color-success: #5fb88a;
+      --color-success-subtle: #1c3227;
+      --color-chance: #b9a4f5;
+      --color-chance-subtle: #2a2440;
+      --color-primary-hover: color-mix(in srgb, var(--color-primary) 88%, white);
+      --color-primary-pressed: color-mix(in srgb, var(--color-primary) 78%, white);
+      --color-critical-hover: color-mix(in srgb, var(--color-critical) 88%, white);
+      --color-critical-pressed: color-mix(in srgb, var(--color-critical) 78%, white);
+    }
+  }
+}

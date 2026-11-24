@@ -9,13 +9,14 @@ teaching logic, pure TypeScript), `packages/engine`, `packages/contract` (Zod AP
 This file is an index. Read the file that matches the task when you touch that area, and treat
 it as mandatory; don't load everything up front.
 
-| Concern                                                                     | Read                                            | When                                                                                        |
-| :-------------------------------------------------------------------------- | :---------------------------------------------- | :------------------------------------------------------------------------------------------ |
-| What the product is and isn't, the teaching loop, the curriculum            | `docs/concept.md`                               | Feature decisions, anything that changes what the player sees or learns                     |
-| Architecture and settled decisions (D1, D2...)                              | `docs/architecture.md`                          | Anything structural. §2 decisions are settled: don't reopen them without Will               |
-| UI behaviour and copy (rules UX-1...)                                       | `docs/design/ux-principles.md`                  | Any change to UI, user-facing text, interaction or motion in `apps/web`                     |
-| Localisation setup, adding a string or a locale                             | `docs/design/README.md`                         | Adding or changing any user-facing string                                                   |
-| How to build it on the web platform (dialogs, popovers, forms, CSS, INP...) | skill `modern-web-guidance` (`.claude/skills/`) | Before writing HTML, CSS or client-side JS in `apps/web`. The UX principles win on conflict |
+| Concern                                                          | Read                                            | When                                                                                                         |
+| :--------------------------------------------------------------- | :---------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| What the product is and isn't, the teaching loop, the curriculum | `docs/concept.md`                               | Feature decisions, anything that changes what the player sees or learns                                      |
+| Architecture and settled decisions (D1, D2...)                   | `docs/architecture.md`                          | Anything structural. §2 decisions are settled: don't reopen them without Will                                |
+| UI behaviour and copy (rules UX-1...)                            | `docs/design/ux-principles.md`                  | Any change to UI, user-facing text, interaction or motion in `apps/web`                                      |
+| Controls, styling and tokens (React Aria, Tailwind, `ui/`)       | `docs/design/components.md`                     | Adding or changing a control, a style, a colour or a primitive in `apps/web`                                 |
+| Localisation setup, adding a string or a locale                  | `docs/design/README.md`                         | Adding or changing any user-facing string                                                                    |
+| How to build it on the web platform (layout, CSS, HTML, INP...)  | skill `modern-web-guidance` (`.claude/skills/`) | Before writing HTML, CSS or client-side JS in `apps/web`. UX principles, then components.md, win on conflict |
 
 ## Commands
 
@@ -77,5 +78,6 @@ it as mandatory; don't load everything up front.
 
 Every string a user can see or hear comes from the message catalogue
 (`apps/web/messages/<locale>.json`, rendered with `m.key()`), never a literal in a component
-(UX-32). en-GB is the source locale. Copy follows `docs/design/ux-principles.md` (Copy): no em
-dashes and no emoji in user-facing text.
+(UX-32). The one exception is React Aria's own built-in strings, localised through its
+`I18nProvider` (components.md). en-GB is the source locale. Copy follows
+`docs/design/ux-principles.md` (Copy): no em dashes and no emoji in user-facing text.

@@ -1,6 +1,7 @@
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import type { ReactNode } from "react";
 import { m } from "../paraglide/messages.js";
+import { Button } from "../ui/Button.tsx";
 
 // Names and SPDX identifiers: the same in every language.
 const COMPONENTS = [
@@ -44,7 +45,7 @@ export function Licences({ onBack }: { onBack: () => void }) {
           <li key={component}>{(note ?? m.licences_item)({ component, licence })}</li>
         ))}
       </ul>
-      <button onClick={onBack}>{m.back()}</button>
+      <Button onPress={onBack}>{m.back()}</Button>
     </section>
   );
 }

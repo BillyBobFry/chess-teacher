@@ -19,6 +19,7 @@ import { orientationOf } from "./Board.tsx";
 import { moveMarkup } from "./MoveButton.tsx";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
+import { Button } from "../ui/Button.tsx";
 
 interface Props {
   gameId: string;
@@ -82,21 +83,16 @@ export function Reveal({
           <p className="prompt">{m.reveal_find()}</p>
           <div className="choices">
             {recentUserMoves(state, lesson).map(([ply, choice]) => (
-              <button
-                key={ply}
-                className="choice"
-                disabled={reveal.wrong.includes(ply)}
-                onClick={() => onGuess(ply)}
-              >
+              <Button key={ply} isDisabled={reveal.wrong.includes(ply)} onPress={() => onGuess(ply)}>
                 {moveText(choice, locale)}
-              </button>
+              </Button>
             ))}
           </div>
           {reveal.attempts > 0 && <p className="not-that">{m.reveal_not_that()}</p>}
           {hint && <p className="hint">{m.reveal_hint({ hint })}</p>}
-          <button className="link" onClick={onShowAnswer}>
+          <Button variant="link" onPress={onShowAnswer}>
             {m.reveal_show_answer()}
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="explain">
@@ -110,10 +106,10 @@ export function Reveal({
           <Futures lesson={lesson} played={playedLine(state, lesson)} />
           <LessonFeedback gameId={gameId} lessonId={lesson.id} />
           <div className="actions">
-            <button className="primary" onClick={onRewind}>
+            <Button variant="primary" onPress={onRewind}>
               {m.reveal_rewind({ move })}
-            </button>
-            <button onClick={onContinue}>{m.reveal_carry_on()}</button>
+            </Button>
+            <Button onPress={onContinue}>{m.reveal_carry_on()}</Button>
           </div>
         </div>
       )}

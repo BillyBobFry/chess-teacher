@@ -1,6 +1,9 @@
 import { useState } from "react";
 import type { NewGameOptions } from "../game/useGame.ts";
 import { m } from "../paraglide/messages.js";
+import { Button } from "../ui/Button.tsx";
+import { Checkbox } from "../ui/Checkbox.tsx";
+import { RadioGroup } from "../ui/RadioGroup.tsx";
 
 const STRENGTHS = [
   { skill: 0, label: m.strength_gentle, note: m.strength_gentle_note },
@@ -18,59 +21,40 @@ export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => voi
       <h1>{m.new_game_title()}</h1>
       <p className="muted">{m.new_game_intro()}</p>
 
-      <fieldset>
-        <legend>{m.new_game_play_as()}</legend>
-        <div className="segmented">
-          {(
-            [
-              ["w", m.colour_white],
-              ["b", m.colour_black],
-              ["random", m.colour_random],
-            ] as const
-          ).map(([v, label]) => (
-            <label key={v} className={colour === v ? "on" : ""}>
-              <input
-                type="radio"
-                name="colour"
-                value={v}
-                checked={colour === v}
-                onChange={() => setColour(v)}
-              />
-              {label()}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <RadioGroup
+        className="my-6"
+        variant="segmented"
+        label={m.new_game_play_as()}
+        value={colour}
+        onChange={setColour}
+        options={[
+          { value: "w", label: m.colour_white() },
+          { value: "b", label: m.colour_black() },
+          { value: "random", label: m.colour_random() },
+        ]}
+      />
 
-      <fieldset>
-        <legend>{m.new_game_opponent()}</legend>
-        <div className="options">
-          {STRENGTHS.map((s) => (
-            <label key={s.skill} className={skill === s.skill ? "option on" : "option"}>
-              <input
-                type="radio"
-                name="skill"
-                checked={skill === s.skill}
-                onChange={() => setSkill(s.skill)}
-              />
-              <strong>{s.label()}</strong> <span className="muted">{s.note()}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <RadioGroup
+        className="my-6"
+        variant="cards"
+        label={m.new_game_opponent()}
+        value={String(skill)}
+        onChange={(v) => setSkill(Number(v))}
+        options={STRENGTHS.map((s) => ({ value: String(s.skill), label: s.label(), description: s.note() }))}
+      />
 
-      <label className="toggle">
-        <input type="checkbox" checked={easy} onChange={(e) => setEasy(e.target.checked)} />
+      <Checkbox className="mt-4 mb-7" isSelected={easy} onChange={setEasy}>
         {m.new_game_warn()}
-      </label>
+      </Checkbox>
 
-      <button
-        className="primary big"
-        disabled={busy}
-        onClick={() => onStart({ colour, opponentSkill: skill, easy })}
+      <Button
+        variant="primary"
+        size="large"
+        isDisabled={busy}
+        onPress={() => onStart({ colour, opponentSkill: skill, easy })}
       >
         {busy ? m.busy_engine() : m.new_game_start()}
-      </button>
+      </Button>
     </section>
   );
 }

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { api } from "../api/client.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
+import { Alert } from "../ui/Alert.tsx";
+import { Button } from "../ui/Button.tsx";
 
 /** Which principles keep coming up, and how you're doing with them. */
 export function Progress({ onBack }: { onBack: () => void }) {
@@ -27,7 +29,7 @@ export function Progress({ onBack }: { onBack: () => void }) {
   return (
     <section className="progress">
       <h1>{m.progress_title()}</h1>
-      {error && <p className="error">{m.progress_error()}</p>}
+      {error && <Alert>{m.progress_error()}</Alert>}
       {!data && !error && <p className="muted">{m.loading()}</p>}
       {data && data.lessons === 0 && <p className="muted">{m.progress_empty()}</p>}
       {data && data.lessons > 0 && (
@@ -66,7 +68,7 @@ export function Progress({ onBack }: { onBack: () => void }) {
           </ul>
         </>
       )}
-      <button onClick={onBack}>{m.back()}</button>
+      <Button onPress={onBack}>{m.back()}</Button>
     </section>
   );
 }

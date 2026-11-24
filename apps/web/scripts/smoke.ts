@@ -229,7 +229,7 @@ try {
 
   await step("new game mid-game asks first, in a dialog (UX-15)", async () => {
     await page.getByRole("button", { name: "New game" }).click();
-    const dialog = page.getByRole("dialog", { name: "Abandon this game?" });
+    const dialog = page.getByRole("alertdialog", { name: "Abandon this game?" });
     await dialog.waitFor();
     if ((await focusedText(page)) !== "Keep playing") throw new Error("the safe choice isn't focused");
     await shot("2c-abandon-dialog");
@@ -255,7 +255,7 @@ try {
     );
     await page.reload();
     await page.getByText("Can you find the move that caused it?").waitFor({ timeout: 30_000 });
-    const choices = page.locator(".choice");
+    const choices = page.locator(".choices").getByRole("button");
     const labels = await choices.allTextContents();
     await choices.nth(labels.length > 1 ? labels.length - 2 : 0).click();
     if ((await page.getByText(/^Hint:/).count()) === 0) {
@@ -297,28 +297,28 @@ try {
     await page.reload();
     await page.getByRole("button", { name: "End game" }).click();
     await page.getByRole("heading", { name: "Game review" }).waitFor();
-    await page.locator(".review-item").first().click();
+    await page.locator(".review").getByRole("button", { expanded: false }).first().click();
     await shot("5-review", true);
   });
 
   await step("account menu shows the AI allowance", async () => {
-    await page.locator(".account summary").click();
+    await page.getByRole("button", { name: "Account" }).click();
     await page.getByText(/AI explanations left this month/).waitFor();
     await shot("6-account");
   });
 
   await step("progress page, from the account menu", async () => {
-    await page.locator(".account-menu").getByRole("button", { name: "Your progress" }).click();
+    await page.getByRole("menuitem", { name: "Your progress" }).click();
     await page.getByRole("heading", { name: "Your progress" }).waitFor();
     await page.getByText("Your focus").waitFor();
-    if (await page.locator(".account[open]").count()) throw new Error("account menu still open");
+    if (await page.getByRole("menu").count()) throw new Error("account menu still open");
     await shot("6b-progress", true);
     await page.getByRole("button", { name: "Back" }).click();
   });
 
   await step("sign out and back in", async () => {
-    await page.locator(".account summary").click();
-    await page.getByRole("button", { name: "Sign out" }).click();
+    await page.getByRole("button", { name: "Account" }).click();
+    await page.getByRole("menuitem", { name: "Sign out" }).click();
     await page.getByRole("heading", { name: "Welcome back" }).waitFor({ timeout: 30_000 });
     await page.getByLabel("Email").fill(EMAIL);
     await page.getByLabel("Password").fill("wrong password!");

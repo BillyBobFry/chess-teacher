@@ -2,6 +2,9 @@ import { useState, type FormEvent } from "react";
 import { authClient } from "../api/client.ts";
 import { authErrorText } from "../api/errors.ts";
 import { m } from "../paraglide/messages.js";
+import { Alert } from "../ui/Alert.tsx";
+import { Button } from "../ui/Button.tsx";
+import { TextField } from "../ui/TextField.tsx";
 
 export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
@@ -33,10 +36,10 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
 
       {googleEnabled && (
         <>
-          <button className="google" onClick={google} disabled={busy}>
+          <Button className="mt-4 w-full" onPress={google} isDisabled={busy}>
             {/* Google's mark, not text. */}
             <span aria-hidden>{"G"}</span> {m.sign_in_google()}
-          </button>
+          </Button>
           <div className="divider">
             <span>{m.sign_in_or()}</span>
           </div>
@@ -45,53 +48,42 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
 
       <form onSubmit={submit}>
         {mode === "signUp" && (
-          <label>
-            {m.field_name()}
-            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
-          </label>
+          <TextField label={m.field_name()} value={name} onChange={setName} autoComplete="name" />
         )}
-        <label>
-          {m.field_email()}
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-          />
-        </label>
-        <label>
-          {m.field_password()}
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete={mode === "signUp" ? "new-password" : "current-password"}
-          />
-        </label>
-        {error && (
-          <p className="form-error" role="alert">
-            {error}
-          </p>
-        )}
-        <button className="primary big" type="submit" disabled={busy}>
+        <TextField
+          label={m.field_email()}
+          type="email"
+          isRequired
+          value={email}
+          onChange={setEmail}
+          autoComplete="email"
+        />
+        <TextField
+          label={m.field_password()}
+          type="password"
+          isRequired
+          minLength={8}
+          value={password}
+          onChange={setPassword}
+          autoComplete={mode === "signUp" ? "new-password" : "current-password"}
+        />
+        {error && <Alert>{error}</Alert>}
+        <Button variant="primary" size="large" type="submit" isDisabled={busy}>
           {mode === "signIn" ? m.sign_in_submit() : m.sign_up_submit()}
-        </button>
+        </Button>
       </form>
 
       <p className="switch">
         {mode === "signIn" ? m.sign_in_new_here() : m.sign_up_have_account()}{" "}
-        <button
-          className="link"
-          onClick={() => {
+        <Button
+          variant="link"
+          onPress={() => {
             setMode(mode === "signIn" ? "signUp" : "signIn");
             setError(null);
           }}
         >
           {mode === "signIn" ? m.sign_in_to_sign_up() : m.sign_in_submit()}
-        </button>
+        </Button>
       </p>
     </section>
   );

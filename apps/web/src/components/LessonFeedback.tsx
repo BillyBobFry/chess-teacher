@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { api } from "../api/client.ts";
 import { m } from "../paraglide/messages.js";
+import { Button } from "../ui/Button.tsx";
+import { TextField } from "../ui/TextField.tsx";
+import { ToggleButton } from "../ui/ToggleButton.tsx";
 
 /** "Did this make sense?" A thumbs up or down, with an optional comment on a thumbs down. */
 export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId: number }) {
@@ -18,22 +21,12 @@ export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId:
   return (
     <div className="feedback">
       <span className="small">{m.feedback_question()}</span>
-      <button
-        className={rating === 1 ? "on" : ""}
-        aria-pressed={rating === 1}
-        aria-label={m.feedback_yes()}
-        onClick={() => send(1)}
-      >
+      <ToggleButton isSelected={rating === 1} aria-label={m.feedback_yes()} onChange={() => send(1)}>
         👍
-      </button>
-      <button
-        className={rating === -1 ? "on" : ""}
-        aria-pressed={rating === -1}
-        aria-label={m.feedback_no()}
-        onClick={() => send(-1)}
-      >
+      </ToggleButton>
+      <ToggleButton isSelected={rating === -1} aria-label={m.feedback_no()} onChange={() => send(-1)}>
         👎
-      </button>
+      </ToggleButton>
       {rating === -1 && (
         <form
           className="feedback-comment"
@@ -42,14 +35,15 @@ export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId:
             send(-1, comment.trim());
           }}
         >
-          <input
+          <TextField
+            className="min-w-0 flex-1"
             value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            onChange={setComment}
             placeholder={m.feedback_comment_placeholder()}
             maxLength={1000}
             aria-label={m.feedback_comment_label()}
           />
-          <button type="submit">{m.feedback_send()}</button>
+          <Button type="submit">{m.feedback_send()}</Button>
         </form>
       )}
     </div>
