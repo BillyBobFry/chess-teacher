@@ -101,5 +101,15 @@ export function Button({
     else ref.current?.removeAttribute("aria-keyshortcuts");
   }, [keyShortcuts]);
 
-  return <AriaButton {...props} ref={ref} className={button({ variant, size, shape, className })} />;
+  return (
+    <AriaButton
+      // A submit button keeps focus where it is when pressed. Otherwise the field being left
+      // shows its error on blur, the button moves before the press ends, and the press is lost.
+      // Submitting then shows every error and focuses the first invalid field (UX-20).
+      {...props}
+      preventFocusOnPress={props.type === "submit" || props.preventFocusOnPress}
+      ref={ref}
+      className={button({ variant, size, shape, className })}
+    />
+  );
 }
