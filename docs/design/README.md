@@ -19,6 +19,9 @@ Enforcement: where a rule is checkable, a script enforces it in `pnpm check`, wh
 - `pnpm lint`: no words written directly in JSX text or in `aria-label`, `title`,
   `placeholder` or `alt` (`eslint/ui-text.js`, UX-32). It sees JSX only; strings built in hooks
   and helpers are left to review.
+- `pnpm lint` (`eslint/ui-components.js`, components.md): no raw `<button>`, `<input>`,
+  `<select>`, `<textarea>` or `<dialog>` and no `react-aria-components` import outside
+  `apps/web/src/ui/` (UX-37); no arbitrary colour utilities such as `bg-[#b42318]`.
 - `pnpm test` (`apps/web/test/messages.test.ts`): every locale has every key and placeholder of
   the en-GB catalogue, and en-GB has no em dashes or emoji (UX-31).
 - `pnpm smoke`: the main journey in en-GB, and the phone layout in en-US.
