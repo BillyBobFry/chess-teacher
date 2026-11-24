@@ -51,6 +51,19 @@ export const PRINCIPLES: Record<PrincipleId, { title: string; text: string }> = 
       "Before every move, ask: what can my opponent capture, which checks do they " +
       "have, and what does their last move threaten?",
   },
+  // Added after the port: the prototype files every material lesson under the two above.
+  free_material: {
+    title: "Take free material",
+    text:
+      "When your opponent leaves a piece or pawn you can win, take it. Before every move, " +
+      "look at everything you can capture.",
+  },
+  forcing_moves: {
+    title: "Look for forcing moves",
+    text:
+      "Checks, captures and threats force your opponent to respond. Before a quiet move, " +
+      "look at yours: one of them may win material.",
+  },
   develop: {
     title: "Develop your knights and bishops first",
     text:

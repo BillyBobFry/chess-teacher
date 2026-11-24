@@ -19,7 +19,9 @@ import {
   Game,
   facts,
   isPrincipleId,
+  playedLine,
   upgradeSession,
+  variationSan,
   type Lesson,
   type SavedSessionState,
 } from "@chess-teacher/core";
@@ -273,7 +275,7 @@ export function createApp(deps: AppDeps) {
     // Games saved by an older version hold lesson text in English; bring them up to date.
     const state = upgradeSession(game.state as SavedSessionState);
     const lesson = state.lessons.find((l: Lesson) => l.id === lessonId);
-    return lesson ? { game, lesson } : null;
+    return lesson ? { game, state, lesson } : null;
   }
 
   async function existing(gameId: string, lessonId: number) {
@@ -330,10 +332,11 @@ export function createApp(deps: AppDeps) {
   });
 
   /**
-   * Generate the explanation for a lesson in a saved game. The client calls this as soon
-   * as the lesson is created, several moves before the reveal, so it's usually ready in time.
-   * The facts come from the saved game, not from the request; the request only says which
-   * language to write in. An explanation is written once, in the locale first asked for.
+   * Generate the explanation for a lesson in a saved game. The client calls this when the
+   * lesson is revealed, so the explanation can say what really happened after the move; it is
+   * usually written while the player looks for the cause. The facts come from the saved game,
+   * not from the request; the request only says which language to write in. An explanation is
+   * written once, in the locale first asked for.
    */
   app.post("/games/:id/lessons/:lessonId/explanation", zValidator("json", ExplanationBody), async (c) => {
     const userId = c.get("userId");
@@ -341,7 +344,7 @@ export function createApp(deps: AppDeps) {
     const locale = isLocale(requested) ? requested : baseLocale;
     const found = await lessonOf(userId, c.req.param("id"), Number(c.req.param("lessonId")));
     if (!found) return c.json(failure("not_found"), 404);
-    const { game, lesson } = found;
+    const { game, state, lesson } = found;
     let used = await usedThisMonth(userId);
     if (!llm) return c.json<ExplanationResponse>({ status: "unavailable", remaining: remaining(used) });
 
@@ -352,12 +355,17 @@ export function createApp(deps: AppDeps) {
     if (remaining(used) <= 0) return c.json<ExplanationResponse>({ status: "quota", remaining: 0 });
 
     let lessonFacts;
+    let soFar;
     try {
       lessonFacts = facts(lesson);
+      soFar = {
+        movesPlayed: variationSan(lesson.fenBefore, playedLine(state, lesson)),
+        trigger: lesson.trigger,
+      };
     } catch {
       return c.json(failure("malformed_lesson"), 400);
     }
-    const factsHash = await sha256(JSON.stringify(lessonFacts) + PROMPT_VERSION + locale);
+    const factsHash = await sha256(JSON.stringify([lessonFacts, soFar]) + PROMPT_VERSION + locale);
 
     // Claim the work: insert a pending row, or take over a stale one.
     const claimed = current
@@ -388,7 +396,7 @@ export function createApp(deps: AppDeps) {
     if (!claimed.length) return c.json(respond(await existing(game.id, lesson.id), used));
     const rowId = claimed[0]!.id;
 
-    const result = await explainLesson(llm, env.llmModel, lessonFacts, locale);
+    const result = await explainLesson(llm, env.llmModel, lessonFacts, soFar, locale);
     await db
       .update(explanations)
       .set({

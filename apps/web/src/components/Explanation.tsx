@@ -53,6 +53,12 @@ export function Explanation({ lesson }: { lesson: Lesson }) {
                 inputs={{ better: f.better_was }}
                 markup={{ better: moveMarkup(better, orientation) }}
               />
+            ) : lesson.feature === "material" ? (
+              <ParaglideMessage
+                message={m.explanation_missed_material}
+                inputs={{ better: f.better_was }}
+                markup={{ better: moveMarkup(better, orientation) }}
+              />
             ) : (
               <ParaglideMessage
                 message={m.explanation_missed_improved}

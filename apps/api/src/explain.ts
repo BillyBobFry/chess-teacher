@@ -6,30 +6,36 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import { CONSEQUENCE, type LessonFacts } from "@chess-teacher/core";
+import { CONSEQUENCE, type LessonFacts, type Trigger } from "@chess-teacher/core";
 import {
   baseLocale,
   detailText,
   factorText,
   principleText,
   principleTitle,
+  triggerText,
   undefendedText,
   type Locale,
 } from "@chess-teacher/lesson-text";
 
-/** 4: facts worded from the catalogue, and the explanation written in the player's locale. */
-export const PROMPT_VERSION = 4;
+/**
+ * 4: facts worded from the catalogue, and the explanation written in the player's locale.
+ * 5: written at the reveal, with the moves really played and what they led to.
+ */
+export const PROMPT_VERSION = 5;
 
 export const SYSTEM_PROMPT = `You are a friendly chess coach. Your student knows how the pieces move but \
 not the strategy. You will receive facts about one of their moves. A chess engine and \
 measuring code produced every fact, and they are correct.
 
 Two kinds of fact need care:
-- "move_played" is the only move from the real game. Everything in \
-"predicted_continuation_after_your_move" and "predicted_continuation_after_better_move" is \
-the engine's prediction of how play could go. Those moves have NOT happened. Describe them \
-conditionally ("if Black then plays…", "after the better move, you could…"), never as \
-events in the game.
+- "moves_played_in_the_game" are the real moves, starting with "move_played", up to the \
+moment the student is being shown this lesson, and "what_happened_in_the_game" is what they \
+led to. Describe these as events in the game, and prefer them to the predictions when they \
+differ. "predicted_continuation_after_your_move" and \
+"predicted_continuation_after_better_move" are the engine's predictions, made when the move \
+was played. Any of their moves that isn't in the real game has NOT happened: describe those \
+conditionally ("if Black had played…", "after the better move, you could…").
 - Factor values ("before_your_move", "end_of_your_line", "end_of_better_line") describe the \
 position before the move and at the end of each prediction.
 
@@ -37,7 +43,7 @@ Fill in three short parts. The student sees them as a headline and two short par
 above two boards that already show both predicted lines move by move, and above a card \
 with the principle. So:
 - "headline": what went wrong, or what was missed, in at most 10 words. No move sequences.
-- "what_it_allowed": what their move allowed (or, for a missed chance, what it missed), in \
+- "what_it_allowed": what their move allowed in the game (or, for a missed chance, what it missed), in \
 1–2 sentences and at most 40 words.
 - "why_better": why the better move was better, naming it and the measured factor, in 1–2 \
 sentences and at most 40 words.
@@ -126,16 +132,25 @@ export function parseParts(raw: string | null | undefined): ExplanationParts | n
   }
 }
 
+/** What really happened after the lesson's move, as far as the game has gone. */
+export interface GameSoFar {
+  /** The real moves in SAN, from the lesson's move (included) to the reveal. */
+  movesPlayed: string;
+  /** What those moves led to; null if the lesson hasn't been triggered. */
+  trigger: Trigger | null;
+}
+
 /**
- * The facts as the model sees them, worded in en-GB whatever language it writes in. The
- * predicted lines are labelled as predictions, so the model doesn't describe them as moves
- * that happened (they haven't: explanations are written when a lesson is created, before the
- * game moves on).
+ * The facts as the model sees them, worded in en-GB whatever language it writes in. The real
+ * moves and the engine's predicted lines are labelled apart, so the model doesn't describe a
+ * prediction as something that happened.
  */
-export function promptFacts(f: LessonFacts) {
+export function promptFacts(f: LessonFacts, game: GameSoFar) {
   const locale = baseLocale;
   return {
     move_played: f.you_played,
+    moves_played_in_the_game: game.movesPlayed,
+    what_happened_in_the_game: game.trigger ? triggerText(game.trigger, locale) : null,
     move_number: f.move_number,
     player_colour: f.player_colour,
     better_was: f.better_was,
@@ -164,9 +179,10 @@ export async function explainLesson(
   client: LlmClient,
   model: string,
   facts: LessonFacts,
+  game: GameSoFar,
   locale: Locale,
 ): Promise<ExplanationResult> {
-  const factJson = JSON.stringify(promptFacts(facts), null, 2);
+  const factJson = JSON.stringify(promptFacts(facts, game), null, 2);
   const body = {
     model,
     max_tokens: 2000,

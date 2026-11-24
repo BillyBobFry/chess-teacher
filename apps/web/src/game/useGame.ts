@@ -1,7 +1,7 @@
 /**
  * The game loop: drives the core's session state machine with the browser engines, turns
  * events into UI state (reveals, toasts), saves to the server after every step, and asks
- * for AI explanations as soon as a lesson is created (several moves before its reveal).
+ * for a lesson's AI explanation as soon as it is revealed, once the moves since are saved.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -64,7 +64,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
   const running = useRef(false);
   const enginesReady = useRef(false);
   const saver = useRef<Saver | null>(null);
-  /** Lessons created but not yet saved: ask for their explanation once they are. */
+  /** Lessons just revealed: ask for their explanation once the game is saved. */
   const wantExplanation = useRef(new Set<number>());
   const explanations = useRef(new Map<string, Promise<ExplanationResponse>>());
   const llmEnabled = opts.llmEnabled;
@@ -162,12 +162,13 @@ export function useGame(opts: { llmEnabled: boolean }) {
       for (const e of events) {
         const lesson = g.state.lessons.find((l) => l.id === e.lessonId);
         if (!lesson) continue;
-        if (e.kind === "created") {
-          wantExplanation.current.add(lesson.id);
-        } else if ((e.kind === "triggered" || e.kind === "chanceGone") && !lesson.deferred && !reveal) {
+        if ((e.kind === "triggered" || e.kind === "chanceGone") && !lesson.deferred && !reveal) {
           // Asking "which move caused it?" is pointless when it was obviously the last one.
           const obvious = e.kind === "chanceGone" && userMovesAgo(g.state, lesson) === 1;
           reveal = { lessonId: e.lessonId, step: obvious ? "explain" : "find", attempts: 0, wrong: [] };
+          // Written now, not when the lesson was created, so it can say what really happened;
+          // usually ready by the time the player has found the cause.
+          wantExplanation.current.add(lesson.id);
         } else if (e.kind === "fixed") {
           toast(
             lesson.kind === "consequence"
@@ -392,8 +393,8 @@ export function useGame(opts: { llmEnabled: boolean }) {
   }, [commit]);
 
   /**
-   * The AI explanation for a lesson: the request made when the lesson was created, or a new
-   * one (which returns the stored explanation if there is one). Polls while it's pending.
+   * The AI explanation for a lesson: the request made when it was revealed, or a new one
+   * (which returns the stored explanation if there is one). Polls while it's pending.
    */
   const explanation = useCallback(
     async (lessonId: number, signal: AbortSignal): Promise<ExplanationResponse | null> => {

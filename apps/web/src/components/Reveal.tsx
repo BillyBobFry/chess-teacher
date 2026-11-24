@@ -50,12 +50,17 @@ export function Reveal({
   const locale = getLocale();
   const ago = userMovesAgo(state, lesson);
   const move = moveText(lessonMove(lesson), locale);
+  const missedMaterial = lesson.feature === "material";
   const headline =
     lesson.kind === "consequence" && lesson.trigger
       ? triggerText(lesson.trigger, locale)
       : ago === 1
-        ? m.reveal_missed_last()
-        : m.reveal_chance_gone();
+        ? missedMaterial
+          ? m.reveal_missed_material_last()
+          : m.reveal_missed_last()
+        : missedMaterial
+          ? m.reveal_material_chance_gone()
+          : m.reveal_chance_gone();
   const markup = { move: moveMarkup(lessonMoves(lesson).yours, orientationOf(lesson.userColour)) };
   const sub =
     lesson.kind === "consequence" ? (

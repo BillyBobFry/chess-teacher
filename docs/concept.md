@@ -116,6 +116,11 @@ A move becomes a lesson candidate only if **both**:
 Otherwise the move is treated as fine. Engines often prefer one move over another for
 reasons no human could articulate; nitpicking every move teaches nothing.
 
+Strategic lessons have a lower bar (0.35 pawns against 0.7 for material) from move 3 on,
+because a strategic mistake costs little per move and rarely reaches the full threshold.
+Below the full threshold a strategic lesson is only taught when the classical evaluation
+check (§12) agrees that its factor explains the gap. Evidence: `reports/near-miss-findings.md`.
+
 ### 5.2 Simulating the two futures
 
 For both the user's move and the best move, play the line forward **3–6 moves each**
@@ -176,6 +181,9 @@ progress can be tracked. Starting list:
 
 - **Safety:** don't leave pieces undefended; check what your opponent's last move
   threatens; check checks, captures and threats before moving.
+- **Chances:** take free material; look for your own forcing moves. When the user's move
+  loses nothing of their own but the better move wins material, that is a missed chance,
+  not a blunder, and is taught under one of these.
 - **Opening:** develop knights and bishops before attacking; control the centre; castle
   early; don't move the same piece twice without reason; don't bring the queen out early.
 - **Pieces:** knights on outposts; rooks on open files; bishops on long, open diagonals;

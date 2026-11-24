@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  DEFAULT_CONFIG,
   Game,
   MATE_SCORE,
+  detectMistake,
   gameOutcome,
   newSession,
   opponentMove,
@@ -9,9 +11,13 @@ import {
   resign,
   settledBalance,
   upgradeSession,
+  userMove,
   variationSan,
+  type Candidate,
   type Engine,
+  type Engines,
   type SavedSessionState,
+  type TeachingConfig,
 } from "../src/index.ts";
 
 /** 1. f3 e5 2. g4 Qh4#: Black mates. */
@@ -122,5 +128,123 @@ describe("upgradeSession", () => {
       scores: [20, -15, 30],
     };
     expect(upgradeSession(saved).scores).toEqual([20]);
+  });
+});
+
+describe("detectMistake", () => {
+  /** The user (to move in `fen`) plays `move`; the engine's lines are given by hand. */
+  const detect = (
+    fen: string,
+    move: string,
+    best: Candidate,
+    reply: Candidate,
+    cfg: TeachingConfig = DEFAULT_CONFIG,
+  ) => detectMistake(1, fen, move, new Game(fen, [move]), [best], [reply], cfg);
+
+  it("teaches a free piece left on the board as a missed chance, not a blunder", () => {
+    // Black's queen on g5 is attacked by the knight on f3 and undefended.
+    const fen = "rnb1kbnr/pppp1ppp/8/4p1q1/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
+    const lesson = detect(
+      fen,
+      "h2h3",
+      { move: "f3g5", score: 900, pv: ["f3g5", "f8e7", "d2d4", "g8f6"] },
+      { move: "g5g6", score: -50, pv: ["g5g6", "b1c3", "b8c6"] },
+    );
+    expect(lesson).toMatchObject({ feature: "material", kind: "missed_chance", principle: "free_material" });
+  });
+
+  it("teaches losing a piece as a consequence", () => {
+    // Ng5 walks into the queen on d8.
+    const fen = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 2";
+    const lesson = detect(
+      fen,
+      "f3g5",
+      { move: "b1c3", score: 30, pv: ["b1c3", "b8c6", "f1c4", "g8f6"] },
+      { move: "d8g5", score: 300, pv: ["d8g5", "d2d4", "g5g6"] },
+    );
+    expect(lesson).toMatchObject({ feature: "material", kind: "consequence", principle: "hanging" });
+  });
+
+  it("teaches losing a piece as a blunder even when the line wins it back later", () => {
+    // From a real game: Ne5 allows Qa5+, which wins the bishop on a3. The engine's line only
+    // gets the material back at the end, with Nc4 and Nd6+.
+    const fen = "rn1qkb1r/pp2pp1p/2p3p1/5b2/3Pp3/BP2PN2/P1P2PPP/R2QKB1R w KQkq - 0 8";
+    const lesson = detect(
+      fen,
+      "f3e5",
+      { move: "f3d2", score: 50, pv: ["f3d2", "h7h5", "c2c3", "b8d7", "d1c2", "e7e5", "a3f8", "e8f8"] },
+      { move: "d8a5", score: 157, pv: ["d8a5", "d1d2", "a5a3", "e5c4", "a3a6", "c4d6", "e7d6"] },
+    );
+    expect(lesson).toMatchObject({ feature: "material", kind: "consequence", principle: "safety" });
+  });
+
+  it("teaches a recapture that leaves another pawn hanging as a blunder", () => {
+    // From a real game: cxd4 wins the pawn back, but leaves b4 to the bishop.
+    const fen = "rnbqkb1r/pp1p1ppp/4pn2/8/1P1p4/2P1PN2/P2N1PPP/R1BQKB1R w KQkq - 0 7";
+    const lesson = detect(
+      fen,
+      "c3d4",
+      { move: "e3d4", score: 40, pv: ["e3d4", "b7b6", "f1d3", "c8b7", "e1g1", "f8e7", "a2a4"] },
+      { move: "f8b4", score: 81, pv: ["f8b4", "f1d3", "e8g8", "a2a3", "b4c3", "a1b1"] },
+    );
+    expect(lesson).toMatchObject({ feature: "material", kind: "consequence", principle: "hanging" });
+  });
+
+  describe("the lower bar for strategic lessons", () => {
+    // Pushing rook pawns while the better line develops, for a gap of only 0.5 pawns.
+    const atMove = (n: number) => `rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 ${n}`;
+    const best: Candidate = {
+      move: "g1f3",
+      score: 50,
+      pv: ["g1f3", "b8c6", "f1c4", "g8f6", "b1c3", "f8c5", "d2d3", "d7d6"],
+    };
+    const reply: Candidate = {
+      move: "b8c6",
+      score: 0,
+      pv: ["b8c6", "a3a4", "g8f6", "h2h3", "f8c5", "h3h4", "d7d6"],
+    };
+
+    it("teaches a small strategic mistake", () => {
+      const lesson = detect(atMove(4), "a2a3", best, reply);
+      expect(lesson).not.toBeNull();
+      expect(lesson?.feature).not.toBe("material");
+    });
+
+    it("doesn't apply in the first moves of the game", () => {
+      expect(detect(atMove(2), "a2a3", best, reply)).toBeNull();
+    });
+
+    it("doesn't apply when it's set to the normal threshold", () => {
+      const cfg = { ...DEFAULT_CONFIG, strategicThreshold: DEFAULT_CONFIG.threshold };
+      expect(detect(atMove(4), "a2a3", best, reply, cfg)).toBeNull();
+    });
+  });
+});
+
+describe("credit for material lessons", () => {
+  it("goes to the review when a later bad move leaves material to be taken, even in a lost position", async () => {
+    // 2. Ng5 hangs the knight (a lesson), Black doesn't take, then 3. Nxf7 drops it for a pawn
+    // in a position the engine already calls lost, so 3. Nxf7 isn't taught itself.
+    const game = new Game("rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 2");
+    const lines = new Map<string, Candidate[]>();
+    lines.set(game.fen, [{ move: "b1c3", score: 30, pv: ["b1c3", "b8c6", "f1c4", "g8f6"] }]);
+    game.push("f3g5");
+    lines.set(game.fen, [{ move: "d8g5", score: 300, pv: ["d8g5", "d2d4", "g5g6"] }]);
+    game.push("b8c6");
+    lines.set(game.fen, [{ move: "g5f3", score: -600, pv: ["g5f3", "d7d5"] }]);
+    game.push("g5f7");
+    lines.set(game.fen, [{ move: "e8f7", score: 700, pv: ["e8f7", "d2d4"] }]);
+    const engine = {
+      analyse: (fen: string) => Promise.resolve(lines.get(fen) ?? []),
+      play: () => Promise.resolve("b8c6"),
+    };
+    const engines: Engines = { analyst: engine, weak: engine };
+
+    let s = newSession({ userColour: "w", startFen: game.startFen, config: { levelUp: false } });
+    s = (await userMove(s, "f3g5", engines)).state;
+    s = (await opponentMove(s, engines)).state;
+    expect(s.lessons.map((l) => l.status)).toEqual(["pending"]);
+    s = (await userMove(s, "g5f7", engines)).state;
+    expect(s.lessons.map((l) => l.status)).toEqual(["superseded"]);
   });
 });
