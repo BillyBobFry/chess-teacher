@@ -1,24 +1,10 @@
-import { Game, uciParts, type Lesson } from "@chess-teacher/core";
+import type { Lesson } from "@chess-teacher/core";
 import type { Move } from "chess.js";
 import { useMemo, useState } from "react";
-import { Board } from "./Board.tsx";
+import { lineMoves } from "../lib/moves.ts";
+import { Board, orientationOf } from "./Board.tsx";
+import { MoveButton } from "./MoveButton.tsx";
 import { m } from "../paraglide/messages.js";
-
-interface Line {
-  fens: string[];
-  moves: Move[];
-}
-
-function walk(fenBefore: string, line: string[]): Line {
-  const game = new Game(fenBefore);
-  const fens = [game.fen];
-  const moves: Move[] = [];
-  for (const uci of line) {
-    moves.push(game.push(uci));
-    fens.push(game.fen);
-  }
-  return { fens, moves };
-}
 
 /**
  * What actually happened after the mistake, beside how the better move could have gone,
@@ -26,31 +12,34 @@ function walk(fenBefore: string, line: string[]): Line {
  * mistake; without it (e.g. nothing played yet) the engine's prediction is shown instead.
  */
 export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] }) {
-  const real = !!played && played.length > 0;
-  const yourMoves = real ? played! : lesson.userLine;
-  const mine = useMemo(() => walk(lesson.fenBefore, yourMoves), [lesson, yourMoves]);
-  const better = useMemo(() => walk(lesson.fenBefore, lesson.bestLine), [lesson]);
+  const real = !!played?.length;
+  const yourMoves = played?.length ? played : lesson.userLine;
+  const mine = useMemo(() => lineMoves(lesson.fenBefore, yourMoves), [lesson, yourMoves]);
+  const better = useMemo(() => lineMoves(lesson.fenBefore, lesson.bestLine), [lesson]);
   const plies = Math.max(yourMoves.length, lesson.bestLine.length);
   const [step, setStep] = useState(0);
-  const orientation = lesson.userColour === "w" ? "white" : "black";
+  const orientation = orientationOf(lesson.userColour);
 
-  const view = (line: Line, moves: string[], colour: string) => {
-    const i = Math.min(step, moves.length);
-    const first = uciParts(moves[0]!);
+  const view = (line: Move[], colour: string) => {
+    const i = Math.min(step, line.length);
+    const last = i > 0 ? line[i - 1] : undefined;
+    const first = line[0];
     return {
-      fen: line.fens[i]!,
-      lastMove: i > 0 ? line.moves[i - 1] : null,
-      arrows: i === 0 ? [{ from: first.from, to: first.to, color: colour }] : [],
+      fen: last?.after ?? lesson.fenBefore,
+      lastMove: last ?? null,
+      arrows: i === 0 && first ? [{ from: first.from, to: first.to, color: colour }] : [],
     };
   };
-  const a = view(mine, yourMoves, "#c2552b");
-  const b = view(better, lesson.bestLine, "#2f8f5f");
+  const a = view(mine, "#c2552b");
+  const b = view(better, "#2f8f5f");
 
   const sanLine = (moves: Move[]) => (
     <ol className="line">
       {moves.map((mv, i) => (
         <li key={i} className={i < step ? "played" : i === step ? "next" : ""}>
-          {mv.san}
+          <MoveButton move={mv} orientation={orientation}>
+            {mv.san}
+          </MoveButton>
         </li>
       ))}
     </ol>
@@ -71,7 +60,7 @@ export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] 
             arrows={a.arrows}
             showNotation={false}
           />
-          {sanLine(mine.moves)}
+          {sanLine(mine)}
         </figure>
         <figure>
           <figcaption>{m.futures_better()}</figcaption>
@@ -84,7 +73,7 @@ export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] 
             arrows={b.arrows}
             showNotation={false}
           />
-          {sanLine(better.moves)}
+          {sanLine(better)}
         </figure>
       </div>
       <div className="stepper" role="group" aria-label={m.futures_stepper()}>

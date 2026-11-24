@@ -19,10 +19,13 @@ import {
   recordFoundCause,
   rewind,
   startUserTurn,
+  takeBack,
+  canTakeBack,
   userMove,
   userMovesAgo,
   type Colour,
   type GameEvent,
+  type SessionState,
 } from "@chess-teacher/core";
 import { hintText, moveText } from "@chess-teacher/lesson-text";
 import { api } from "../api/client.ts";
@@ -47,6 +50,10 @@ export interface NewGameOptions {
 }
 
 let toastId = 0;
+
+/** Undo and redo wait while a lesson is open, after the game, and while a move is checked. */
+const canStep = (g: SavedGame | null, checking: boolean): g is SavedGame =>
+  !!g && !g.reveal && !g.finished && !checking;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export function useGame(opts: { llmEnabled: boolean }) {
@@ -65,6 +72,15 @@ export function useGame(opts: { llmEnabled: boolean }) {
   const wantExplanation = useRef(new Set<number>());
   const explanations = useRef(new Map<string, Promise<ExplanationResponse>>());
   const llmEnabled = opts.llmEnabled;
+  /** The user's move is being checked: too late to undo the move before it. */
+  const checking = useRef(false);
+  /** States undo replaced, latest last: redo goes back to them. Not saved. */
+  const [redoStates, setRedoStatesState] = useState<SessionState[]>([]);
+  const redoRef = useRef<SessionState[]>([]);
+  const setRedoStates = useCallback((states: SessionState[]) => {
+    redoRef.current = states;
+    setRedoStatesState(states);
+  }, []);
 
   const refreshMe = useCallback(() => {
     api
@@ -96,10 +112,11 @@ export function useGame(opts: { llmEnabled: boolean }) {
       }
       if (!llmEnabled) return;
       for (const lessonId of [...wantExplanation.current]) {
-        if (saved.state.lessons.some((l) => l.id === lessonId)) {
-          wantExplanation.current.delete(lessonId);
-          void requestExplanation(saved.id, lessonId);
-        }
+        const lesson = saved.state.lessons.find((l) => l.id === lessonId);
+        if (!lesson) continue;
+        wantExplanation.current.delete(lessonId);
+        // Its move was undone, so it will never be shown: don't spend the player's allowance.
+        if (lesson.status !== "rewound") void requestExplanation(saved.id, lessonId);
       }
     },
     [llmEnabled, requestExplanation],
@@ -112,6 +129,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
         if (err instanceof ConflictError) {
           // Another device moved on: load the latest version instead of overwriting it.
           void loadActiveGame().then((latest) => {
+            setRedoStates([]);
             gameRef.current = latest;
             setGame(latest);
             if (latest) attachSaver(latest);
@@ -119,7 +137,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
         }
       });
     },
-    [onSaved],
+    [onSaved, setRedoStates],
   );
 
   const commit = useCallback((next: SavedGame) => {
@@ -165,9 +183,11 @@ export function useGame(opts: { llmEnabled: boolean }) {
           toast(m.toast_opponent_spotted());
         }
       }
+      // The redo moves would replay past a lesson the player has now been shown.
+      if (reveal && !g.reveal) setRedoStates([]);
       return { ...g, reveal };
     },
-    [toast],
+    [setRedoStates, toast],
   );
 
   /** Run the game forward until it needs the user (their move, or a reveal). */
@@ -236,6 +256,8 @@ export function useGame(opts: { llmEnabled: boolean }) {
       if (!g || running.current || g.reveal || g.finished || !isUserTurn(g.state)) return false;
       if (!isLegal(gameOf(g.state).chess, uci)) return false;
       running.current = true;
+      checking.current = true;
+      setRedoStates([]);
       setPendingMove(uci);
       setBusy("checking");
       void (async () => {
@@ -249,6 +271,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
           setError(errorText(err));
         } finally {
           running.current = false;
+          checking.current = false;
           setPendingMove(null);
           setBusy(null);
           void advance();
@@ -256,7 +279,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
       })();
       return true;
     },
-    [advance, commit, engines, handle],
+    [advance, commit, engines, handle, setRedoStates],
   );
 
   const newGame = useCallback(
@@ -277,12 +300,13 @@ export function useGame(opts: { llmEnabled: boolean }) {
         finished: false,
       });
       wantExplanation.current.clear();
+      setRedoStates([]);
       gameRef.current = created;
       setGame(created);
       attachSaver(created);
       void advance();
     },
-    [advance, attachSaver, commit, engines],
+    [advance, attachSaver, commit, engines, setRedoStates],
   );
 
   // ---- the reveal: find the cause, then the explanation
@@ -336,11 +360,34 @@ export function useGame(opts: { llmEnabled: boolean }) {
     (lessonId: number) => {
       const g = gameRef.current;
       if (!g) return;
+      setRedoStates([]);
       commit({ ...g, state: rewind(g.state, lessonId), reveal: null, finished: false });
       void advance();
     },
-    [advance, commit],
+    [advance, commit, setRedoStates],
   );
+
+  // ---- undo and redo: take back the user's latest move (and the reply), or play them again
+
+  const undo = useCallback(() => {
+    const g = gameRef.current;
+    if (!canStep(g, checking.current)) return;
+    const back = takeBack(g.state);
+    if (!back) return;
+    setRedoStates([...redoRef.current, g.state]);
+    // Anything the engine is working on for the old position is dropped when it returns.
+    commit({ ...g, state: back });
+    void advance();
+  }, [advance, commit, setRedoStates]);
+
+  const redo = useCallback(() => {
+    const g = gameRef.current;
+    const next = redoRef.current.at(-1);
+    if (!canStep(g, checking.current) || !next) return;
+    setRedoStates(redoRef.current.slice(0, -1));
+    commit({ ...g, state: next });
+    void advance();
+  }, [advance, commit, setRedoStates]);
 
   const endGame = useCallback(() => {
     const g = gameRef.current;
@@ -392,6 +439,10 @@ export function useGame(opts: { llmEnabled: boolean }) {
     showAnswer,
     closeReveal,
     rewindTo,
+    undo,
+    redo,
+    canUndo: canStep(game, !!pendingMove) && canTakeBack(game.state),
+    canRedo: canStep(game, !!pendingMove) && redoStates.length > 0,
     endGame,
     explanation,
     dismissError: () => setError(null),

@@ -8,21 +8,29 @@ import {
   undefendedText,
 } from "@chess-teacher/lesson-text";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
+import { lessonMoves } from "../lib/moves.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
+import { orientationOf } from "./Board.tsx";
+import { moveMarkup } from "./MoveButton.tsx";
 
 /** The lesson's explanation, built from the same measured facts an LLM would receive. */
 export function Explanation({ lesson }: { lesson: Lesson }) {
   const f = facts(lesson);
   const locale = getLocale();
   const mate = lesson.feature === "mate";
+  const orientation = orientationOf(lesson.userColour);
+  const { yours, better } = lessonMoves(lesson);
   return (
     <div className="explanation">
       <p className="lead">
         <ParaglideMessage
           message={m.explanation_lead}
           inputs={{ moveNumber: f.move_number, played: f.you_played, better: f.better_was }}
-          markup={{ strong: ({ children }) => <strong>{children}</strong> }}
+          markup={{
+            played: (props) => <strong>{moveMarkup(yours, orientation)(props)}</strong>,
+            better: (props) => <strong>{moveMarkup(better, orientation)(props)}</strong>,
+          }}
         />
       </p>
       {mate ? (
@@ -39,12 +47,19 @@ export function Explanation({ lesson }: { lesson: Lesson }) {
       ) : (
         <>
           <p>
-            {lesson.feature === "their_pawns"
-              ? m.explanation_missed_pawns({ better: f.better_was })
-              : m.explanation_missed_improved({
-                  better: f.better_was,
-                  factor: factorText(f.key_factor, locale),
-                })}
+            {lesson.feature === "their_pawns" ? (
+              <ParaglideMessage
+                message={m.explanation_missed_pawns}
+                inputs={{ better: f.better_was }}
+                markup={{ better: moveMarkup(better, orientation) }}
+              />
+            ) : (
+              <ParaglideMessage
+                message={m.explanation_missed_improved}
+                inputs={{ better: f.better_was, factor: factorText(f.key_factor, locale) }}
+                markup={{ better: moveMarkup(better, orientation) }}
+              />
+            )}
           </p>
           <dl className="facts">
             <dt>{m.facts_better_line()}</dt>

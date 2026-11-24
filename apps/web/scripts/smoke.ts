@@ -100,7 +100,7 @@ const gameBody = (state: SessionState, reveal: object | null = null) => ({
 /** Wait until move row `row` (from 1) has both White's and Black's moves. */
 const opponentReplied = (page: Page, row = 1) =>
   page.waitForFunction(
-    (r) => (document.querySelectorAll(".moves li span")[r * 3 - 1]?.textContent ?? "").length > 0,
+    (r) => (document.querySelectorAll(".moves li > span")[r * 3 - 1]?.textContent ?? "").length > 0,
     row,
     {
       timeout: 60_000,
@@ -216,7 +216,11 @@ try {
     }
     await shot("2b-keyboard-selected");
     await page.keyboard.press("Enter");
-    await page.locator(".moves").getByText("Nf3", { exact: true }).waitFor({ timeout: 30_000 });
+    // A move's name starts with its notation, then reads it in words (WCAG 2.5.3, UX-106).
+    await page
+      .locator(".moves")
+      .getByRole("button", { name: /^Nf3 \(White's move 2: knight to f3\)$/ })
+      .waitFor({ timeout: 30_000 });
     await opponentReplied(page, 2);
     // The board describes the last move in words (UX-106).
     await page.getByText(/^Black's last move: \w/).waitFor();

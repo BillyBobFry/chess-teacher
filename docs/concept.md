@@ -56,6 +56,11 @@ wrong.**
 If you spot the weakness yourself and fix it before the punishment lands, the app
 celebrates that instead: _"Nice — you saw your d-pawn was weak and defended it in time."_
 
+At any point in play the player can **undo** their latest move (and the opponent's reply)
+and redo it. A lesson made by a move they undo is dropped, so a mistake undone before it
+bites is never taught; a lesson already revealed stays. This trades some teaching for
+letting the player explore, and was chosen deliberately.
+
 Because the rule is simply _"reveal when the consequence lands"_, tactics and strategy
 are handled the same way: a hanging piece is revealed one move later; a weak pawn might
 be revealed eight moves later.

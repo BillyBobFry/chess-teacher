@@ -1,9 +1,14 @@
-import { Chess, type Move, type Square } from "chess.js";
+import { Chess, type Color, type Move, type Square } from "chess.js";
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { Chessboard } from "react-chessboard";
 import { pieceName, spokenMove } from "../lib/moves.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
+
+export type Orientation = "white" | "black";
+
+/** The board as the player sees it: their own pieces at the bottom. */
+export const orientationOf = (colour: Color): Orientation => (colour === "w" ? "white" : "black");
 
 export interface BoardArrow {
   from: string;
@@ -16,7 +21,7 @@ interface Props {
   /** The board's accessible name, e.g. "Game board" or the caption beside it. */
   label: string;
   fen: string;
-  orientation: "white" | "black";
+  orientation: Orientation;
   /** When set, the user can move pieces of the side to move (click, drag or keyboard). */
   onMove?: (uci: string) => boolean;
   /** The move that led to `fen`, marked on the board and read out to screen readers. */

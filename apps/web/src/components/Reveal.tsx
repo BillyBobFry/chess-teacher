@@ -1,5 +1,4 @@
 import {
-  lessonBestSan,
   lessonMove,
   playedLine,
   recentUserMoves,
@@ -9,11 +8,15 @@ import {
 } from "@chess-teacher/core";
 import type { ExplanationResponse } from "@chess-teacher/contract";
 import { moveText, triggerText } from "@chess-teacher/lesson-text";
+import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import type { RevealState } from "../game/storage.ts";
+import { lessonMoves } from "../lib/moves.ts";
 import { AiExplanation } from "./AiExplanation.tsx";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
+import { orientationOf } from "./Board.tsx";
+import { moveMarkup } from "./MoveButton.tsx";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 
@@ -52,12 +55,15 @@ export function Reveal({
       : ago === 1
         ? m.reveal_missed_last()
         : m.reveal_chance_gone();
+  const markup = { move: moveMarkup(lessonMoves(lesson).yours, orientationOf(lesson.userColour)) };
   const sub =
-    lesson.kind === "consequence"
-      ? m.reveal_cause_recent()
-      : ago === 1
-        ? m.reveal_missed_last_detail({ move })
-        : m.reveal_missed_ago_detail({ ago, move });
+    lesson.kind === "consequence" ? (
+      m.reveal_cause_recent()
+    ) : ago === 1 ? (
+      <ParaglideMessage message={m.reveal_missed_last_detail} inputs={{ move }} markup={markup} />
+    ) : (
+      <ParaglideMessage message={m.reveal_missed_ago_detail} inputs={{ ago, move }} markup={markup} />
+    );
 
   return (
     <section className="reveal" aria-live="polite">
@@ -99,11 +105,7 @@ export function Reveal({
               <span aria-hidden>✓</span> {m.reveal_found()}
             </p>
           )}
-          <AiExplanation
-            load={loadExplanation}
-            betterMove={lessonBestSan(lesson)}
-            missedChance={lesson.kind === "missed_chance"}
-          />
+          <AiExplanation load={loadExplanation} lesson={lesson} played={playedLine(state, lesson)} />
           <Explanation lesson={lesson} />
           <Futures lesson={lesson} played={playedLine(state, lesson)} />
           <LessonFeedback gameId={gameId} lessonId={lesson.id} />

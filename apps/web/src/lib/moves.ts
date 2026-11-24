@@ -1,3 +1,4 @@
+import { Game, fullmoveOf, type Lesson } from "@chess-teacher/core";
 import type { Color, Move, PieceSymbol } from "chess.js";
 import { m } from "../paraglide/messages.js";
 
@@ -76,4 +77,44 @@ export function spokenMove(move: Move): string {
   if (move.san.endsWith("#")) return m.move_spoken_checkmate({ move: words });
   if (move.san.endsWith("+")) return m.move_spoken_check({ move: words });
   return words;
+}
+
+/** A line of UCI moves played out from a position. */
+export function lineMoves(fen: string, line: string[]): Move[] {
+  const game = new Game(fen);
+  return line.map((uci) => game.push(uci));
+}
+
+/** A lesson's mistake and its better move, both from the position before them. */
+export function lessonMoves(lesson: Lesson): { yours: Move | undefined; better: Move | undefined } {
+  return {
+    yours: lineMoves(lesson.fenBefore, [lesson.userMove])[0],
+    better: lineMoves(lesson.fenBefore, [lesson.bestMove])[0],
+  };
+}
+
+const withoutCheck = (san: string) => san.replace(/[+#]$/, "");
+
+/**
+ * The move a token from `splitMoves` names, if exactly one of `candidates` fits it ("12. Bc7"
+ * by number, colour and move; "Nxg3" by move alone). Null when it is ambiguous, or a bare
+ * square like "d4", which in prose is more often a square than a pawn move, unless it is one
+ * of the `named` moves the text is about (a lesson's mistake and better move).
+ */
+export function findMove(token: string, candidates: Move[], named: Move[]): Move | null {
+  const parts = /^(?:(\d+)\.(\.\.)?\s?)?(.+)$/.exec(token);
+  if (!parts?.[3]) return null;
+  const [, number, dots, san] = parts;
+  if (number === undefined && /^[a-h][1-8][+#]?$/.test(san)) {
+    return named.find((mv) => withoutCheck(mv.san) === withoutCheck(san)) ?? null;
+  }
+  const fits = candidates.filter(
+    (mv) =>
+      withoutCheck(mv.san) === withoutCheck(san) &&
+      (number === undefined || (fullmoveOf(mv.before) === Number(number) && mv.color === (dots ? "b" : "w"))),
+  );
+  // Two lines can share a move from the same position: that's still one move.
+  const distinct = new Map(fits.map((mv) => [`${mv.before} ${mv.lan}`, mv]));
+  const [only, ...others] = distinct.values();
+  return only && others.length === 0 ? only : null;
 }
