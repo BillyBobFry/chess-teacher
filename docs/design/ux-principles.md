@@ -327,14 +327,15 @@ figurines (♘f3) in that formatter. A move's accessible name reads it in words 
 Parts of the current UI don't meet these rules yet. Fix them when you touch that code, not as
 drive-by changes in an unrelated PR:
 
-- UX-15: "New game" during a game uses `window.confirm`.
 - UX-31: emoji and symbol glyphs as icons (👍 👎 ⚠ ⏳ ✓ and the stepper's ⏮ ◀ ▶ ⏭); there is no icon
   set yet.
 - UX-32 and UX-41: lesson text, principles, hints and triggers come from `packages/core` in
   English; API and auth errors come from the server in English; AI explanations are written in
   English whatever the locale; the landing page is static English HTML. Only `apps/web`'s own
-  strings are in the catalogue.
+  strings are in the catalogue. When a piece is dragged with the pointer, react-chessboard's drag
+  library (dnd-kit) announces it to screen readers in its own English; react-chessboard doesn't
+  let us replace that text. Keyboard moves don't use it.
 - UX-60: some existing copy says "please" in errors; reword it when you touch it.
-- UX-100: moves can't be made with a keyboard, and the board isn't described to screen readers.
 - UX-106: move text in lessons is built in `packages/core`, outside the formatter, and has no
-  spoken form.
+  spoken form. The move list and the lines under the futures boards show SAN with no spoken
+  form either; the board reads moves in words (`spokenMove` in `apps/web/src/lib/moves.ts`).

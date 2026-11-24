@@ -1,8 +1,10 @@
 import type { ConfigResponse } from "@chess-teacher/contract";
-import { gameOf, isUserTurn, uciParts, type Game } from "@chess-teacher/core";
+import { gameOf, isUserTurn, type Game } from "@chess-teacher/core";
+import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, authClient } from "./api/client.ts";
 import { Board } from "./components/Board.tsx";
+import { ConfirmDialog } from "./components/ConfirmDialog.tsx";
 import { Licences } from "./components/Licences.tsx";
 import { MoveList } from "./components/MoveList.tsx";
 import { NewGame } from "./components/NewGame.tsx";
@@ -116,20 +118,16 @@ function GameApp({
   const g = useGame({ llmEnabled });
   const [choosing, setChoosing] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
+  const [confirmingAbandon, setConfirmingAbandon] = useState(false);
   const saved = g.game;
 
   const board = useMemo(() => {
     if (!saved) return null;
     const game = gameOf(saved.state);
-    let fen = game.fen;
-    let last = saved.state.moves.at(-1);
-    if (g.pendingMove) {
-      game.push(g.pendingMove);
-      fen = game.fen;
-      last = g.pendingMove;
-    }
-    const lm = last ? uciParts(last) : null;
-    return { fen, lastMove: lm ? ([lm.from, lm.to] as [string, string]) : null, game };
+    const lastMove = g.pendingMove
+      ? game.push(g.pendingMove)
+      : (game.chess.history({ verbose: true }).at(-1) ?? null);
+    return { fen: game.fen, lastMove, game };
   }, [saved, g.pendingMove]);
 
   const revealId = saved?.reveal?.lessonId;
@@ -147,13 +145,22 @@ function GameApp({
         </button>
       )}
       {saved && !choosing && (
-        <button
-          onClick={() => {
-            if (saved.finished || confirm(m.confirm_abandon())) setChoosing(true);
-          }}
-        >
+        <button onClick={() => (saved.finished ? setChoosing(true) : setConfirmingAbandon(true))}>
           {m.nav_new_game()}
         </button>
+      )}
+      {saved && board && (
+        <ConfirmDialog
+          open={confirmingAbandon}
+          title={m.confirm_abandon_title()}
+          body={m.confirm_abandon_body({ moveNumber: board.game.chess.moveNumber() })}
+          confirmLabel={m.confirm_abandon_confirm()}
+          cancelLabel={m.confirm_abandon_cancel()}
+          onClose={(confirmed) => {
+            setConfirmingAbandon(false);
+            if (confirmed) setChoosing(true);
+          }}
+        />
       )}
       <details className="account">
         <summary aria-label={m.account_menu()}>{userName.slice(0, 1).toUpperCase() || "?"}</summary>
@@ -246,6 +253,7 @@ function GameApp({
           </div>
           <Board
             id="main"
+            label={m.board_game()}
             fen={board.fen}
             orientation={orientation}
             lastMove={board.lastMove}
@@ -287,6 +295,13 @@ function GameApp({
               <h2 className="panel-title">{m.panel_moves()}</h2>
               <MoveList startFen={state.startFen} moves={state.moves} />
               <p className="muted small">{m.panel_play_hint()}</p>
+              <p className="muted small">
+                <ParaglideMessage
+                  message={m.board_keyboard_hint}
+                  inputs={{}}
+                  markup={{ kbd: ({ children }) => <kbd>{children}</kbd> }}
+                />
+              </p>
             </>
           )}
         </aside>
