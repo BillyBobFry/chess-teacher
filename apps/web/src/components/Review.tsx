@@ -1,4 +1,4 @@
-import { lessonMove, playedLine, type Lesson, type SessionState } from "@chess-teacher/core";
+import { gameOutcome, lessonMove, playedLine, type Lesson, type SessionState } from "@chess-teacher/core";
 import { moveText, principleTitle } from "@chess-teacher/lesson-text";
 import { useState } from "react";
 import type { Key } from "../ui/Disclosure.tsx";
@@ -39,6 +39,8 @@ export function Review({
   onProgress?: () => void;
 }) {
   const lessons = state.lessons.filter((l) => l.status !== "rewound");
+  // Praise for a clean game is only earned by finishing it without losing (UX-30).
+  const earned = ["won", "drawn"].includes(gameOutcome(state));
   const [open, setOpen] = useState<Key | null>(null);
   const locale = getLocale();
   return (
@@ -46,7 +48,7 @@ export function Review({
       <h2>{m.review_title()}</h2>
       <p className="muted">{result}</p>
       {lessons.length === 0 ? (
-        <p>{m.review_none()}</p>
+        <p>{earned ? m.review_none() : m.review_none_neutral()}</p>
       ) : (
         <DisclosureGroup className="mb-4" expanded={open} onExpandedChange={setOpen}>
           {lessons.map((l) => {

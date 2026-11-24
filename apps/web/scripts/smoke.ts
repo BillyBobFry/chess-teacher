@@ -3,9 +3,9 @@
  * scripts/serve-vercel-output.mjs with an embedded Postgres and the fake LLM, driven in
  * headless Chromium:
  *   landing page → create an account → play 1. e4 → play 2. Nf3 by keyboard alone →
- *   the abandon-game dialog → reload and resume →
+ *   the new-game dialog → reload and resume →
  *   a recorded game at a reveal (wrong guess → hint → answer → AI explanation → futures →
- *   rewind) → end a game and review it → sign out and back in → phone layout.
+ *   rewind) → resign a game and review it → sign out and back in → phone layout.
  * Fails on any console error. Screenshots go to the directory given.
  *
  * Usage: node scripts/build-vercel.mjs && pnpm --filter @chess-teacher/web smoke <dir> [--scale 2]
@@ -229,14 +229,14 @@ try {
 
   await step("new game mid-game asks first, in a dialog (UX-15)", async () => {
     await page.getByRole("button", { name: "New game" }).click();
-    const dialog = page.getByRole("alertdialog", { name: "Abandon this game?" });
+    const dialog = page.getByRole("alertdialog", { name: "Start a new game?" });
     await dialog.waitFor();
     if ((await focusedText(page)) !== "Keep playing") throw new Error("the safe choice isn't focused");
-    await shot("2c-abandon-dialog");
+    await shot("2c-new-game-dialog");
     await page.keyboard.press("Escape");
     await dialog.waitFor({ state: "hidden" });
     await page.getByRole("button", { name: "New game" }).click();
-    await dialog.getByRole("button", { name: "Abandon game" }).click();
+    await dialog.getByRole("button", { name: "Start a new game" }).click();
     await page.getByRole("heading", { name: "Learn from your own mistakes" }).waitFor();
     await page.getByRole("button", { name: "Back to the current game" }).click();
     await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 30_000 });
@@ -292,11 +292,22 @@ try {
       throw new Error(`expected ${Math.ceil(lesson.ply / 2)} rows, got ${rows}`);
   });
 
-  await step("end a game and review it", async () => {
+  await step("resign a game with no lessons: no praise (UX-30)", async () => {
+    await postGame(page, gameBody({ ...newSession({ userColour: "w" }), moves: ["e2e4", "e7e5"] }));
+    await page.reload();
+    await page.getByRole("button", { name: "Resign" }).click();
+    await page.getByRole("button", { name: "Resign game" }).click();
+    await page.getByText("No clear mistakes found in the moves you played.").waitFor();
+  });
+
+  await step("resign a game and review it", async () => {
     await postGame(page, gameBody(end));
     await page.reload();
-    await page.getByRole("button", { name: "End game" }).click();
+    await page.getByRole("button", { name: "Resign" }).click();
+    await page.getByRole("alertdialog", { name: "Resign this game?" }).waitFor();
+    await page.getByRole("button", { name: "Resign game" }).click();
     await page.getByRole("heading", { name: "Game review" }).waitFor();
+    await page.getByText("You resigned.").first().waitFor();
     await page.locator(".review").getByRole("button", { expanded: false }).first().click();
     await shot("5-review", true);
   });

@@ -1,5 +1,5 @@
 import type { ConfigResponse } from "@chess-teacher/contract";
-import { gameOf, isUserTurn, type Game } from "@chess-teacher/core";
+import { gameOf, gameOutcome, isUserTurn, type Game, type SessionState } from "@chess-teacher/core";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, authClient } from "./api/client.ts";
@@ -49,12 +49,17 @@ function stepKey(e: KeyboardEvent): "undo" | "redo" | null {
   return null;
 }
 
-function resultText(game: Game, userColour: "w" | "b"): string {
-  const chess = game.chess;
-  if (chess.isCheckmate()) return chess.turn() === userColour ? m.result_lost() : m.result_won();
-  if (chess.isStalemate()) return m.result_stalemate();
-  if (game.isGameOver()) return m.result_draw();
-  return m.result_ended();
+function resultText(game: Game, state: SessionState): string {
+  switch (gameOutcome(state)) {
+    case "won":
+      return m.result_won();
+    case "lost":
+      return state.resigned ? m.result_resigned() : m.result_lost();
+    case "drawn":
+      return game.chess.isStalemate() ? m.result_stalemate() : m.result_draw();
+    case "ended":
+      return m.result_ended();
+  }
 }
 
 function Shell({
@@ -148,7 +153,8 @@ function GameApp({
   const g = useGame({ llmEnabled });
   const [choosing, setChoosing] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
-  const [confirmingAbandon, setConfirmingAbandon] = useState(false);
+  const [confirmingNewGame, setConfirmingNewGame] = useState(false);
+  const [confirmingResign, setConfirmingResign] = useState(false);
   const saved = g.game;
 
   const board = useMemo(() => {
@@ -183,24 +189,37 @@ function GameApp({
   const nav = (
     <>
       {saved && !saved.finished && !choosing && (
-        <Button onPress={() => g.endGame()} isDisabled={!!saved.reveal}>
-          {m.nav_end_game()}
+        <Button onPress={() => setConfirmingResign(true)} isDisabled={!!saved.reveal}>
+          {m.nav_resign()}
         </Button>
       )}
       {saved && !choosing && (
-        <Button onPress={() => (saved.finished ? setChoosing(true) : setConfirmingAbandon(true))}>
+        <Button onPress={() => (saved.finished ? setChoosing(true) : setConfirmingNewGame(true))}>
           {m.nav_new_game()}
         </Button>
       )}
       {saved && board && (
         <ConfirmDialog
-          open={confirmingAbandon}
-          title={m.confirm_abandon_title()}
-          body={m.confirm_abandon_body({ moveNumber: board.game.chess.moveNumber() })}
-          confirmLabel={m.confirm_abandon_confirm()}
-          cancelLabel={m.confirm_abandon_cancel()}
+          open={confirmingResign}
+          title={m.confirm_resign_title()}
+          body={m.confirm_resign_body({ moveNumber: board.game.chess.moveNumber() })}
+          confirmLabel={m.confirm_resign_confirm()}
+          cancelLabel={m.confirm_resign_cancel()}
           onClose={(confirmed) => {
-            setConfirmingAbandon(false);
+            setConfirmingResign(false);
+            if (confirmed) g.resign();
+          }}
+        />
+      )}
+      {saved && board && (
+        <ConfirmDialog
+          open={confirmingNewGame}
+          title={m.confirm_new_game_title()}
+          body={m.confirm_new_game_body({ moveNumber: board.game.chess.moveNumber() })}
+          confirmLabel={m.confirm_new_game_confirm()}
+          cancelLabel={m.confirm_new_game_cancel()}
+          onClose={(confirmed) => {
+            setConfirmingNewGame(false);
             if (confirmed) setChoosing(true);
           }}
         />
@@ -280,7 +299,7 @@ function GameApp({
   const revealLesson = saved.reveal ? state.lessons.find((l) => l.id === saved.reveal!.lessonId) : undefined;
   const canMove = !saved.finished && !saved.reveal && !g.busy && !g.pendingMove && isUserTurn(state);
   const status = saved.finished
-    ? resultText(board.game, state.userColour)
+    ? resultText(board.game, state)
     : saved.reveal
       ? m.status_paused()
       : g.busy
@@ -318,7 +337,7 @@ function GameApp({
             <Review
               gameId={saved.id}
               state={state}
-              result={resultText(board.game, state.userColour)}
+              result={resultText(board.game, state)}
               onNewGame={() => setChoosing(true)}
               onProgress={() => setShowProgress(true)}
             />

@@ -55,7 +55,7 @@ export function ConfirmDialog({
   open: boolean;
   title: string;
   body: string;
-  /** Names the destructive action ("Abandon game"); styled as a critical button. */
+  /** Names the destructive action ("Resign game"); styled as a critical button. */
   confirmLabel: string;
   /** The safe way out ("Keep playing"); focused when the dialog opens. */
   cancelLabel: string;

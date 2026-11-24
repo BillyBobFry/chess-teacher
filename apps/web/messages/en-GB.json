@@ -15,20 +15,33 @@
   "result_stalemate": "Stalemate: a draw.",
   "result_draw": "Draw.",
   "result_ended": "Game ended.",
-  "nav_end_game": "End game",
+  "result_resigned": "You resigned.",
+  "nav_resign": "Resign",
   "nav_new_game": "New game",
-  "confirm_abandon_title": "Abandon this game?",
-  "confirm_abandon_body": [
+  "confirm_new_game_title": "Start a new game?",
+  "confirm_new_game_body": [
     {
       "declarations": ["input moveNumber", "local moveCount = moveNumber: number"],
       "selectors": [],
       "match": {
-        "": "You're on move {moveCount}. Starting a new game ends this one for good."
+        "": "You're on move {moveCount}. Starting a new game resigns this one."
       }
     }
   ],
-  "confirm_abandon_confirm": "Abandon game",
-  "confirm_abandon_cancel": "Keep playing",
+  "confirm_new_game_confirm": "Start a new game",
+  "confirm_new_game_cancel": "Keep playing",
+  "confirm_resign_title": "Resign this game?",
+  "confirm_resign_body": [
+    {
+      "declarations": ["input moveNumber", "local moveCount = moveNumber: number"],
+      "selectors": [],
+      "match": {
+        "": "You're on move {moveCount}. Resigning ends the game for good and opens the review."
+      }
+    }
+  ],
+  "confirm_resign_confirm": "Resign game",
+  "confirm_resign_cancel": "Keep playing",
   "account_menu": "Account",
   "account_allowance": [
     {
@@ -124,6 +137,7 @@
   "reveal_carry_on": "Carry on",
   "review_title": "Game review",
   "review_none": "No clear mistakes found. Well played!",
+  "review_none_neutral": "No clear mistakes found in the moves you played.",
   "outcome_fixed": "You fixed it in time",
   "outcome_deferred": "Happened at the same time as another lesson",
   "outcome_found": "Found it yourself",
