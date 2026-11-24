@@ -214,6 +214,7 @@ buttons, headings and errors. The glossary (en-GB; each locale keeps its own lis
 | coach             | the voice of the AI explanation ("Your coach")                                     | AI tutor, assistant, bot             |
 | AI explanation    | one explanation written by the coach; the unit of the monthly allowance            | credit, token, analysis              |
 | rewind            | go back to before the mistake and play on from there                               | undo, take back                      |
+| undo, redo        | remove the player's latest move and the opponent's reply; play them again          | take back, takeback, rewind          |
 | carry on          | continue the game after a lesson                                                   | resume, continue                     |
 | sign in, sign out | start and end a session; a new player's button is "Create account"                 | log in, log out, register            |
 

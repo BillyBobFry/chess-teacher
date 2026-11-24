@@ -9,7 +9,7 @@
 import { Position, type Colour } from "./board.ts";
 import type { Candidate, Engines } from "./engine.ts";
 import { FEATURES_BY_NAME, type Measurement } from "./features.ts";
-import { Game, STANDARD_START, fullmoveOf, isLegal, plyOf, sanOf } from "./game.ts";
+import { Game, STANDARD_START, fullmoveOf, isLegal, plyOf, sanOf, turnOf } from "./game.ts";
 import {
   CONSEQUENCE,
   DEFAULT_CONFIG,
@@ -261,6 +261,45 @@ export function rewind(state: SessionState, lessonId: number): SessionState {
   s.moves = s.moves.slice(0, target.ply - plyOf(s.startFen));
   for (const l of s.lessons) {
     if (l.ply >= target.ply && l !== target && l.status === "pending") l.status = "rewound";
+  }
+  s.analysis = null;
+  return s;
+}
+
+/** Index in `moves` of the user's latest move, or -1 if they haven't moved yet. */
+function lastUserMoveIndex(s: SessionState): number {
+  const first = turnOf(s.startFen) === s.userColour ? 0 : 1;
+  if (s.moves.length <= first) return -1;
+  return first + 2 * Math.floor((s.moves.length - 1 - first) / 2);
+}
+
+export const canTakeBack = (s: SessionState): boolean => lastUserMoveIndex(s) >= 0;
+
+/**
+ * Take back the user's latest move, and the opponent's reply if it was played, so it's the
+ * user's turn in the position before their move. Lessons made by those moves no longer
+ * count ("rewound") but stay, so lesson ids stay unique (the server keys explanations by
+ * them); lessons those moves fixed, superseded or expired are pending again.
+ * Lessons already revealed stay revealed: the player has seen them. Null if the user
+ * hasn't moved yet.
+ */
+export function takeBack(state: SessionState): SessionState | null {
+  const index = lastUserMoveIndex(state);
+  if (index < 0) return null;
+  const s = clone(state);
+  const ply = plyOf(s.startFen) + index;
+  // Every move taken back after the user's own was an opponent's reply, logged in opponentModes.
+  const replies = s.moves.length - index - 1;
+  s.moves = s.moves.slice(0, index);
+  s.opponentModes = s.opponentModes.slice(0, Math.max(0, s.opponentModes.length - replies));
+  for (const l of s.lessons) {
+    if (l.status === "triggered" || l.status === "rewound") continue;
+    if (l.ply >= ply) {
+      l.status = "rewound";
+    } else if (l.resolvedPly !== null && l.resolvedPly > ply) {
+      l.status = "pending";
+      l.resolvedPly = null;
+    }
   }
   s.analysis = null;
   return s;

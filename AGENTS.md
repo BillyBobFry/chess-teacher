@@ -42,6 +42,9 @@ it as mandatory; don't load everything up front.
   migration against a production `DATABASE_URL`; production migrates during the Vercel build.
 - **One change per PR.** Work on a branch. Guidance (this file, `CLAUDE.md`, `docs/design/**`,
   `.claude/skills/**`) changes in its own PR, never mixed with code.
+- **Every PR targets `main`**, the trunk. Branch from `origin/main` and merge back into it; never
+  base a PR on another feature branch. Work that needs an unmerged PR waits for it to merge.
+  `main` requires a linear history, so merge with squash or rebase.
 
 ## Conventions
 

@@ -1,20 +1,38 @@
 import type { ExplanationResponse } from "@chess-teacher/contract";
+import { lessonBestSan, type Lesson } from "@chess-teacher/core";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
+import type { Move } from "chess.js";
 import { Fragment, useEffect, useState, type ReactNode } from "react";
-import { splitMoves } from "../lib/moves.ts";
+import { findMove, lessonMoves, lineMoves, splitMoves } from "../lib/moves.ts";
 import { m } from "../paraglide/messages.js";
+import { orientationOf, type Orientation } from "./Board.tsx";
+import { MoveButton, moveMarkup } from "./MoveButton.tsx";
 
-/** Text with chess moves picked out so they're easy to spot. */
-function withMoves(text: string): ReactNode[] {
-  return splitMoves(text).map((seg, i) =>
-    seg.move ? (
+interface Known {
+  /** Every move in the lines the coach could mention. */
+  lines: Move[];
+  /** The mistake and the better move. */
+  named: Move[];
+}
+
+/**
+ * Text with chess moves picked out so they're easy to spot. A move that is surely one of
+ * `known` previews its board; one we can't place stays text, rather than show a wrong board.
+ */
+function withMoves(text: string, known: Known, orientation: Orientation): ReactNode[] {
+  return splitMoves(text).map((seg, i) => {
+    if (!seg.move) return <Fragment key={i}>{seg.text}</Fragment>;
+    const move = findMove(seg.text, known.lines, known.named);
+    return move ? (
+      <MoveButton key={i} move={move} orientation={orientation}>
+        {seg.text}
+      </MoveButton>
+    ) : (
       <span key={i} className="move">
         {seg.text}
       </span>
-    ) : (
-      <Fragment key={i}>{seg.text}</Fragment>
-    ),
-  );
+    );
+  });
 }
 
 /**
@@ -24,14 +42,23 @@ function withMoves(text: string): ReactNode[] {
  */
 export function AiExplanation({
   load,
-  betterMove,
-  missedChance,
+  lesson,
+  played,
 }: {
   load: (signal: AbortSignal) => Promise<ExplanationResponse | null>;
-  betterMove: string;
-  missedChance: boolean;
+  lesson: Lesson;
+  /** The real moves from the mistake on. */
+  played: string[];
 }) {
   const [result, setResult] = useState<ExplanationResponse | null | "loading">("loading");
+  const orientation = orientationOf(lesson.userColour);
+  const { yours, better } = lessonMoves(lesson);
+  // The coach writes about the two lines it was given; the real moves may come up too.
+  const known: Known = {
+    lines: [lesson.userLine, lesson.bestLine, played].flatMap((line) => lineMoves(lesson.fenBefore, line)),
+    named: [yours, better].filter((mv) => mv !== undefined),
+  };
+  const missedChance = lesson.kind === "missed_chance";
 
   useEffect(() => {
     const controller = new AbortController();
@@ -54,7 +81,7 @@ export function AiExplanation({
     return (
       <div className="ai">
         <div className="ai-label">{m.ai_label()}</div>
-        <p>{withMoves(result.text!)}</p>
+        <p>{withMoves(result.text!, known, orientation)}</p>
         {foot}
       </div>
     );
@@ -63,18 +90,18 @@ export function AiExplanation({
   return (
     <div className="ai">
       <div className="ai-label">{m.ai_label()}</div>
-      <p className="ai-headline">{withMoves(headline)}</p>
+      <p className="ai-headline">{withMoves(headline, known, orientation)}</p>
       <dl className="ai-parts">
         <dt>{missedChance ? m.ai_what_missed() : m.ai_what_allowed()}</dt>
-        <dd>{withMoves(what_it_allowed)}</dd>
+        <dd>{withMoves(what_it_allowed, known, orientation)}</dd>
         <dt>
           <ParaglideMessage
             message={m.ai_why_better}
-            inputs={{ move: betterMove }}
-            markup={{ move: ({ children }) => <span className="move">{children}</span> }}
+            inputs={{ move: lessonBestSan(lesson) }}
+            markup={{ move: moveMarkup(better, orientation) }}
           />
         </dt>
-        <dd>{withMoves(why_better)}</dd>
+        <dd>{withMoves(why_better, known, orientation)}</dd>
       </dl>
       {foot}
     </div>

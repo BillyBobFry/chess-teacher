@@ -3,7 +3,7 @@ import { gameOf, isUserTurn, type Game } from "@chess-teacher/core";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, authClient } from "./api/client.ts";
-import { Board } from "./components/Board.tsx";
+import { Board, orientationOf } from "./components/Board.tsx";
 import { ConfirmDialog } from "./components/ConfirmDialog.tsx";
 import { Licences } from "./components/Licences.tsx";
 import { MoveList } from "./components/MoveList.tsx";
@@ -22,6 +22,27 @@ const BUSY_TEXT: Record<Exclude<Busy, null>, () => string> = {
   checking: m.busy_checking,
   opponent: m.busy_opponent,
 };
+
+// Apple platforms use Cmd for shortcuts; everywhere else, Ctrl.
+const APPLE = /Mac|iPhone|iPad/.test(navigator.platform);
+
+/**
+ * Undo is Cmd/Ctrl+Z; redo is Cmd/Ctrl+Shift+Z or Ctrl+Y. Cmd+Y is left alone: on a Mac it's
+ * the browser's History. Text fields and dialogs keep their own shortcuts.
+ */
+function stepKey(e: KeyboardEvent): "undo" | "redo" | null {
+  if (e.defaultPrevented || e.altKey || !(e.metaKey || e.ctrlKey)) return null;
+  const target = e.target;
+  if (
+    target instanceof HTMLElement &&
+    (target.isContentEditable || target.closest("input, textarea, select, dialog"))
+  )
+    return null;
+  const key = e.key.toLowerCase();
+  if (key === "z") return e.shiftKey ? "redo" : "undo";
+  if (key === "y" && e.ctrlKey && !e.metaKey && !e.shiftKey) return "redo";
+  return null;
+}
 
 function resultText(game: Game, userColour: "w" | "b"): string {
   const chess = game.chess;
@@ -130,6 +151,19 @@ function GameApp({
     return { fen: game.fen, lastMove, game };
   }, [saved, g.pendingMove]);
 
+  const { undo, redo } = g;
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const step = stepKey(e);
+      if (!step) return;
+      e.preventDefault();
+      if (step === "undo") undo();
+      else redo();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [undo, redo]);
+
   const revealId = saved?.reveal?.lessonId;
   const { explanation } = g;
   const loadExplanation = useCallback(
@@ -231,7 +265,7 @@ function GameApp({
   }
 
   const state = saved.state;
-  const orientation = state.userColour === "w" ? "white" : "black";
+  const orientation = orientationOf(state.userColour);
   const revealLesson = saved.reveal ? state.lessons.find((l) => l.id === saved.reveal!.lessonId) : undefined;
   const canMove = !saved.finished && !saved.reveal && !g.busy && !g.pendingMove && isUserTurn(state);
   const status = saved.finished
@@ -293,7 +327,21 @@ function GameApp({
           ) : (
             <>
               <h2 className="panel-title">{m.panel_moves()}</h2>
-              <MoveList startFen={state.startFen} moves={state.moves} />
+              <MoveList startFen={state.startFen} moves={state.moves} orientation={orientation} />
+              <div className="move-actions">
+                <button onClick={undo} disabled={!g.canUndo} aria-keyshortcuts="Control+Z Meta+Z">
+                  {m.moves_undo()}{" "}
+                  <kbd aria-hidden="true">{APPLE ? m.shortcut_undo_apple() : m.shortcut_undo()}</kbd>
+                </button>
+                <button
+                  onClick={redo}
+                  disabled={!g.canRedo}
+                  aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
+                >
+                  {m.moves_redo()}{" "}
+                  <kbd aria-hidden="true">{APPLE ? m.shortcut_redo_apple() : m.shortcut_redo()}</kbd>
+                </button>
+              </div>
               <p className="muted small">{m.panel_play_hint()}</p>
               <p className="muted small">
                 <ParaglideMessage

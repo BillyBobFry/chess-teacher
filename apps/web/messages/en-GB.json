@@ -54,6 +54,15 @@
   "panel_moves": "Moves",
   "panel_play_hint": "Play normally. If a mistake comes back to bite you, the game will pause so you can find out why.",
   "moves_empty": "No moves yet.",
+  "moves_undo": "Undo",
+  "moves_redo": "Redo",
+  "shortcut_undo": "Ctrl+Z",
+  "shortcut_redo": "Ctrl+Y",
+  "shortcut_undo_apple": "⌘Z",
+  "shortcut_redo_apple": "⇧⌘Z",
+  "moves_spoken_white": "(White's move {moveNumber}: {move})",
+  "moves_spoken_black": "(Black's move {moveNumber}: {move})",
+  "moves_board_before": "Board before {move}",
   "error_conflict": "This game was changed on another device.",
   "toast_fixed": "Nice! {move} had left a weakness, and you fixed it before it cost you.",
   "toast_found_chance": "Nice! You found the better idea you missed with {move}.",
@@ -90,7 +99,7 @@
   "reveal_missed_last": "Your last move missed a better option.",
   "reveal_chance_gone": "The chance has gone.",
   "reveal_cause_recent": "The cause was one of your recent moves.",
-  "reveal_missed_last_detail": "Instead of {move}, there was a clearly better move.",
+  "reveal_missed_last_detail": "Instead of {#move}{move}{/move}, there was a clearly better move.",
   "reveal_missed_ago_detail": [
     {
       "declarations": [
@@ -101,8 +110,8 @@
       ],
       "selectors": ["agoPlural"],
       "match": {
-        "agoPlural=one": "{agoCount} move ago, with {move}, you had a clearly better option.",
-        "agoPlural=other": "{agoCount} moves ago, with {move}, you had a clearly better option."
+        "agoPlural=one": "{agoCount} move ago, with {#move}{move}{/move}, you had a clearly better option.",
+        "agoPlural=other": "{agoCount} moves ago, with {#move}{move}{/move}, you had a clearly better option."
       }
     }
   ],
@@ -149,13 +158,13 @@
       }
     }
   ],
-  "explanation_lead": "On move {moveNumber} you played {#strong}{played}{/strong}. {#strong}{better}{/strong} was better.",
+  "explanation_lead": "On move {moveNumber} you played {#played}{played}{/played}. {#better}{better}{/better} was better.",
   "explanation_mate": "After your move, your opponent had a forced checkmate.",
   "facts_before": "Before your move",
   "facts_your_line": "Where your move leads",
   "facts_better_line": "Where the better move leads",
-  "explanation_missed_pawns": "Your move wasn't a disaster, but {better} would have left your opponent with pawn weaknesses.",
-  "explanation_missed_improved": "Your move wasn't a disaster, but {better} would have improved {factor}.",
+  "explanation_missed_pawns": "Your move wasn't a disaster, but {#better}{better}{/better} would have left your opponent with pawn weaknesses.",
+  "explanation_missed_improved": "Your move wasn't a disaster, but {#better}{better}{/better} would have improved {factor}.",
   "explanation_undefended": "Your move left this undefended: {pieces}.",
   "ai_writing": "Your coach is writing an explanation…",
   "ai_quota": "You've used this month's AI explanations. Here's what we measured:",

@@ -458,6 +458,79 @@ button.danger:active:not(:disabled) {
 .moves .n {
   color: var(--muted);
 }
+.moves li {
+  align-items: center;
+}
+.moves .move {
+  font-weight: inherit;
+}
+
+/* A move that previews its board (MoveButton): text that looks pressable (UX-61). */
+button.move-button {
+  padding: 0 0.15rem;
+  margin: 0 -0.15rem;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--muted);
+  text-underline-offset: 0.2em;
+}
+button.move-button:hover {
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+}
+/* The popover is rendered in the body, out of reach of :has(), so React marks the open one. */
+button.move-button[data-open] {
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+}
+@media (pointer: coarse) {
+  .moves button.move-button {
+    min-block-size: 44px;
+    min-inline-size: 44px;
+  }
+}
+
+.move-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+.move-actions button {
+  min-block-size: 44px;
+}
+
+/* ---------- a move's board, before it, with the move as an arrow */
+
+.move-preview {
+  inline-size: min(16rem, calc(100vw - 32px));
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+/* Without anchor positioning the popover keeps the browser's centred placement. */
+@supports (position-area: block-end) {
+  .move-preview[popover] {
+    inset: auto;
+    margin: 0.25rem 0;
+    position-area: block-end span-inline-start;
+    /* When it fits on neither side of the move (a phone), it spans the width, centred. */
+    position-try-fallbacks:
+      flip-inline,
+      block-end span-all,
+      flip-block,
+      flip-block flip-inline,
+      block-start span-all;
+  }
+}
+.move-preview-title {
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
 
 /* ---------- reveal */
 
