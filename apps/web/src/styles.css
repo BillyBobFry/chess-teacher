@@ -34,23 +34,6 @@ body {
   font: 16px/1.5 var(--font-sans);
 }
 
-button {
-  font: inherit;
-  color: inherit;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 0.5rem 0.9rem;
-  cursor: pointer;
-}
-button:hover:not(:disabled) {
-  border-color: var(--color-fg-muted);
-}
-button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
 .muted {
   color: var(--color-fg-muted);
 }
@@ -83,62 +66,6 @@ main.page {
   font-size: 1.9rem;
   line-height: 1.2;
   margin: 0 0 0.5rem;
-}
-.new-game fieldset {
-  border: none;
-  padding: 0;
-  margin: 1.5rem 0;
-}
-.new-game legend {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-.new-game input[type="radio"] {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-.segmented {
-  display: inline-flex;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-.segmented label {
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  background: var(--color-surface);
-}
-.segmented label + label {
-  border-left: 1px solid var(--color-border);
-}
-.segmented label.on,
-.option.on {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-}
-.option.on .muted {
-  color: inherit;
-  opacity: 0.85;
-}
-.options {
-  display: grid;
-  gap: 0.5rem;
-}
-.option {
-  display: block;
-  padding: 0.7rem 0.9rem;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: var(--color-surface);
-  cursor: pointer;
-}
-.toggle {
-  display: flex;
-  gap: 0.6rem;
-  align-items: center;
-  margin: 1rem 0 1.75rem;
-  cursor: pointer;
 }
 
 /* ---------- game layout */
@@ -234,76 +161,12 @@ main.game {
   box-shadow: inset 0 0 0 5px var(--color-surface);
 }
 
-.visually-hidden:where(:not(:focus-within, :active)) {
-  position: absolute !important;
-  clip-path: inset(50%) !important;
-  overflow: hidden !important;
-  width: 1px !important;
-  height: 1px !important;
-  margin: -1px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  white-space: nowrap !important;
-}
-
-kbd {
-  font: inherit;
-  font-size: 0.85em;
-  padding: 0 0.3em;
-  border: 1px solid var(--color-border);
-  border-bottom-width: 2px;
-  border-radius: 4px;
-  background: var(--color-surface-muted);
-  color: var(--color-fg);
-  white-space: nowrap;
-}
-
-/* ---------- confirm dialog (UX-15) */
-
-dialog.confirm {
-  max-inline-size: min(28rem, calc(100vw - 32px));
-  padding: 1.25rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-panel);
-  background: var(--color-surface);
-  color: var(--color-fg);
-  box-shadow: var(--shadow-panel);
-}
-dialog.confirm:modal {
-  overscroll-behavior: contain;
-}
-dialog.confirm::backdrop {
-  background: rgb(0 0 0 / 0.45);
-  overflow: hidden;
-  overscroll-behavior: contain;
-}
-dialog.confirm h1 {
-  font-size: 1.25rem;
-  line-height: 1.3;
-  margin: 0 0 0.5rem;
-}
-dialog.confirm p {
-  margin: 0 0 1.25rem;
-  max-inline-size: 65ch;
-}
-.confirm-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
 .status {
   font-weight: 600;
   min-height: 1.5em;
 }
 .status.your-move {
   color: var(--color-primary);
-}
-.error {
-  background: var(--color-warning-subtle);
-  color: var(--color-warning);
-  padding: 0.6rem 0.8rem;
-  border-radius: 8px;
 }
 
 .panel {
@@ -347,68 +210,11 @@ dialog.confirm p {
   font-weight: inherit;
 }
 
-/* A move that previews its board (MoveButton): text that looks pressable (UX-61). */
-button.move-button {
-  padding: 0 0.15rem;
-  margin: 0 -0.15rem;
-  border: none;
-  border-radius: 4px;
-  background: none;
-  color: inherit;
-  text-decoration: underline dotted;
-  text-decoration-color: var(--color-fg-muted);
-  text-underline-offset: 0.2em;
-}
-button.move-button:hover {
-  background: color-mix(in srgb, var(--color-fg) 10%, transparent);
-}
-/* The popover is rendered in the body, out of reach of :has(), so React marks the open one. */
-button.move-button[data-open] {
-  background: color-mix(in srgb, var(--color-fg) 10%, transparent);
-}
-@media (pointer: coarse) {
-  .moves button.move-button {
-    min-block-size: 44px;
-    min-inline-size: 44px;
-  }
-}
-
 .move-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin: 0.75rem 0;
-}
-
-/* ---------- a move's board, before it, with the move as an arrow */
-
-.move-preview {
-  inline-size: min(16rem, calc(100vw - 32px));
-  padding: 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-panel);
-  background: var(--color-surface);
-  color: var(--color-fg);
-  box-shadow: var(--shadow-panel);
-}
-/* Without anchor positioning the popover keeps the browser's centred placement. */
-@supports (position-area: block-end) {
-  .move-preview[popover] {
-    inset: auto;
-    margin: 0.25rem 0;
-    position-area: block-end span-inline-start;
-    /* When it fits on neither side of the move (a phone), it spans the width, centred. */
-    position-try-fallbacks:
-      flip-inline,
-      block-end span-all,
-      flip-block,
-      flip-block flip-inline,
-      block-start span-all;
-  }
-}
-.move-preview-title {
-  font-weight: 600;
-  margin: 0 0 0.5rem;
 }
 
 /* ---------- reveal */
@@ -540,62 +346,6 @@ button.move-button[data-open] {
 .review h2 {
   margin-top: 0;
 }
-.review-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1rem;
-}
-.review-list li {
-  border-bottom: 1px solid var(--color-border);
-}
-.review-item {
-  display: grid;
-  grid-template-columns: 6rem 1fr;
-  gap: 0.1rem 0.75rem;
-  width: 100%;
-  text-align: left;
-  border: none;
-  border-radius: 0;
-  background: none;
-  padding: 0.6rem 0.2rem;
-}
-.review-move {
-  font-weight: 600;
-  grid-row: span 2;
-}
-.review-outcome {
-  font-size: 0.85rem;
-  color: var(--color-fg-muted);
-}
-.review-detail {
-  padding: 0 0.2rem 1rem;
-}
-
-/* ---------- toasts */
-
-.toasts {
-  position: fixed;
-  bottom: 16px;
-  left: 16px;
-  right: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  pointer-events: none;
-}
-.toast {
-  max-width: 480px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-panel);
-  padding: 0.7rem 1rem;
-  border-radius: 8px;
-}
-.toast.good {
-  background: var(--color-success-subtle);
-  border-color: var(--color-success);
-}
 
 .licences h2 {
   font-size: 1.1rem;
@@ -615,24 +365,6 @@ button.move-button[data-open] {
   gap: 0.9rem;
   margin-top: 1rem;
 }
-.sign-in label {
-  display: grid;
-  gap: 0.3rem;
-  font-weight: 600;
-  font-size: 0.925rem;
-}
-.sign-in input {
-  font: inherit;
-  padding: 0.6rem 0.7rem;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: var(--color-surface);
-  color: var(--color-fg);
-}
-.sign-in input:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
-}
 .divider {
   display: flex;
   align-items: center;
@@ -647,53 +379,8 @@ button.move-button[data-open] {
   flex: 1;
   border-top: 1px solid var(--color-border);
 }
-.form-error {
-  color: var(--color-warning);
-  background: var(--color-warning-subtle);
-  padding: 0.5rem 0.7rem;
-  border-radius: 8px;
-  margin: 0;
-}
 .switch {
   margin-top: 1.25rem;
-}
-
-/* ---------- account menu */
-
-.account {
-  position: relative;
-}
-.account summary {
-  list-style: none;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  font-weight: 700;
-  cursor: pointer;
-}
-.account summary::-webkit-details-marker {
-  display: none;
-}
-.account-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
-  z-index: 10;
-  width: 240px;
-  display: grid;
-  gap: 0.5rem;
-  padding: 0.8rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-panel);
-}
-.account-name {
-  font-weight: 600;
 }
 
 /* ---------- AI explanation */
@@ -727,27 +414,10 @@ button.move-button[data-open] {
   gap: 0.5rem;
   margin: 0.75rem 0;
 }
-.feedback > button {
-  padding: 0.25rem 0.6rem;
-}
-.feedback > button.on {
-  border-color: var(--color-primary);
-  background: var(--color-success-subtle);
-}
 .feedback-comment {
   display: flex;
   gap: 0.4rem;
   width: 100%;
-}
-.feedback-comment input {
-  flex: 1;
-  min-width: 0;
-  font: inherit;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: var(--color-surface);
-  color: var(--color-fg);
 }
 .feedback-thanks {
   margin: 0.75rem 0;

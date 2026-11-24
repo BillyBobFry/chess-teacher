@@ -2,7 +2,9 @@ import { useState, type FormEvent } from "react";
 import { authClient } from "../api/client.ts";
 import { authErrorText } from "../api/errors.ts";
 import { m } from "../paraglide/messages.js";
+import { Alert } from "../ui/Alert.tsx";
 import { Button } from "../ui/Button.tsx";
+import { TextField } from "../ui/TextField.tsx";
 
 export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
@@ -46,37 +48,26 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
 
       <form onSubmit={submit}>
         {mode === "signUp" && (
-          <label>
-            {m.field_name()}
-            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
-          </label>
+          <TextField label={m.field_name()} value={name} onChange={setName} autoComplete="name" />
         )}
-        <label>
-          {m.field_email()}
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-          />
-        </label>
-        <label>
-          {m.field_password()}
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete={mode === "signUp" ? "new-password" : "current-password"}
-          />
-        </label>
-        {error && (
-          <p className="form-error" role="alert">
-            {error}
-          </p>
-        )}
+        <TextField
+          label={m.field_email()}
+          type="email"
+          isRequired
+          value={email}
+          onChange={setEmail}
+          autoComplete="email"
+        />
+        <TextField
+          label={m.field_password()}
+          type="password"
+          isRequired
+          minLength={8}
+          value={password}
+          onChange={setPassword}
+          autoComplete={mode === "signUp" ? "new-password" : "current-password"}
+        />
+        {error && <Alert>{error}</Alert>}
         <Button variant="primary" size="large" type="submit" isDisabled={busy}>
           {mode === "signIn" ? m.sign_in_submit() : m.sign_up_submit()}
         </Button>

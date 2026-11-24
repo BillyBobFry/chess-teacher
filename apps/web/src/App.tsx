@@ -4,13 +4,17 @@ import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, authClient } from "./api/client.ts";
 import { Board, orientationOf } from "./components/Board.tsx";
-import { ConfirmDialog } from "./components/ConfirmDialog.tsx";
 import { Licences } from "./components/Licences.tsx";
 import { MoveList } from "./components/MoveList.tsx";
 import { NewGame } from "./components/NewGame.tsx";
 import { Progress } from "./components/Progress.tsx";
 import { Reveal } from "./components/Reveal.tsx";
+import { Alert } from "./ui/Alert.tsx";
 import { Button } from "./ui/Button.tsx";
+import { ConfirmDialog } from "./ui/Dialog.tsx";
+import { Kbd } from "./ui/Kbd.tsx";
+import { Menu, MenuItem, MenuSection, MenuTrigger } from "./ui/Menu.tsx";
+import { Toasts } from "./ui/Toast.tsx";
 import { Review } from "./components/Review.tsx";
 import { SignIn } from "./components/SignIn.tsx";
 import { useGame, type Busy } from "./game/useGame.ts";
@@ -201,31 +205,33 @@ function GameApp({
           }}
         />
       )}
-      <details className="account">
-        <summary aria-label={m.account_menu()}>{userName.slice(0, 1).toUpperCase() || "?"}</summary>
-        <div className="account-menu">
-          <div className="account-name">{userName}</div>
-          {g.me?.explanations.enabled && (
-            <div className="muted small">
-              {m.account_allowance({
-                remaining: g.me.explanations.remaining,
-                limit: g.me.explanations.limit,
-              })}
-            </div>
-          )}
-          <Button
-            onPress={(e) => {
-              e.target.closest("details")?.removeAttribute("open");
-              setShowProgress(true);
-            }}
+      <MenuTrigger>
+        <Button variant="primary" shape="circle" aria-label={m.account_menu()}>
+          {userName.slice(0, 1).toUpperCase() || "?"}
+        </Button>
+        <Menu label={m.account_menu()}>
+          <MenuSection
+            header={
+              <>
+                <span className="block font-semibold">{userName}</span>
+                {g.me?.explanations.enabled && (
+                  <span className="block text-sm text-fg-muted">
+                    {m.account_allowance({
+                      remaining: g.me.explanations.remaining,
+                      limit: g.me.explanations.limit,
+                    })}
+                  </span>
+                )}
+              </>
+            }
           >
-            {m.account_progress()}
-          </Button>
-          <Button onPress={() => void authClient.signOut().then(() => window.location.reload())}>
-            {m.account_sign_out()}
-          </Button>
-        </div>
-      </details>
+            <MenuItem onAction={() => setShowProgress(true)}>{m.account_progress()}</MenuItem>
+            <MenuItem onAction={() => void authClient.signOut().then(() => window.location.reload())}>
+              {m.account_sign_out()}
+            </MenuItem>
+          </MenuSection>
+        </Menu>
+      </MenuTrigger>
     </>
   );
 
@@ -251,7 +257,7 @@ function GameApp({
     return (
       <Shell nav={nav} onLicences={onLicences}>
         <main className="page">
-          {g.error && <div className="error">{g.error}</div>}
+          {g.error && <Alert className="mb-4">{g.error}</Alert>}
           <NewGame
             busy={g.busy === "engine"}
             onStart={async (opts) => {
@@ -299,12 +305,12 @@ function GameApp({
             onMove={canMove ? g.move : undefined}
           />
           {g.error && (
-            <div className="error" role="alert">
+            <Alert>
               {g.error}{" "}
               <Button variant="link" onPress={g.dismissError}>
                 {m.dismiss()}
               </Button>
-            </div>
+            </Alert>
           )}
         </div>
         <aside className="panel">
@@ -336,7 +342,7 @@ function GameApp({
               <div className="move-actions">
                 <Button onPress={undo} isDisabled={!g.canUndo} aria-keyshortcuts="Control+Z Meta+Z">
                   {m.moves_undo()}{" "}
-                  <kbd aria-hidden="true">{APPLE ? m.shortcut_undo_apple() : m.shortcut_undo()}</kbd>
+                  <Kbd aria-hidden>{APPLE ? m.shortcut_undo_apple() : m.shortcut_undo()}</Kbd>
                 </Button>
                 <Button
                   onPress={redo}
@@ -344,7 +350,7 @@ function GameApp({
                   aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
                 >
                   {m.moves_redo()}{" "}
-                  <kbd aria-hidden="true">{APPLE ? m.shortcut_redo_apple() : m.shortcut_redo()}</kbd>
+                  <Kbd aria-hidden>{APPLE ? m.shortcut_redo_apple() : m.shortcut_redo()}</Kbd>
                 </Button>
               </div>
               <p className="muted small">{m.panel_play_hint()}</p>
@@ -352,20 +358,14 @@ function GameApp({
                 <ParaglideMessage
                   message={m.board_keyboard_hint}
                   inputs={{}}
-                  markup={{ kbd: ({ children }) => <kbd>{children}</kbd> }}
+                  markup={{ kbd: ({ children }) => <Kbd>{children}</Kbd> }}
                 />
               </p>
             </>
           )}
         </aside>
       </main>
-      <div className="toasts" aria-live="polite">
-        {g.toasts.map((t) => (
-          <div key={t.id} className={`toast ${t.tone}`}>
-            {t.text}
-          </div>
-        ))}
-      </div>
+      <Toasts toasts={g.toasts} />
     </Shell>
   );
 }

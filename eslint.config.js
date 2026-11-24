@@ -65,12 +65,11 @@ export default tseslint.config(
     },
   },
   {
-    // Controls come from apps/web/src/ui/ (docs/design/components.md). A warning until every
-    // screen is moved; then an error.
+    // Controls come from apps/web/src/ui/ (docs/design/components.md).
     files: ["apps/web/src/**/*.tsx"],
     ignores: ["apps/web/src/ui/**"],
     rules: {
-      "ui-components/no-raw-controls": "warn",
+      "ui-components/no-raw-controls": "error",
       "no-restricted-imports": [
         "error",
         {

@@ -277,16 +277,16 @@ export function Board({
                 aria-selected={square === selected ? true : undefined}
                 onFocus={() => setFocused(square)}
               >
-                <span className="visually-hidden">{describe(square)}</span>
+                <span className="sr-only">{describe(square)}</span>
               </div>
             ))}
           </div>
         ))}
       </div>
-      <p id={describedBy} className="visually-hidden" aria-live="polite">
+      <p id={describedBy} className="sr-only" aria-live="polite">
         {lastMoveText}
       </p>
-      <p className="visually-hidden" aria-live="polite">
+      <p className="sr-only" aria-live="polite">
         {announcement}
       </p>
     </div>

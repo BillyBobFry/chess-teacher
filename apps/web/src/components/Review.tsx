@@ -1,12 +1,14 @@
 import { lessonMove, playedLine, type Lesson, type SessionState } from "@chess-teacher/core";
 import { moveText, principleTitle } from "@chess-teacher/lesson-text";
 import { useState } from "react";
+import type { Key } from "../ui/Disclosure.tsx";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import { Button } from "../ui/Button.tsx";
+import { Disclosure, DisclosureGroup } from "../ui/Disclosure.tsx";
 
 /** What became of a lesson; `tick` marks the outcomes the player can be pleased with. */
 function outcome(l: Lesson): { text: string; tick: boolean } {
@@ -37,7 +39,7 @@ export function Review({
   onProgress?: () => void;
 }) {
   const lessons = state.lessons.filter((l) => l.status !== "rewound");
-  const [open, setOpen] = useState<number | null>(null);
+  const [open, setOpen] = useState<Key | null>(null);
   const locale = getLocale();
   return (
     <section className="review">
@@ -46,34 +48,35 @@ export function Review({
       {lessons.length === 0 ? (
         <p>{m.review_none()}</p>
       ) : (
-        <ul className="review-list">
+        <DisclosureGroup className="mb-4" expanded={open} onExpandedChange={setOpen}>
           {lessons.map((l) => {
             const o = outcome(l);
             return (
-              <li key={l.id}>
-                <button
-                  className="review-item"
-                  aria-expanded={open === l.id}
-                  onClick={() => setOpen(open === l.id ? null : l.id)}
-                >
-                  <span className="review-move">{moveText(lessonMove(l), locale)}</span>
-                  <span className="review-principle">{principleTitle(l.principle, locale)}</span>
-                  <span className="review-outcome">
-                    {o.text}
-                    {o.tick && <span aria-hidden> ✓</span>}
+              <Disclosure
+                key={l.id}
+                id={l.id}
+                summary={
+                  <span className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-0.5">
+                    <span className="row-span-2 font-semibold">{moveText(lessonMove(l), locale)}</span>
+                    <span>{principleTitle(l.principle, locale)}</span>
+                    <span className="text-sm text-fg-muted">
+                      {o.text}
+                      {o.tick && <span aria-hidden> ✓</span>}
+                    </span>
                   </span>
-                </button>
+                }
+              >
                 {open === l.id && (
-                  <div className="review-detail">
+                  <>
                     <Explanation lesson={l} />
                     <Futures lesson={l} played={playedLine(state, l)} />
                     <LessonFeedback gameId={gameId} lessonId={l.id} />
-                  </div>
+                  </>
                 )}
-              </li>
+              </Disclosure>
             );
           })}
-        </ul>
+        </DisclosureGroup>
       )}
       <div className="actions">
         <Button variant="primary" onPress={onNewGame}>

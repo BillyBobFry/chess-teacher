@@ -35,7 +35,12 @@ export function MoveList({
     return (
       <span>
         {move ? (
-          <MoveButton move={move} orientation={orientation}>
+          // In a list rather than a sentence, so it can take a full 44px target (UX-23).
+          <MoveButton
+            move={move}
+            orientation={orientation}
+            className="pointer-coarse:min-h-11 pointer-coarse:min-w-11"
+          >
             {move.san}
           </MoveButton>
         ) : (

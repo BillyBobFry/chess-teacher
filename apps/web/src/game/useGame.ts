@@ -33,15 +33,10 @@ import { errorText } from "../api/errors.ts";
 import { getEngines } from "../engine/engines.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
+import type { ToastMessage } from "../ui/Toast.tsx";
 import { ConflictError, Saver, createGame, loadActiveGame, type SavedGame } from "./storage.ts";
 
 export type Busy = null | "loading" | "engine" | "preparing" | "checking" | "opponent";
-
-export interface Toast {
-  id: number;
-  text: string;
-  tone: "good" | "info";
-}
 
 export interface NewGameOptions {
   colour: Colour | "random";
@@ -62,7 +57,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState<Busy>("loading");
   const [pendingMove, setPendingMove] = useState<string | null>(null);
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [me, setMe] = useState<MeResponse | null>(null);
   const running = useRef(false);
@@ -146,7 +141,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
     saver.current?.save(next);
   }, []);
 
-  const toast = useCallback((text: string, tone: Toast["tone"] = "info") => {
+  const toast = useCallback((text: string, tone: ToastMessage["tone"] = "info") => {
     const id = ++toastId;
     setToasts((t) => [...t, { id, text, tone }]);
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 6000);
@@ -177,7 +172,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
             lesson.kind === "consequence"
               ? m.toast_fixed({ move: moveText(lessonMove(lesson), getLocale()) })
               : m.toast_found_chance({ move: moveText(lessonMove(lesson), getLocale()) }),
-            "good",
+            "success",
           );
         } else if (e.kind === "warning") {
           toast(m.toast_opponent_spotted());

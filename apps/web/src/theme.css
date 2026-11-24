@@ -39,8 +39,12 @@
   --color-critical-pressed: color-mix(in srgb, var(--color-critical) 78%, black);
 
   --radius-*: initial;
+  --radius-inline: 4px;
   --radius-control: 8px;
   --radius-panel: 10px;
+
+  /* Behind a modal dialog, in light and dark. */
+  --color-backdrop: rgb(0 0 0 / 0.45);
 
   --shadow-*: initial;
   --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 14px rgb(0 0 0 / 0.06);
