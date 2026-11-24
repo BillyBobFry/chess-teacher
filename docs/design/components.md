@@ -7,9 +7,9 @@ theme of semantic tokens, and one folder of wrapped controls (D15 in
 
 ## Two folders
 
-- **`apps/web/src/ui/`: primitives.** One file per control (`Button.tsx`, later `Dialog.tsx`,
-  `RadioGroup.tsx`, `Switch.tsx`, `TextField.tsx`, `Toast.tsx`...). Each wraps a React Aria
-  component and owns all of its styling. This folder is the list of what exists.
+- **`apps/web/src/ui/`: primitives.** One file per control (`Button.tsx`, `Dialog.tsx`,
+  `Menu.tsx`, `RadioGroup.tsx`, `TextField.tsx`...). Each wraps a React Aria component where
+  React Aria has one, and owns all of its styling. This folder is the list of what exists.
 - **`apps/web/src/components/`: features.** Screens and pieces of the game (`Reveal`,
   `NewGame`, `Futures`). They compose primitives and lay them out with Tailwind utilities.
 
@@ -95,6 +95,8 @@ there.
 
 `apps/web/src/styles.css` holds the styles from before D15, in a cascade layer below Tailwind's
 utilities. Don't add rules to it. When you change a screen, move what you touch to primitives and
-utilities and delete the rules it no longer needs. Lint warns (rather than errors) on raw
-controls until every screen is moved; Tailwind's base reset (preflight) is switched on in the
-same change that deletes the last of `styles.css`.
+utilities and delete the rules it no longer needs. Every control already comes from `ui/`;
+what's left in `styles.css` is feature layout and content styling. Tailwind's base reset
+(preflight) is switched on in the same change that deletes the last of it, so until then a
+primitive sets every property it relies on, including the background and border of a
+`<button>`.
