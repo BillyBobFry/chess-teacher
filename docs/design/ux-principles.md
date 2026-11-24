@@ -58,7 +58,7 @@ faded, and the reason is visible nearby. Disable only an action that cannot run 
 request in flight, the engine still thinking, a limit reached); never disable a submit because
 the form is not filled in correctly yet (UX-20). After a failed action the button is enabled
 again so the user can retry, and the error appears inline (UX-14). Each view has at most one
-primary button (`.primary`).
+primary button (`variant="primary"`).
 
 **UX-13 Success is contextual.** Prefer feedback where the change happened (a tick, the new item in
 the list, the board itself) over a toast. Use a toast only when there is no sensible place in
@@ -118,8 +118,8 @@ label or a hint.
 ## Interaction and motion
 
 **UX-22 Keyboard first.** Everything works with a keyboard, the board included (UX-100). Use
-semantic HTML and ARIA where HTML is not enough. Focus styles use `:focus-visible`, never
-`:focus`.
+semantic HTML and ARIA where HTML is not enough. Focus styles use keyboard focus only
+(`data-focus-visible` on React Aria components, otherwise `:focus-visible`), never `:focus`.
 
 **UX-23 Hit targets.** Interactive targets are at least 44 by 44px, and neighbouring targets at least
 8px apart. Touch has no hover, so nothing may depend on hover to be found or understood.
@@ -136,7 +136,7 @@ behave differently look different. Nothing that cannot be pressed is styled like
 alone (UX-36). Things that already look pressable need no underline.
 
 **UX-8 Hover is a surface step.** Cards and rows change background one neutral step on hover
-(`--surface` to `--surface-2`). The border and everything else stay as at rest: no coloured hover
+(`surface` to `surface-muted`). The border and everything else stay as at rest: no coloured hover
 border, no hover shadow.
 
 **UX-45 An open menu's trigger looks active.** While a menu is open, its trigger holds its hover look,
@@ -226,12 +226,12 @@ under about 20 words.
 
 ## Typography
 
-**UX-34 Contrast through extremes.** Make hierarchy clear with weight, size and colour (`--text`
-against `--muted`) used boldly, not many small steps. When the important thing does not stand out,
+**UX-34 Contrast through extremes.** Make hierarchy clear with weight, size and colour (`fg`
+against `fg-muted`) used boldly, not many small steps. When the important thing does not stand out,
 first quieten what competes with it before making it louder.
 
-**UX-47 Text on a fill uses that fill's colours.** `--muted` is for neutral surfaces; on a tinted
-fill (`--warn-bg`, `--chance-bg`, `--good-bg`) text uses `--text` or the fill's own colour. Never
+**UX-47 Text on a fill uses that fill's colours.** `fg-muted` is for neutral surfaces; on a tinted
+fill (`warning-subtle`, `chance-subtle`, `success-subtle`) text uses `fg` or the fill's own colour. Never
 lower text contrast with `opacity`.
 
 **UX-48 Labels are a last resort.** When showing data rather than asking for it, fold the label into
@@ -252,7 +252,9 @@ longer is start-aligned (`text-align: start`). One text alignment per view.
 **UX-36 Never colour alone.** Every status has text or a shape as well as a colour. Decorative
 icons are `aria-hidden`; icon-only buttons have a label. On the board this means UX-101.
 
-**UX-37 Reuse components.** Check `apps/web/src/components/` before building a control. An optional
+**UX-37 Controls come from `ui/`.** Every control is a primitive in `apps/web/src/ui/`, wrapping
+React Aria Components (D15); feature code never builds its own. If one is missing, add it to `ui/`
+first. How to write one, and the tokens it may use: [`components.md`](components.md). An optional
 prop with a default must be what nearly every caller wants and environment-agnostic; behaviour
 tied to one caller, endpoint or flow is a required prop.
 
