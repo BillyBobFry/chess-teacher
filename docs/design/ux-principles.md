@@ -327,16 +327,18 @@ figurines (♘f3) in that formatter. A move's accessible name reads it in words 
 Parts of the current UI don't meet these rules yet. Fix them when you touch that code, not as
 drive-by changes in an unrelated PR:
 
-- UX-15: "New game" during a game uses `window.confirm`.
 - UX-31: emoji and symbol glyphs as icons (👍 👎 ⚠ ⏳ ✓ and the stepper's ⏮ ◀ ▶ ⏭); there is no icon
   set yet.
 - UX-32: the landing page (`apps/web/landing/`) is static English HTML. The sample explanation
-  that the fake LLM writes in development (`FAKE_LLM=1`) is English whatever the locale.
+  that the fake LLM writes in development (`FAKE_LLM=1`) is English whatever the locale. When a
+  piece is dragged with the pointer, react-chessboard's drag library (dnd-kit) announces it to
+  screen readers in its own English; react-chessboard doesn't let us replace that text.
+  Keyboard moves don't use it.
 - UX-41: an AI explanation is written once, in the locale it was first asked for; changing
   locale later doesn't rewrite it. Lessons in games saved before lesson text moved to the
   catalogue keep their trigger sentence in English when the game was rewound past it.
 - UX-60: some existing copy says "please" in errors; reword it when you touch it.
-- UX-100: moves can't be made with a keyboard, and the board isn't described to screen readers.
-- UX-106: moves have no spoken form yet. Lesson moves go through `moveText()` in
-  `@chess-teacher/lesson-text`, but the move list, the futures boards and the lines sent to the
-  LLM still use SAN from `packages/core` directly.
+- UX-106: the board reads moves in words (`spokenMove` in `apps/web/src/lib/moves.ts`), and
+  lesson moves go through `moveText()` in `@chess-teacher/lesson-text`, but lesson moves have no
+  spoken form yet. The move list, the lines under the futures boards and the lines sent to the
+  LLM show SAN from `packages/core` directly, with no spoken form.

@@ -17,7 +17,18 @@
   "result_ended": "Game ended.",
   "nav_end_game": "End game",
   "nav_new_game": "New game",
-  "confirm_abandon": "Abandon this game and start a new one?",
+  "confirm_abandon_title": "Abandon this game?",
+  "confirm_abandon_body": [
+    {
+      "declarations": ["input moveNumber", "local moveCount = moveNumber: number"],
+      "selectors": [],
+      "match": {
+        "": "You're on move {moveCount}. Starting a new game ends this one for good."
+      }
+    }
+  ],
+  "confirm_abandon_confirm": "Abandon game",
+  "confirm_abandon_cancel": "Keep playing",
   "account_menu": "Account",
   "account_allowance": [
     {
@@ -71,28 +82,6 @@
   "field_email": "Email",
   "field_password": "Password",
   "error_generic": "Something went wrong. Try again.",
-  "error_network": "Couldn't reach the server. Check your connection, then try again.",
-  "error_api_internal": "Something went wrong on our side. Try again in a moment.",
-  "error_api_not_signed_in": "You've been signed out. Reload the page to sign in again.",
-  "error_api_invalid_request": "The server couldn't read that request. Reload the page and try again.",
-  "error_api_game_too_large": "This game is too long to save. Start a new game to keep playing.",
-  "error_api_illegal_move": "This game couldn't be saved: the server found an illegal move in it.",
-  "error_api_not_found": "That game couldn't be found. Reload the page to see your current game.",
-  "error_api_malformed_lesson": "This lesson couldn't be explained.",
-  "auth_error_invalid_credentials": "That email and password don't match an account. Check them and try again.",
-  "auth_error_invalid_email": "Enter an email address, like name@example.com.",
-  "auth_error_email_taken": "There's already an account with that email. Sign in instead.",
-  "auth_error_password_too_short": [
-    {
-      "declarations": ["input min", "local minCount = min: number"],
-      "selectors": [],
-      "match": {
-        "": "Use a password with at least {minCount} characters."
-      }
-    }
-  ],
-  "auth_error_password_too_long": "That password is too long. Use a shorter one.",
-  "auth_error_rate_limited": "Too many attempts. Wait a minute, then try again.",
   "sign_in_submit": "Sign in",
   "sign_up_submit": "Create account",
   "sign_in_new_here": "New here?",
@@ -277,6 +266,67 @@
   "licences_item": "{component}: {licence}",
   "licences_stockfish_heading": "Stockfish",
   "licences_item_pieces": "{component} (including its piece set): {licence}",
+  "board_game": "Game board",
+  "board_keyboard_hint": "With a keyboard: {#kbd}Tab{/kbd} to the board, the {#kbd}arrow keys{/kbd} to move between squares, and {#kbd}Enter{/kbd} to pick up a piece and put it down.",
+  "board_empty": "empty",
+  "board_mark_last_move": "last move",
+  "board_mark_target": "you can move here",
+  "board_mark_capture": "you can capture here",
+  "board_mark_lesson": "part of the lesson",
+  "board_last_move_white": "White's last move: {move}",
+  "board_last_move_black": "Black's last move: {move}",
+  "board_selected": "Picked up {piece} on {square}. It can move to {targets}.",
+  "board_selected_stuck": "Picked up {piece} on {square}. It has no legal moves.",
+  "board_put_down": "Put the piece down.",
+  "board_pick_own": "Pick up one of your own pieces first.",
+  "piece_white_pawn": "white pawn",
+  "piece_white_knight": "white knight",
+  "piece_white_bishop": "white bishop",
+  "piece_white_rook": "white rook",
+  "piece_white_queen": "white queen",
+  "piece_white_king": "white king",
+  "piece_black_pawn": "black pawn",
+  "piece_black_knight": "black knight",
+  "piece_black_bishop": "black bishop",
+  "piece_black_rook": "black rook",
+  "piece_black_queen": "black queen",
+  "piece_black_king": "black king",
+  "piece_pawn": "pawn",
+  "piece_knight": "knight",
+  "piece_bishop": "bishop",
+  "piece_rook": "rook",
+  "piece_queen": "queen",
+  "piece_king": "king",
+  "move_spoken": "{piece} to {square}",
+  "move_spoken_capture": "{piece} takes {captured} on {square}",
+  "move_spoken_promotion": "pawn to {square}, promotes to {promoted}",
+  "move_spoken_capture_promotion": "pawn takes {captured} on {square}, promotes to {promoted}",
+  "move_spoken_castle_kingside": "castles kingside",
+  "move_spoken_castle_queenside": "castles queenside",
+  "move_spoken_check": "{move}, check",
+  "move_spoken_checkmate": "{move}, checkmate",
+  "error_network": "Couldn't reach the server. Check your connection, then try again.",
+  "error_api_internal": "Something went wrong on our side. Try again in a moment.",
+  "error_api_not_signed_in": "You've been signed out. Reload the page to sign in again.",
+  "error_api_invalid_request": "The server couldn't read that request. Reload the page and try again.",
+  "error_api_game_too_large": "This game is too long to save. Start a new game to keep playing.",
+  "error_api_illegal_move": "This game couldn't be saved: the server found an illegal move in it.",
+  "error_api_not_found": "That game couldn't be found. Reload the page to see your current game.",
+  "error_api_malformed_lesson": "This lesson couldn't be explained.",
+  "auth_error_invalid_credentials": "That email and password don't match an account. Check them and try again.",
+  "auth_error_invalid_email": "Enter an email address, like name@example.com.",
+  "auth_error_email_taken": "There's already an account with that email. Sign in instead.",
+  "auth_error_password_too_short": [
+    {
+      "declarations": ["input min", "local minCount = min: number"],
+      "selectors": [],
+      "match": {
+        "": "Use a password with at least {minCount} characters."
+      }
+    }
+  ],
+  "auth_error_password_too_long": "That password is too long. Use a shorter one.",
+  "auth_error_rate_limited": "Too many attempts. Wait a minute, then try again.",
   "principle_hanging_title": "Don't leave pieces undefended",
   "principle_hanging_text": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
   "principle_safety_title": "Check checks, captures and threats",

@@ -20,6 +20,10 @@
   --sq-selected: rgba(47, 111, 79, 0.55);
   --sq-target: rgba(20, 60, 40, 0.38);
   --sq-marked: rgba(181, 84, 28, 0.85);
+  --sq-last-edge: rgba(150, 120, 10, 0.9);
+  --sq-selected-edge: #1f5a3c;
+  --danger: #b42318;
+  --danger-text: #ffffff;
   --arrow-yours: #c2552b;
   --arrow-better: #2f8f5f;
 
@@ -46,6 +50,8 @@
     --good-bg: #1c3227;
     --sq-light: #d9c7a6;
     --sq-dark: #94704d;
+    --danger: #f97066;
+    --danger-text: #2a0d0a;
     color-scheme: dark;
   }
 }
@@ -251,8 +257,158 @@ main.game {
   gap: 0.6rem;
 }
 .board {
+  position: relative;
   width: 100%;
   aspect-ratio: 1;
+  /* The marks are shapes drawn with backgrounds: keep them in forced-colours mode too. */
+  forced-color-adjust: none;
+}
+
+/* Board marks (UX-101): each differs by shape, not just colour. Drawn under the piece. */
+.sq {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.sq-piece {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+.sq-mark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* Last move: a tint with a triangle in two opposite corners. */
+.sq-last {
+  background:
+    linear-gradient(135deg, var(--sq-last-edge) 0 18%, transparent 18%),
+    linear-gradient(315deg, var(--sq-last-edge) 0 18%, transparent 18%), var(--sq-last);
+}
+/* Selected: a tint with a solid square ring. */
+.sq-selected {
+  background: var(--sq-selected);
+  box-shadow: inset 0 0 0 3px var(--sq-selected-edge);
+}
+/* Lesson squares: diagonal stripes. */
+.sq-lesson {
+  background: repeating-linear-gradient(-45deg, var(--sq-marked) 0 3px, transparent 3px 9px);
+}
+/* Where the selected piece can go: a dot, or a ring around a piece it can capture. */
+.sq-target {
+  background: radial-gradient(circle, var(--sq-target) 22%, transparent 24%);
+}
+.sq-capture {
+  background: radial-gradient(circle, transparent 62%, var(--sq-target) 64%);
+  z-index: 2;
+}
+
+/* The keyboard and screen-reader layer: an invisible grid over the squares. Pointer events
+   go through it to the board underneath. */
+.board-grid {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+.board-row {
+  display: flex;
+  flex: 1;
+}
+.board-cell {
+  flex: 1;
+  border-radius: 2px;
+}
+.board-cell:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: -3px;
+  box-shadow: inset 0 0 0 5px var(--surface);
+}
+
+.visually-hidden:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+kbd {
+  font: inherit;
+  font-size: 0.85em;
+  padding: 0 0.3em;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* ---------- confirm dialog (UX-15) */
+
+dialog.confirm {
+  max-inline-size: min(28rem, calc(100vw - 32px));
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+dialog.confirm:modal {
+  overscroll-behavior: contain;
+}
+dialog.confirm::backdrop {
+  background: rgb(0 0 0 / 0.45);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+dialog.confirm h1 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  margin: 0 0 0.5rem;
+}
+dialog.confirm p {
+  margin: 0 0 1.25rem;
+  max-inline-size: 65ch;
+}
+.confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.confirm-actions button {
+  min-block-size: 44px;
+}
+button.danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--danger-text);
+  font-weight: 600;
+}
+button.danger:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 88%, black);
+}
+button.danger:active:not(:disabled) {
+  background: color-mix(in srgb, var(--danger) 78%, black);
+}
+@media (prefers-color-scheme: dark) {
+  button.danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--danger) 88%, white);
+  }
+  button.danger:active:not(:disabled) {
+    background: color-mix(in srgb, var(--danger) 78%, white);
+  }
 }
 .status {
   font-weight: 600;

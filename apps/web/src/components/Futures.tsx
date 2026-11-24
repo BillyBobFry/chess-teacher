@@ -1,23 +1,23 @@
-import { Game, sanOf, uciParts, type Lesson } from "@chess-teacher/core";
+import { Game, uciParts, type Lesson } from "@chess-teacher/core";
+import type { Move } from "chess.js";
 import { useMemo, useState } from "react";
 import { Board } from "./Board.tsx";
 import { m } from "../paraglide/messages.js";
 
 interface Line {
   fens: string[];
-  sans: string[];
+  moves: Move[];
 }
 
 function walk(fenBefore: string, line: string[]): Line {
   const game = new Game(fenBefore);
   const fens = [game.fen];
-  const sans: string[] = [];
-  for (const m of line) {
-    sans.push(sanOf(game.fen, m));
-    game.push(m);
+  const moves: Move[] = [];
+  for (const uci of line) {
+    moves.push(game.push(uci));
     fens.push(game.fen);
   }
-  return { fens, sans };
+  return { fens, moves };
 }
 
 /**
@@ -36,22 +36,21 @@ export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] 
 
   const view = (line: Line, moves: string[], colour: string) => {
     const i = Math.min(step, moves.length);
-    const last = i > 0 ? uciParts(moves[i - 1]!) : null;
     const first = uciParts(moves[0]!);
     return {
       fen: line.fens[i]!,
-      lastMove: last ? ([last.from, last.to] as [string, string]) : null,
+      lastMove: i > 0 ? line.moves[i - 1] : null,
       arrows: i === 0 ? [{ from: first.from, to: first.to, color: colour }] : [],
     };
   };
   const a = view(mine, yourMoves, "#c2552b");
   const b = view(better, lesson.bestLine, "#2f8f5f");
 
-  const sanLine = (sans: string[]) => (
+  const sanLine = (moves: Move[]) => (
     <ol className="line">
-      {sans.map((s, i) => (
+      {moves.map((mv, i) => (
         <li key={i} className={i < step ? "played" : i === step ? "next" : ""}>
-          {s}
+          {mv.san}
         </li>
       ))}
     </ol>
@@ -65,25 +64,27 @@ export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] 
           <figcaption>{real ? m.futures_what_happened() : m.futures_your_move()}</figcaption>
           <Board
             id={`yours-${lesson.id}`}
+            label={real ? m.futures_what_happened() : m.futures_your_move()}
             fen={a.fen}
             orientation={orientation}
             lastMove={a.lastMove}
             arrows={a.arrows}
             showNotation={false}
           />
-          {sanLine(mine.sans)}
+          {sanLine(mine.moves)}
         </figure>
         <figure>
           <figcaption>{m.futures_better()}</figcaption>
           <Board
             id={`better-${lesson.id}`}
+            label={m.futures_better()}
             fen={b.fen}
             orientation={orientation}
             lastMove={b.lastMove}
             arrows={b.arrows}
             showNotation={false}
           />
-          {sanLine(better.sans)}
+          {sanLine(better.moves)}
         </figure>
       </div>
       <div className="stepper" role="group" aria-label={m.futures_stepper()}>
