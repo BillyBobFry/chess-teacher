@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { NewGameOptions } from "../game/useGame.ts";
 import { m } from "../paraglide/messages.js";
+import { Button } from "../ui/Button.tsx";
 
 const STRENGTHS = [
   { skill: 0, label: m.strength_gentle, note: m.strength_gentle_note },
@@ -64,13 +65,14 @@ export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => voi
         {m.new_game_warn()}
       </label>
 
-      <button
-        className="primary big"
-        disabled={busy}
-        onClick={() => onStart({ colour, opponentSkill: skill, easy })}
+      <Button
+        variant="primary"
+        size="large"
+        isDisabled={busy}
+        onPress={() => onStart({ colour, opponentSkill: skill, easy })}
       >
         {busy ? m.busy_engine() : m.new_game_start()}
-      </button>
+      </Button>
     </section>
   );
 }

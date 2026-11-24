@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { authClient } from "../api/client.ts";
 import { authErrorText } from "../api/errors.ts";
 import { m } from "../paraglide/messages.js";
+import { Button } from "../ui/Button.tsx";
 
 export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
@@ -33,10 +34,10 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
 
       {googleEnabled && (
         <>
-          <button className="google" onClick={google} disabled={busy}>
+          <Button className="mt-4 w-full" onPress={google} isDisabled={busy}>
             {/* Google's mark, not text. */}
             <span aria-hidden>{"G"}</span> {m.sign_in_google()}
-          </button>
+          </Button>
           <div className="divider">
             <span>{m.sign_in_or()}</span>
           </div>
@@ -76,22 +77,22 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
             {error}
           </p>
         )}
-        <button className="primary big" type="submit" disabled={busy}>
+        <Button variant="primary" size="large" type="submit" isDisabled={busy}>
           {mode === "signIn" ? m.sign_in_submit() : m.sign_up_submit()}
-        </button>
+        </Button>
       </form>
 
       <p className="switch">
         {mode === "signIn" ? m.sign_in_new_here() : m.sign_up_have_account()}{" "}
-        <button
-          className="link"
-          onClick={() => {
+        <Button
+          variant="link"
+          onPress={() => {
             setMode(mode === "signIn" ? "signUp" : "signIn");
             setError(null);
           }}
         >
           {mode === "signIn" ? m.sign_in_to_sign_up() : m.sign_in_submit()}
-        </button>
+        </Button>
       </p>
     </section>
   );

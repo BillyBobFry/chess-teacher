@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api/client.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
+import { Button } from "../ui/Button.tsx";
 
 /** Which principles keep coming up, and how you're doing with them. */
 export function Progress({ onBack }: { onBack: () => void }) {
@@ -66,7 +67,7 @@ export function Progress({ onBack }: { onBack: () => void }) {
           </ul>
         </>
       )}
-      <button onClick={onBack}>{m.back()}</button>
+      <Button onPress={onBack}>{m.back()}</Button>
     </section>
   );
 }

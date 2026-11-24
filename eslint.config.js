@@ -3,6 +3,7 @@ import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 import { builtinModules } from "node:module";
+import { uiComponents } from "./eslint/ui-components.js";
 import { uiText } from "./eslint/ui-text.js";
 
 const nodeBuiltins = [...builtinModules, ...builtinModules.map((m) => `node:${m}`)];
@@ -55,9 +56,33 @@ export default tseslint.config(
   },
   {
     files: ["apps/web/src/**/*.{ts,tsx}"],
-    plugins: { "react-hooks": reactHooks, "ui-text": uiText },
+    plugins: { "react-hooks": reactHooks, "ui-text": uiText, "ui-components": uiComponents },
     languageOptions: { globals: globals.browser },
-    rules: { ...reactHooks.configs.recommended.rules, "ui-text/no-jsx-text": "error" },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      "ui-text/no-jsx-text": "error",
+      "ui-components/no-arbitrary-colours": "error",
+    },
+  },
+  {
+    // Controls come from apps/web/src/ui/ (docs/design/components.md). A warning until every
+    // screen is moved; then an error.
+    files: ["apps/web/src/**/*.tsx"],
+    ignores: ["apps/web/src/ui/**"],
+    rules: {
+      "ui-components/no-raw-controls": "warn",
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "react-aria-components",
+              message: "Use the primitives in apps/web/src/ui/; only they import React Aria.",
+            },
+          ],
+        },
+      ],
+    },
   },
   {
     files: [

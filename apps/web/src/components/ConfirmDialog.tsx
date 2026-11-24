@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef } from "react";
+import { Button } from "../ui/Button.tsx";
 
 interface Props {
   open: boolean;
@@ -41,12 +42,15 @@ export function ConfirmDialog({ open, title, body, confirmLabel, cancelLabel, on
     >
       <h1 id={titleId}>{title}</h1>
       <p>{body}</p>
-      {/* Cancel comes first so showModal() focuses it: the safe choice is the default. */}
+      {/* Cancel comes first so showModal() focuses it: the safe choice is the default. Both
+          submit, so the dialog closes with the button's value. */}
       <form method="dialog" className="confirm-actions">
-        <button value="cancel">{cancelLabel}</button>
-        <button value="confirm" className="danger">
+        <Button type="submit" value="cancel">
+          {cancelLabel}
+        </Button>
+        <Button type="submit" value="confirm" variant="critical">
           {confirmLabel}
-        </button>
+        </Button>
       </form>
     </dialog>
   );

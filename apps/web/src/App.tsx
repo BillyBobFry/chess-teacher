@@ -10,6 +10,7 @@ import { MoveList } from "./components/MoveList.tsx";
 import { NewGame } from "./components/NewGame.tsx";
 import { Progress } from "./components/Progress.tsx";
 import { Reveal } from "./components/Reveal.tsx";
+import { Button } from "./ui/Button.tsx";
 import { Review } from "./components/Review.tsx";
 import { SignIn } from "./components/SignIn.tsx";
 import { useGame, type Busy } from "./game/useGame.ts";
@@ -63,17 +64,21 @@ function Shell({
 }) {
   return (
     <div className="app">
-      <header className="top">
-        <a className="brand" href="/app/">
-          <span aria-hidden>♞</span> {m.app_name()}
+      {/* Wraps rather than scrolls: on a narrow phone the nav takes a second line (UX-40). */}
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border bg-surface px-4 py-3 max-sm:px-3 max-sm:py-2">
+        <a className="text-lg font-bold whitespace-nowrap text-fg no-underline" href="/app/">
+          <span className="me-1 text-2xl" aria-hidden>
+            ♞
+          </span>{" "}
+          {m.app_name()}
         </a>
-        <nav>{nav}</nav>
+        <nav className="ms-auto flex items-center gap-2">{nav}</nav>
       </header>
       {children}
       <footer className="bottom">
-        <button className="link" onClick={onLicences}>
+        <Button variant="link" onPress={onLicences}>
           {m.footer_licences()}
-        </button>
+        </Button>
       </footer>
     </div>
   );
@@ -174,14 +179,14 @@ function GameApp({
   const nav = (
     <>
       {saved && !saved.finished && !choosing && (
-        <button onClick={() => g.endGame()} disabled={!!saved.reveal}>
+        <Button onPress={() => g.endGame()} isDisabled={!!saved.reveal}>
           {m.nav_end_game()}
-        </button>
+        </Button>
       )}
       {saved && !choosing && (
-        <button onClick={() => (saved.finished ? setChoosing(true) : setConfirmingAbandon(true))}>
+        <Button onPress={() => (saved.finished ? setChoosing(true) : setConfirmingAbandon(true))}>
           {m.nav_new_game()}
-        </button>
+        </Button>
       )}
       {saved && board && (
         <ConfirmDialog
@@ -208,17 +213,17 @@ function GameApp({
               })}
             </div>
           )}
-          <button
-            onClick={(e) => {
-              e.currentTarget.closest("details")?.removeAttribute("open");
+          <Button
+            onPress={(e) => {
+              e.target.closest("details")?.removeAttribute("open");
               setShowProgress(true);
             }}
           >
             {m.account_progress()}
-          </button>
-          <button onClick={() => void authClient.signOut().then(() => window.location.reload())}>
+          </Button>
+          <Button onPress={() => void authClient.signOut().then(() => window.location.reload())}>
             {m.account_sign_out()}
-          </button>
+          </Button>
         </div>
       </details>
     </>
@@ -255,9 +260,9 @@ function GameApp({
             }}
           />
           {saved && choosing && (
-            <button className="link back" onClick={() => setChoosing(false)}>
+            <Button variant="link" className="mt-4" onPress={() => setChoosing(false)}>
               {m.game_back_to_current()}
-            </button>
+            </Button>
           )}
         </main>
       </Shell>
@@ -296,9 +301,9 @@ function GameApp({
           {g.error && (
             <div className="error" role="alert">
               {g.error}{" "}
-              <button className="link" onClick={g.dismissError}>
+              <Button variant="link" onPress={g.dismissError}>
                 {m.dismiss()}
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -329,18 +334,18 @@ function GameApp({
               <h2 className="panel-title">{m.panel_moves()}</h2>
               <MoveList startFen={state.startFen} moves={state.moves} orientation={orientation} />
               <div className="move-actions">
-                <button onClick={undo} disabled={!g.canUndo} aria-keyshortcuts="Control+Z Meta+Z">
+                <Button onPress={undo} isDisabled={!g.canUndo} aria-keyshortcuts="Control+Z Meta+Z">
                   {m.moves_undo()}{" "}
                   <kbd aria-hidden="true">{APPLE ? m.shortcut_undo_apple() : m.shortcut_undo()}</kbd>
-                </button>
-                <button
-                  onClick={redo}
-                  disabled={!g.canRedo}
+                </Button>
+                <Button
+                  onPress={redo}
+                  isDisabled={!g.canRedo}
                   aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
                 >
                   {m.moves_redo()}{" "}
                   <kbd aria-hidden="true">{APPLE ? m.shortcut_redo_apple() : m.shortcut_redo()}</kbd>
-                </button>
+                </Button>
               </div>
               <p className="muted small">{m.panel_play_hint()}</p>
               <p className="muted small">

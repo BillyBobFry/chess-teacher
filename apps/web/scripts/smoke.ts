@@ -255,7 +255,7 @@ try {
     );
     await page.reload();
     await page.getByText("Can you find the move that caused it?").waitFor({ timeout: 30_000 });
-    const choices = page.locator(".choice");
+    const choices = page.locator(".choices").getByRole("button");
     const labels = await choices.allTextContents();
     await choices.nth(labels.length > 1 ? labels.length - 2 : 0).click();
     if ((await page.getByText(/^Hint:/).count()) === 0) {

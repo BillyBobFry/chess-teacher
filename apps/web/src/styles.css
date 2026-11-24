@@ -1,19 +1,8 @@
-:root {
-  --bg: #f6f4ef;
-  --surface: #ffffff;
-  --surface-2: #efece4;
-  --text: #22201c;
-  --muted: #6b665c;
-  --border: #dcd7cb;
-  --accent: #2f6f4f;
-  --accent-text: #ffffff;
-  --warn: #b5541c;
-  --warn-bg: #fbeadf;
-  --chance: #6a4fb3;
-  --chance-bg: #ece7f8;
-  --good: #2f6f4f;
-  --good-bg: #e2f1e8;
+/* Styles from before D15, layered below Tailwind's utilities by theme.css. Don't add rules here:
+   move what you touch to ui/ primitives and utilities (docs/design/components.md). */
 
+/* Board colours: only the board uses them, so they are not Tailwind tokens. */
+:root {
   --sq-light: #ecdcbf;
   --sq-dark: #b08a64;
   --sq-last: rgba(214, 190, 60, 0.55);
@@ -22,37 +11,14 @@
   --sq-marked: rgba(181, 84, 28, 0.85);
   --sq-last-edge: rgba(150, 120, 10, 0.9);
   --sq-selected-edge: #1f5a3c;
-  --danger: #b42318;
-  --danger-text: #ffffff;
   --arrow-yours: #c2552b;
   --arrow-better: #2f8f5f;
-
-  --radius: 10px;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 14px rgba(0, 0, 0, 0.06);
-  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #171614;
-    --surface: #211f1c;
-    --surface-2: #2b2925;
-    --text: #ece8e1;
-    --muted: #a39d92;
-    --border: #3a3732;
-    --accent: #5fb88a;
-    --accent-text: #10231a;
-    --warn: #f0965f;
-    --warn-bg: #3a2518;
-    --chance: #b9a4f5;
-    --chance-bg: #2a2440;
-    --good: #5fb88a;
-    --good-bg: #1c3227;
     --sq-light: #d9c7a6;
     --sq-dark: #94704d;
-    --danger: #f97066;
-    --danger-text: #2a0d0a;
-    color-scheme: dark;
   }
 }
 
@@ -63,52 +29,30 @@
 html,
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font:
-    16px/1.5 system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-fg);
+  font: 16px/1.5 var(--font-sans);
 }
 
 button {
   font: inherit;
   color: inherit;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 0.5rem 0.9rem;
   cursor: pointer;
 }
 button:hover:not(:disabled) {
-  border-color: var(--muted);
+  border-color: var(--color-fg-muted);
 }
 button:disabled {
   opacity: 0.5;
   cursor: default;
 }
-button.primary {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
-  font-weight: 600;
-}
-button.big {
-  padding: 0.8rem 1.4rem;
-  font-size: 1.05rem;
-}
-button.link {
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--accent);
-  text-decoration: underline;
-}
 
 .muted {
-  color: var(--muted);
+  color: var(--color-fg-muted);
 }
 .small {
   font-size: 0.875rem;
@@ -118,44 +62,6 @@ button.link {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-header.top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-}
-header.top nav {
-  display: flex;
-  gap: 0.5rem;
-}
-.brand {
-  border: none;
-  background: none;
-  font-weight: 700;
-  font-size: 1.1rem;
-  padding: 0;
-}
-.brand {
-  white-space: nowrap;
-}
-@media (max-width: 480px) {
-  header.top {
-    padding: 0.5rem 12px;
-  }
-  header.top nav button {
-    padding: 0.35rem 0.6rem;
-    font-size: 0.875rem;
-    white-space: nowrap;
-  }
-}
-.brand span {
-  font-size: 1.4rem;
-  margin-right: 0.2rem;
 }
 
 footer.bottom {
@@ -194,22 +100,22 @@ main.page {
 }
 .segmented {
   display: inline-flex;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
 }
 .segmented label {
   padding: 0.5rem 1rem;
   cursor: pointer;
-  background: var(--surface);
+  background: var(--color-surface);
 }
 .segmented label + label {
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--color-border);
 }
 .segmented label.on,
 .option.on {
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
 }
 .option.on .muted {
   color: inherit;
@@ -222,9 +128,9 @@ main.page {
 .option {
   display: block;
   padding: 0.7rem 0.9rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--surface);
+  background: var(--color-surface);
   cursor: pointer;
 }
 .toggle {
@@ -323,9 +229,9 @@ main.game {
   border-radius: 2px;
 }
 .board-cell:focus-visible {
-  outline: 3px solid var(--text);
+  outline: 3px solid var(--color-fg);
   outline-offset: -3px;
-  box-shadow: inset 0 0 0 5px var(--surface);
+  box-shadow: inset 0 0 0 5px var(--color-surface);
 }
 
 .visually-hidden:where(:not(:focus-within, :active)) {
@@ -344,11 +250,11 @@ kbd {
   font: inherit;
   font-size: 0.85em;
   padding: 0 0.3em;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border);
   border-bottom-width: 2px;
   border-radius: 4px;
-  background: var(--surface-2);
-  color: var(--text);
+  background: var(--color-surface-muted);
+  color: var(--color-fg);
   white-space: nowrap;
 }
 
@@ -357,11 +263,11 @@ kbd {
 dialog.confirm {
   max-inline-size: min(28rem, calc(100vw - 32px));
   padding: 1.25rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+  color: var(--color-fg);
+  box-shadow: var(--shadow-panel);
 }
 dialog.confirm:modal {
   overscroll-behavior: contain;
@@ -386,49 +292,25 @@ dialog.confirm p {
   justify-content: flex-end;
   gap: 0.5rem;
 }
-.confirm-actions button {
-  min-block-size: 44px;
-}
-button.danger {
-  background: var(--danger);
-  border-color: var(--danger);
-  color: var(--danger-text);
-  font-weight: 600;
-}
-button.danger:hover:not(:disabled) {
-  border-color: var(--danger);
-  background: color-mix(in srgb, var(--danger) 88%, black);
-}
-button.danger:active:not(:disabled) {
-  background: color-mix(in srgb, var(--danger) 78%, black);
-}
-@media (prefers-color-scheme: dark) {
-  button.danger:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--danger) 88%, white);
-  }
-  button.danger:active:not(:disabled) {
-    background: color-mix(in srgb, var(--danger) 78%, white);
-  }
-}
 .status {
   font-weight: 600;
   min-height: 1.5em;
 }
 .status.your-move {
-  color: var(--accent);
+  color: var(--color-primary);
 }
 .error {
-  background: var(--warn-bg);
-  color: var(--warn);
+  background: var(--color-warning-subtle);
+  color: var(--color-warning);
   padding: 0.6rem 0.8rem;
   border-radius: 8px;
 }
 
 .panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
   padding: 1rem;
   min-width: 0;
 }
@@ -453,10 +335,10 @@ button.danger:active:not(:disabled) {
   padding: 0.15rem 0.25rem;
 }
 .moves li:nth-child(odd) {
-  background: var(--surface-2);
+  background: var(--color-surface-muted);
 }
 .moves .n {
-  color: var(--muted);
+  color: var(--color-fg-muted);
 }
 .moves li {
   align-items: center;
@@ -474,15 +356,15 @@ button.move-button {
   background: none;
   color: inherit;
   text-decoration: underline dotted;
-  text-decoration-color: var(--muted);
+  text-decoration-color: var(--color-fg-muted);
   text-underline-offset: 0.2em;
 }
 button.move-button:hover {
-  background: color-mix(in srgb, var(--text) 10%, transparent);
+  background: color-mix(in srgb, var(--color-fg) 10%, transparent);
 }
 /* The popover is rendered in the body, out of reach of :has(), so React marks the open one. */
 button.move-button[data-open] {
-  background: color-mix(in srgb, var(--text) 10%, transparent);
+  background: color-mix(in srgb, var(--color-fg) 10%, transparent);
 }
 @media (pointer: coarse) {
   .moves button.move-button {
@@ -497,20 +379,17 @@ button.move-button[data-open] {
   gap: 0.5rem;
   margin: 0.75rem 0;
 }
-.move-actions button {
-  min-block-size: 44px;
-}
 
 /* ---------- a move's board, before it, with the move as an arrow */
 
 .move-preview {
   inline-size: min(16rem, calc(100vw - 32px));
   padding: 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface);
+  color: var(--color-fg);
+  box-shadow: var(--shadow-panel);
 }
 /* Without anchor positioning the popover keeps the browser's centred placement. */
 @supports (position-area: block-end) {
@@ -550,16 +429,16 @@ button.move-button[data-open] {
   margin: 0.2rem 0 0;
 }
 .reveal-headline.consequence {
-  background: var(--warn-bg);
+  background: var(--color-warning-subtle);
 }
 .reveal-headline.consequence h2 {
-  color: var(--warn);
+  color: var(--color-warning);
 }
 .reveal-headline.missed_chance {
-  background: var(--chance-bg);
+  background: var(--color-chance-subtle);
 }
 .reveal-headline.missed_chance h2 {
-  color: var(--chance);
+  color: var(--color-chance);
 }
 .reveal-icon {
   font-size: 1.4rem;
@@ -574,20 +453,17 @@ button.move-button[data-open] {
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
-.choice {
-  font-variant-numeric: tabular-nums;
-}
 .not-that {
-  color: var(--warn);
+  color: var(--color-warning);
   margin: 0.25rem 0;
 }
 .hint {
-  background: var(--surface-2);
+  background: var(--color-surface-muted);
   padding: 0.5rem 0.7rem;
   border-radius: 8px;
 }
 .found {
-  color: var(--good);
+  color: var(--color-success);
   font-weight: 600;
 }
 
@@ -602,14 +478,14 @@ button.move-button[data-open] {
   font-size: 0.925rem;
 }
 .facts dt {
-  color: var(--muted);
+  color: var(--color-fg-muted);
 }
 .facts dd {
   margin: 0;
 }
 .principle {
-  border-left: 4px solid var(--accent);
-  background: var(--surface-2);
+  border-left: 4px solid var(--color-primary);
+  background: var(--color-surface-muted);
   padding: 0.6rem 0.8rem;
   border-radius: 0 8px 8px 0;
   margin: 1rem 0;
@@ -643,30 +519,14 @@ button.move-button[data-open] {
   flex-wrap: wrap;
   gap: 0.15rem 0.45rem;
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--color-fg-muted);
 }
 .line li.played {
-  color: var(--text);
+  color: var(--color-fg);
 }
 .line li.next {
-  color: var(--text);
+  color: var(--color-fg);
   font-weight: 700;
-}
-.stepper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  margin: 0.75rem 0;
-}
-.stepper button {
-  padding: 0.35rem 0.6rem;
-}
-.step-label {
-  min-width: 8.5rem;
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--muted);
 }
 .actions {
   display: flex;
@@ -686,7 +546,7 @@ button.move-button[data-open] {
   margin: 0 0 1rem;
 }
 .review-list li {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 .review-item {
   display: grid;
@@ -705,7 +565,7 @@ button.move-button[data-open] {
 }
 .review-outcome {
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--color-fg-muted);
 }
 .review-detail {
   padding: 0 0.2rem 1rem;
@@ -726,15 +586,15 @@ button.move-button[data-open] {
 }
 .toast {
   max-width: 480px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-panel);
   padding: 0.7rem 1rem;
   border-radius: 8px;
 }
 .toast.good {
-  background: var(--good-bg);
-  border-color: var(--good);
+  background: var(--color-success-subtle);
+  border-color: var(--color-success);
 }
 
 .licences h2 {
@@ -764,30 +624,20 @@ button.move-button[data-open] {
 .sign-in input {
   font: inherit;
   padding: 0.6rem 0.7rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--surface);
-  color: var(--text);
+  background: var(--color-surface);
+  color: var(--color-fg);
 }
 .sign-in input:focus {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 1px;
-}
-.google {
-  width: 100%;
-  margin-top: 1rem;
-  padding: 0.7rem;
-  font-weight: 600;
-}
-.google span {
-  font-weight: 800;
-  margin-right: 0.4rem;
 }
 .divider {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--muted);
+  color: var(--color-fg-muted);
   font-size: 0.875rem;
   margin: 1rem 0 0;
 }
@@ -795,24 +645,17 @@ button.move-button[data-open] {
 .divider::after {
   content: "";
   flex: 1;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--color-border);
 }
 .form-error {
-  color: var(--warn);
-  background: var(--warn-bg);
+  color: var(--color-warning);
+  background: var(--color-warning-subtle);
   padding: 0.5rem 0.7rem;
   border-radius: 8px;
   margin: 0;
 }
 .switch {
   margin-top: 1.25rem;
-}
-.back {
-  margin-top: 1rem;
-}
-a.brand {
-  color: inherit;
-  text-decoration: none;
 }
 
 /* ---------- account menu */
@@ -827,8 +670,8 @@ a.brand {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   font-weight: 700;
   cursor: pointer;
 }
@@ -844,26 +687,23 @@ a.brand {
   display: grid;
   gap: 0.5rem;
   padding: 0.8rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
 }
 .account-name {
   font-weight: 600;
-}
-header.top nav {
-  align-items: center;
 }
 
 /* ---------- AI explanation */
 
 .ai {
-  border: 1px solid var(--accent);
+  border: 1px solid var(--color-primary);
   border-radius: 8px;
   padding: 0.7rem 0.85rem;
   margin-bottom: 0.75rem;
-  background: var(--good-bg);
+  background: var(--color-success-subtle);
 }
 .ai p {
   margin: 0.2rem 0 0.4rem;
@@ -871,7 +711,7 @@ header.top nav {
 .ai-label {
   font-weight: 700;
   font-size: 0.85rem;
-  color: var(--good);
+  color: var(--color-success);
 }
 .ai-foot,
 .ai-note {
@@ -891,8 +731,8 @@ header.top nav {
   padding: 0.25rem 0.6rem;
 }
 .feedback > button.on {
-  border-color: var(--accent);
-  background: var(--good-bg);
+  border-color: var(--color-primary);
+  background: var(--color-success-subtle);
 }
 .feedback-comment {
   display: flex;
@@ -904,10 +744,10 @@ header.top nav {
   min-width: 0;
   font: inherit;
   padding: 0.4rem 0.6rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--surface);
-  color: var(--text);
+  background: var(--color-surface);
+  color: var(--color-fg);
 }
 .feedback-thanks {
   margin: 0.75rem 0;
@@ -919,17 +759,17 @@ header.top nav {
   margin-top: 0;
 }
 .focus {
-  border-left: 4px solid var(--accent);
-  background: var(--surface);
-  border-radius: 0 var(--radius) var(--radius) 0;
+  border-left: 4px solid var(--color-primary);
+  background: var(--color-surface);
+  border-radius: 0 var(--radius-panel) var(--radius-panel) 0;
   padding: 0.8rem 1rem;
   margin: 1rem 0 1.5rem;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-panel);
 }
 .focus-label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -947,7 +787,7 @@ header.top nav {
 }
 .principles li {
   padding: 0.7rem 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 .principle-row {
   display: flex;
@@ -958,12 +798,12 @@ header.top nav {
   font-weight: 600;
 }
 .principle-count {
-  color: var(--muted);
+  color: var(--color-fg-muted);
   white-space: nowrap;
 }
 .bar {
   height: 6px;
-  background: var(--accent);
+  background: var(--color-primary);
   border-radius: 3px;
   margin: 0.4rem 0;
   opacity: 0.7;
@@ -989,7 +829,7 @@ header.top nav {
 .ai-parts dt {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--muted);
+  color: var(--color-fg-muted);
   margin-top: 0.5rem;
 }
 .ai-parts dd {

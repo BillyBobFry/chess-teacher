@@ -6,6 +6,7 @@ import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
+import { Button } from "../ui/Button.tsx";
 
 /** What became of a lesson; `tick` marks the outcomes the player can be pleased with. */
 function outcome(l: Lesson): { text: string; tick: boolean } {
@@ -75,10 +76,10 @@ export function Review({
         </ul>
       )}
       <div className="actions">
-        <button className="primary" onClick={onNewGame}>
+        <Button variant="primary" onPress={onNewGame}>
           {m.nav_new_game()}
-        </button>
-        {onProgress && <button onClick={onProgress}>{m.account_progress()}</button>}
+        </Button>
+        {onProgress && <Button onPress={onProgress}>{m.account_progress()}</Button>}
       </div>
     </section>
   );

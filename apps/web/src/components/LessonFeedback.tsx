@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../api/client.ts";
 import { m } from "../paraglide/messages.js";
+import { Button } from "../ui/Button.tsx";
 
 /** "Did this make sense?" A thumbs up or down, with an optional comment on a thumbs down. */
 export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId: number }) {
@@ -49,7 +50,7 @@ export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId:
             maxLength={1000}
             aria-label={m.feedback_comment_label()}
           />
-          <button type="submit">{m.feedback_send()}</button>
+          <Button type="submit">{m.feedback_send()}</Button>
         </form>
       )}
     </div>
