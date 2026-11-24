@@ -10,12 +10,14 @@
     "dev": "tsx watch src/dev.ts",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/db/migrate-cli.ts"
+    "db:migrate": "tsx src/db/migrate-cli.ts",
+    "db:check": "drizzle-kit generate && test -z \"$(git status --porcelain -- drizzle)\" || (git status --short -- drizzle; echo \"schema.ts has changes with no migration: run pnpm --filter @chess-teacher/api db:generate and commit the result\"; exit 1)"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.12.0",
     "@chess-teacher/contract": "workspace:*",
     "@chess-teacher/core": "workspace:*",
+    "@chess-teacher/lesson-text": "workspace:*",
     "@electric-sql/pglite": "0.6.0",
     "@hono/node-server": "2.1.11",
     "@hono/zod-validator": "0.9.1",

@@ -4,6 +4,7 @@ import type {
   ApiError,
   ConfigResponse,
   CreateGameBody,
+  ExplanationBody,
   ExplanationResponse,
   FeedbackBody,
   GameRecord,
@@ -53,6 +54,9 @@ export const api = {
     request<ExplanationResponse>(`/games/${gameId}/lessons/${lessonId}/explanation`),
   feedback: (gameId: string, lessonId: number, body: FeedbackBody) =>
     request<{ ok: true }>(`/games/${gameId}/lessons/${lessonId}/feedback`, { method: "PUT", json: body }),
-  requestExplanation: (gameId: string, lessonId: number) =>
-    request<ExplanationResponse>(`/games/${gameId}/lessons/${lessonId}/explanation`, { method: "POST" }),
+  requestExplanation: (gameId: string, lessonId: number, body: ExplanationBody) =>
+    request<ExplanationResponse>(`/games/${gameId}/lessons/${lessonId}/explanation`, {
+      method: "POST",
+      json: body,
+    }),
 };

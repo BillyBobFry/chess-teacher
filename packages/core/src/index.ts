@@ -8,3 +8,4 @@ export * from "./opponent.ts";
 export * from "./principles.ts";
 export * from "./session.ts";
 export * from "./validate.ts";
+export * from "./text.ts";

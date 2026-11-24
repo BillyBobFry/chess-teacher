@@ -14,22 +14,21 @@ import { parseArgs } from "node:util";
 import {
   CONSEQUENCE,
   MISSED_CHANCE,
-  PRINCIPLES,
-  facts,
   finish,
   gameOf,
   lessonGap,
-  lessonLabel,
+  lessonMove,
   newSession,
   opponentMove,
   startUserTurn,
-  templateExplanation,
   userMove,
   type Engines,
+  type PrincipleId,
   type SessionState,
 } from "@chess-teacher/core";
 import { NodeUciEngine, findStockfish } from "@chess-teacher/engine/node";
 import { createRequire } from "node:module";
+import { PRINCIPLES, factsText, moveLabel, templateExplanation, triggerText } from "./prototype-text.ts";
 
 const { values: args } = parseArgs({
   options: {
@@ -52,7 +51,7 @@ interface LessonRow {
   colour: string;
   kind: string;
   feature: string;
-  principle: string;
+  principle: PrincipleId;
   status: string;
   deferred: boolean;
   gapCp: number;
@@ -109,7 +108,7 @@ async function playGame(
     msPerUserMove: userTime / Math.max(1, userMoves),
     lessons: state.lessons.map((l) => ({
       game: n,
-      move: lessonLabel(l),
+      move: moveLabel(lessonMove(l)),
       colour: userColour === "w" ? "white" : "black",
       kind: l.kind,
       feature: l.feature,
@@ -118,9 +117,9 @@ async function playGame(
       deferred: l.deferred,
       gapCp: lessonGap(l),
       delayMoves: l.resolvedPly === null ? null : (l.resolvedPly - l.ply) / 2,
-      triggerText: l.triggerText,
+      triggerText: triggerText(l.trigger),
       explanation: templateExplanation(l),
-      facts: facts(l),
+      facts: factsText(l),
     })),
   };
 }
@@ -151,7 +150,7 @@ function summarise(games: GameRow[]) {
     consequenceStatus: count(cons.map((l) => l.status)),
     missedStatus: count(lessons.filter((l) => l.kind === MISSED_CHANCE).map((l) => l.status)),
     features: count(lessons.map((l) => l.feature)),
-    principles: count(lessons.map((l) => PRINCIPLES[l.principle]!.title)),
+    principles: count(lessons.map((l) => PRINCIPLES[l.principle].title)),
   };
 }
 

@@ -1,22 +1,23 @@
-import { Game, sanOf, uciParts, type Lesson } from "@chess-teacher/core";
+import { Game, uciParts, type Lesson } from "@chess-teacher/core";
+import type { Move } from "chess.js";
 import { useMemo, useState } from "react";
 import { Board } from "./Board.tsx";
+import { m } from "../paraglide/messages.js";
 
 interface Line {
   fens: string[];
-  sans: string[];
+  moves: Move[];
 }
 
 function walk(fenBefore: string, line: string[]): Line {
   const game = new Game(fenBefore);
   const fens = [game.fen];
-  const sans: string[] = [];
-  for (const m of line) {
-    sans.push(sanOf(game.fen, m));
-    game.push(m);
+  const moves: Move[] = [];
+  for (const uci of line) {
+    moves.push(game.push(uci));
     fens.push(game.fen);
   }
-  return { fens, sans };
+  return { fens, moves };
 }
 
 /**
@@ -35,22 +36,21 @@ export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] 
 
   const view = (line: Line, moves: string[], colour: string) => {
     const i = Math.min(step, moves.length);
-    const last = i > 0 ? uciParts(moves[i - 1]!) : null;
     const first = uciParts(moves[0]!);
     return {
       fen: line.fens[i]!,
-      lastMove: last ? ([last.from, last.to] as [string, string]) : null,
+      lastMove: i > 0 ? line.moves[i - 1] : null,
       arrows: i === 0 ? [{ from: first.from, to: first.to, color: colour }] : [],
     };
   };
   const a = view(mine, yourMoves, "#c2552b");
   const b = view(better, lesson.bestLine, "#2f8f5f");
 
-  const sanLine = (sans: string[]) => (
+  const sanLine = (moves: Move[]) => (
     <ol className="line">
-      {sans.map((s, i) => (
+      {moves.map((mv, i) => (
         <li key={i} className={i < step ? "played" : i === step ? "next" : ""}>
-          {s}
+          {mv.san}
         </li>
       ))}
     </ol>
@@ -58,53 +58,57 @@ export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] 
 
   return (
     <div className="futures">
-      <p className="futures-note muted small">
-        {real
-          ? "Left: what actually happened in your game. Right: how the better move could have gone (the engine's prediction)."
-          : "How each could have gone: the engine's prediction, not moves from your game."}
-      </p>
+      <p className="futures-note muted small">{real ? m.futures_note_real() : m.futures_note_predicted()}</p>
       <div className="futures-boards">
         <figure>
-          <figcaption>{real ? "What happened" : "Your move, then…"}</figcaption>
+          <figcaption>{real ? m.futures_what_happened() : m.futures_your_move()}</figcaption>
           <Board
             id={`yours-${lesson.id}`}
+            label={real ? m.futures_what_happened() : m.futures_your_move()}
             fen={a.fen}
             orientation={orientation}
             lastMove={a.lastMove}
             arrows={a.arrows}
             showNotation={false}
           />
-          {sanLine(mine.sans)}
+          {sanLine(mine.moves)}
         </figure>
         <figure>
-          <figcaption>The better move, then…</figcaption>
+          <figcaption>{m.futures_better()}</figcaption>
           <Board
             id={`better-${lesson.id}`}
+            label={m.futures_better()}
             fen={b.fen}
             orientation={orientation}
             lastMove={b.lastMove}
             arrows={b.arrows}
             showNotation={false}
           />
-          {sanLine(better.sans)}
+          {sanLine(better.moves)}
         </figure>
       </div>
-      <div className="stepper" role="group" aria-label="Step through both lines">
-        <button onClick={() => setStep(0)} disabled={step === 0} aria-label="Start">
+      <div className="stepper" role="group" aria-label={m.futures_stepper()}>
+        <button onClick={() => setStep(0)} disabled={step === 0} aria-label={m.futures_start()}>
           ⏮
         </button>
-        <button onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0} aria-label="Back">
+        <button
+          onClick={() => setStep((s) => Math.max(0, s - 1))}
+          disabled={step === 0}
+          aria-label={m.futures_back()}
+        >
           ◀
         </button>
-        <span className="step-label">{step === 0 ? "Before the move" : `Move ${step} of ${plies}`}</span>
+        <span className="step-label">
+          {step === 0 ? m.futures_before() : m.futures_step({ step, total: plies })}
+        </span>
         <button
           onClick={() => setStep((s) => Math.min(plies, s + 1))}
           disabled={step === plies}
-          aria-label="Forward"
+          aria-label={m.futures_forward()}
         >
           ▶
         </button>
-        <button onClick={() => setStep(plies)} disabled={step === plies} aria-label="End">
+        <button onClick={() => setStep(plies)} disabled={step === plies} aria-label={m.futures_end()}>
           ⏭
         </button>
       </div>

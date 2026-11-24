@@ -1,0 +1,683 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_name": "Chess Teacher",
+  "loading": "Loading…",
+  "back": "Back",
+  "dismiss": "Dismiss",
+  "footer_licences": "Licenses",
+  "busy_loading": "Loading your game…",
+  "busy_engine": "Starting the engine…",
+  "busy_preparing": "Getting ready for your move…",
+  "busy_checking": "Thinking about your move…",
+  "busy_opponent": "Your opponent is thinking…",
+  "result_lost": "Checkmate. You lost this one.",
+  "result_won": "Checkmate. You won!",
+  "result_stalemate": "Stalemate: a draw.",
+  "result_draw": "Draw.",
+  "result_ended": "Game ended.",
+  "nav_end_game": "End game",
+  "nav_new_game": "New game",
+  "confirm_abandon_title": "Abandon this game?",
+  "confirm_abandon_body": [
+    {
+      "declarations": ["input moveNumber", "local moveCount = moveNumber: number"],
+      "selectors": [],
+      "match": {
+        "": "You're on move {moveCount}. Starting a new game ends this one for good."
+      }
+    }
+  ],
+  "confirm_abandon_confirm": "Abandon game",
+  "confirm_abandon_cancel": "Keep playing",
+  "account_menu": "Account",
+  "account_allowance": [
+    {
+      "declarations": [
+        "input remaining",
+        "input limit",
+        "local remainingCount = remaining: number",
+        "local limitPlural = limit: plural",
+        "local limitCount = limit: number"
+      ],
+      "selectors": ["limitPlural"],
+      "match": {
+        "limitPlural=one": "{remainingCount} of {limitCount} AI explanation left this month",
+        "limitPlural=other": "{remainingCount} of {limitCount} AI explanations left this month"
+      }
+    }
+  ],
+  "account_progress": "Your progress",
+  "account_sign_out": "Sign out",
+  "game_back_to_current": "Back to the current game",
+  "status_paused": "Game paused",
+  "status_your_move": "Your move",
+  "panel_moves": "Moves",
+  "panel_play_hint": "Play normally. If a mistake comes back to bite you, the game will pause so you can find out why.",
+  "moves_empty": "No moves yet.",
+  "error_conflict": "This game was changed on another device.",
+  "toast_fixed": "Nice! {move} had left a weakness, and you fixed it before it cost you.",
+  "toast_found_chance": "Nice! You found the better idea you missed with {move}.",
+  "new_game_title": "Learn from your own mistakes",
+  "new_game_intro": "Play a game. When a mistake comes back to bite you, the game pauses and you work out which move caused it, then see what would have happened with the better move.",
+  "new_game_play_as": "Play as",
+  "colour_white": "White",
+  "colour_black": "Black",
+  "colour_random": "Random",
+  "new_game_opponent": "Opponent",
+  "strength_gentle": "Gentle",
+  "strength_gentle_note": "for new players",
+  "strength_steady": "Steady",
+  "strength_steady_note": "a fair fight for improving players",
+  "strength_testing": "Testing",
+  "strength_testing_note": "for players who know the basics well",
+  "new_game_warn": "Warn me when my opponent spots a weakness",
+  "new_game_start": "Start game",
+  "sign_in_title": "Welcome back",
+  "sign_in_intro": "Sign in to carry on where you left off.",
+  "sign_up_title": "Create your account",
+  "sign_up_intro": "Your games and lessons are saved to your account, so you can pick up on any device.",
+  "sign_in_google": "Continue with Google",
+  "sign_in_or": "or",
+  "field_name": "Name",
+  "field_email": "Email",
+  "field_password": "Password",
+  "error_generic": "Something went wrong. Try again.",
+  "sign_in_submit": "Sign in",
+  "sign_up_submit": "Create account",
+  "sign_in_new_here": "New here?",
+  "sign_in_to_sign_up": "Create an account",
+  "sign_up_have_account": "Already have an account?",
+  "reveal_missed_last": "Your last move missed a better option.",
+  "reveal_chance_gone": "The chance has gone.",
+  "reveal_cause_recent": "The cause was one of your recent moves.",
+  "reveal_missed_last_detail": "Instead of {move}, there was a clearly better move.",
+  "reveal_missed_ago_detail": [
+    {
+      "declarations": [
+        "input ago",
+        "input move",
+        "local agoPlural = ago: plural",
+        "local agoCount = ago: number"
+      ],
+      "selectors": ["agoPlural"],
+      "match": {
+        "agoPlural=one": "{agoCount} move ago, with {move}, you had a clearly better option.",
+        "agoPlural=other": "{agoCount} moves ago, with {move}, you had a clearly better option."
+      }
+    }
+  ],
+  "reveal_find": "Can you find the move that caused it?",
+  "reveal_not_that": "Not that one.",
+  "reveal_hint": "Hint: {hint}",
+  "reveal_show_answer": "Show me the answer",
+  "reveal_found": "Yes, that's the one.",
+  "reveal_rewind": "Rewind to before {move}",
+  "reveal_carry_on": "Carry on",
+  "review_title": "Game review",
+  "review_none": "No clear mistakes found. Well played!",
+  "outcome_fixed": "You fixed it in time",
+  "outcome_deferred": "Happened at the same time as another lesson",
+  "outcome_found": "Found it yourself",
+  "outcome_revealed": "Revealed during the game",
+  "outcome_shown": "Shown during the game",
+  "outcome_not_shown": "Not shown during the game",
+  "outcome_superseded": "Overtaken by a later mistake of the same kind",
+  "outcome_got_away": "You got away with it: a stronger player would have punished it",
+  "outcome_missed": "Missed chance",
+  "futures_note_real": "Left: what actually happened in your game. Right: how the better move could have gone (the engine's prediction).",
+  "futures_note_predicted": "How each could have gone: the engine's prediction, not moves from your game.",
+  "futures_what_happened": "What happened",
+  "futures_your_move": "Your move, then…",
+  "futures_better": "The better move, then…",
+  "futures_stepper": "Step through both lines",
+  "futures_start": "Start",
+  "futures_back": "Back",
+  "futures_forward": "Forward",
+  "futures_end": "End",
+  "futures_before": "Before the move",
+  "futures_step": [
+    {
+      "declarations": [
+        "input step",
+        "input total",
+        "local stepCount = step: number",
+        "local totalCount = total: number"
+      ],
+      "selectors": [],
+      "match": {
+        "": "Move {stepCount} of {totalCount}"
+      }
+    }
+  ],
+  "explanation_lead": "On move {moveNumber} you played {#strong}{played}{/strong}. {#strong}{better}{/strong} was better.",
+  "explanation_mate": "After your move, your opponent had a forced checkmate.",
+  "facts_before": "Before your move",
+  "facts_your_line": "Where your move leads",
+  "facts_better_line": "Where the better move leads",
+  "explanation_missed_pawns": "Your move wasn't a disaster, but {better} would have left your opponent with pawn weaknesses.",
+  "explanation_missed_improved": "Your move wasn't a disaster, but {better} would have improved {factor}.",
+  "explanation_undefended": "Your move left this undefended: {pieces}.",
+  "ai_writing": "Your coach is writing an explanation…",
+  "ai_quota": "You've used this month's AI explanations. Here's what we measured:",
+  "ai_label": "Your coach",
+  "ai_foot": [
+    {
+      "declarations": [
+        "input remaining",
+        "local remainingPlural = remaining: plural",
+        "local remainingCount = remaining: number"
+      ],
+      "selectors": ["remainingPlural"],
+      "match": {
+        "remainingPlural=one": "Written by AI from the measured facts below · {remainingCount} AI explanation left this month",
+        "remainingPlural=other": "Written by AI from the measured facts below · {remainingCount} AI explanations left this month"
+      }
+    }
+  ],
+  "ai_what_missed": "What it missed",
+  "ai_what_allowed": "What it allowed",
+  "ai_why_better": "Why {#move}{move}{/move} was better",
+  "feedback_question": "Did this lesson make sense?",
+  "feedback_yes": "Yes, it made sense",
+  "feedback_no": "No, it didn't make sense",
+  "feedback_comment_label": "What didn't make sense?",
+  "feedback_comment_placeholder": "What didn't make sense? (optional)",
+  "feedback_send": "Send",
+  "feedback_thanks": "Thanks: that helps us improve the lessons.",
+  "progress_title": "Your progress",
+  "progress_error": "Couldn't load your progress. Please try again.",
+  "progress_empty": "Nothing yet. Play a game: every lesson you meet is counted here by the principle it teaches.",
+  "progress_summary": [
+    {
+      "declarations": [
+        "input lessons",
+        "input games",
+        "local lessonsPlural = lessons: plural",
+        "local gamesPlural = games: plural",
+        "local lessonsCount = lessons: number",
+        "local gamesCount = games: number"
+      ],
+      "selectors": ["lessonsPlural", "gamesPlural"],
+      "match": {
+        "lessonsPlural=one, gamesPlural=one": "{lessonsCount} lesson across your last {gamesCount} game.",
+        "lessonsPlural=one, gamesPlural=other": "{lessonsCount} lesson across your last {gamesCount} games.",
+        "lessonsPlural=other, gamesPlural=one": "{lessonsCount} lessons across your last {gamesCount} game.",
+        "lessonsPlural=other, gamesPlural=other": "{lessonsCount} lessons across your last {gamesCount} games."
+      }
+    }
+  ],
+  "progress_focus": "Your focus",
+  "progress_lessons": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countValue = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countValue} lesson",
+        "countPlural=other": "{countValue} lessons"
+      }
+    }
+  ],
+  "progress_found": [
+    {
+      "declarations": [
+        "input found",
+        "input revealed",
+        "local foundCount = found: number",
+        "local revealedCount = revealed: number"
+      ],
+      "selectors": [],
+      "match": {
+        "": "Found the cause yourself {foundCount} of {revealedCount}"
+      }
+    }
+  ],
+  "progress_fixed": [
+    {
+      "declarations": ["input count", "local countValue = count: number"],
+      "selectors": [],
+      "match": {
+        "": "Fixed in time {countValue}×"
+      }
+    }
+  ],
+  "progress_recent": [
+    {
+      "declarations": [
+        "input count",
+        "input games",
+        "local gamesPlural = games: plural",
+        "local countValue = count: number",
+        "local gamesCount = games: number"
+      ],
+      "selectors": ["gamesPlural"],
+      "match": {
+        "gamesPlural=one": "In {countValue} of your last {gamesCount} game",
+        "gamesPlural=other": "In {countValue} of your last {gamesCount} games"
+      }
+    }
+  ],
+  "licences_title": "Licenses",
+  "licences_stockfish": "The chess engine running in your browser is Stockfish 19 (the WebAssembly build by the stockfish.js project), licensed under the {#gpl}GNU General Public License v3{/gpl}. Source code: {#stockfish}Stockfish{/stockfish} and {#stockfishjs}stockfish.js{/stockfishjs}. A second engine, Stockfish 11 (also GPL v3, {#licence11}license{/licence11}), is used for its classical evaluation when checking strategic lessons. This app talks to both engines only through the UCI text protocol.",
+  "licences_other": "Other components",
+  "licences_item": "{component}: {licence}",
+  "licences_stockfish_heading": "Stockfish",
+  "licences_item_pieces": "{component} (including its piece set): {licence}",
+  "board_game": "Game board",
+  "board_keyboard_hint": "With a keyboard: {#kbd}Tab{/kbd} to the board, the {#kbd}arrow keys{/kbd} to move between squares, and {#kbd}Enter{/kbd} to pick up a piece and put it down.",
+  "board_empty": "empty",
+  "board_mark_last_move": "last move",
+  "board_mark_target": "you can move here",
+  "board_mark_capture": "you can capture here",
+  "board_mark_lesson": "part of the lesson",
+  "board_last_move_white": "White's last move: {move}",
+  "board_last_move_black": "Black's last move: {move}",
+  "board_selected": "Picked up {piece} on {square}. It can move to {targets}.",
+  "board_selected_stuck": "Picked up {piece} on {square}. It has no legal moves.",
+  "board_put_down": "Put the piece down.",
+  "board_pick_own": "Pick up one of your own pieces first.",
+  "piece_white_pawn": "white pawn",
+  "piece_white_knight": "white knight",
+  "piece_white_bishop": "white bishop",
+  "piece_white_rook": "white rook",
+  "piece_white_queen": "white queen",
+  "piece_white_king": "white king",
+  "piece_black_pawn": "black pawn",
+  "piece_black_knight": "black knight",
+  "piece_black_bishop": "black bishop",
+  "piece_black_rook": "black rook",
+  "piece_black_queen": "black queen",
+  "piece_black_king": "black king",
+  "piece_pawn": "pawn",
+  "piece_knight": "knight",
+  "piece_bishop": "bishop",
+  "piece_rook": "rook",
+  "piece_queen": "queen",
+  "piece_king": "king",
+  "move_spoken": "{piece} to {square}",
+  "move_spoken_capture": "{piece} takes {captured} on {square}",
+  "move_spoken_promotion": "pawn to {square}, promotes to {promoted}",
+  "move_spoken_capture_promotion": "pawn takes {captured} on {square}, promotes to {promoted}",
+  "move_spoken_castle_kingside": "castles kingside",
+  "move_spoken_castle_queenside": "castles queenside",
+  "move_spoken_check": "{move}, check",
+  "move_spoken_checkmate": "{move}, checkmate",
+  "error_network": "Couldn't reach the server. Check your connection, then try again.",
+  "error_api_internal": "Something went wrong on our side. Try again in a moment.",
+  "error_api_not_signed_in": "You've been signed out. Reload the page to sign in again.",
+  "error_api_invalid_request": "The server couldn't read that request. Reload the page and try again.",
+  "error_api_game_too_large": "This game is too long to save. Start a new game to keep playing.",
+  "error_api_illegal_move": "This game couldn't be saved: the server found an illegal move in it.",
+  "error_api_not_found": "That game couldn't be found. Reload the page to see your current game.",
+  "error_api_malformed_lesson": "This lesson couldn't be explained.",
+  "auth_error_invalid_credentials": "That email and password don't match an account. Check them and try again.",
+  "auth_error_invalid_email": "Enter an email address, like name@example.com.",
+  "auth_error_email_taken": "There's already an account with that email. Sign in instead.",
+  "auth_error_password_too_short": [
+    {
+      "declarations": ["input min", "local minCount = min: number"],
+      "selectors": [],
+      "match": {
+        "": "Use a password with at least {minCount} characters."
+      }
+    }
+  ],
+  "auth_error_password_too_long": "That password is too long. Use a shorter one.",
+  "auth_error_rate_limited": "Too many attempts. Wait a minute, then try again.",
+  "principle_hanging_title": "Don't leave pieces undefended",
+  "principle_hanging_text": "Before you move, check that every piece is protected, and that the move doesn't remove a defender from something else.",
+  "principle_safety_title": "Check checks, captures and threats",
+  "principle_safety_text": "Before every move, ask: what can my opponent capture, which checks do they have, and what does their last move threaten?",
+  "principle_develop_title": "Develop your knights and bishops first",
+  "principle_develop_text": "In the opening, get your minor pieces off the back rank before starting an attack. Undeveloped pieces can't help.",
+  "principle_king_safety_title": "Keep your king safe",
+  "principle_king_safety_text": "Castle early and keep the pawns in front of your king where they are. Every pawn move there leaves holes your opponent can use.",
+  "principle_centre_title": "Control the center",
+  "principle_centre_text": "Pieces and pawns that control d4, e4, d5 and e5 influence the whole board and make it easier to move pieces from one side to the other.",
+  "principle_activity_title": "Keep your pieces active",
+  "principle_activity_text": "A piece with lots of squares is worth more than one that is stuck. Look for your worst piece and improve it.",
+  "principle_pawn_weaknesses_title": "Avoid weakening your pawns",
+  "principle_pawn_weaknesses_text": "Isolated, doubled and backward pawns are hard to defend and give your opponent targets. Don't create them without a good reason.",
+  "principle_target_weaknesses_title": "Create and attack weaknesses",
+  "principle_target_weaknesses_text": "If you can force your opponent into isolated, doubled or backward pawns, they become long-term targets.",
+  "principle_passed_pawns_title": "Passed pawns must be pushed (or stopped)",
+  "principle_passed_pawns_text": "A pawn with no enemy pawns in front of it, or on the files next to it, can become a queen. Create your own and blockade theirs.",
+  "principle_outposts_title": "Knights love outposts",
+  "principle_outposts_text": "A knight on a square that enemy pawns can never attack, defended by your own pawn, is often as strong as a rook.",
+  "principle_open_files_title": "Rooks belong on open files",
+  "principle_open_files_text": "Rooks need open lines. Put them on files without your own pawns, where they can reach the enemy position.",
+  "principle_king_activity_title": "Activate your king in the endgame",
+  "principle_king_activity_text": "Once the queens are off, the king is no longer in danger and becomes a strong piece. Bring it toward the center.",
+  "move_white": "{moveNumber}. {san}",
+  "move_black": "{moveNumber}… {san}",
+  "piece_on_p": "pawn on {square}",
+  "piece_on_n": "knight on {square}",
+  "piece_on_b": "bishop on {square}",
+  "piece_on_r": "rook on {square}",
+  "piece_on_q": "queen on {square}",
+  "piece_on_k": "king on {square}",
+  "piece_count_p": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countCount = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "a pawn",
+        "countPlural=other": "{countCount} pawns"
+      }
+    }
+  ],
+  "piece_count_n": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countCount = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "a knight",
+        "countPlural=other": "{countCount} knights"
+      }
+    }
+  ],
+  "piece_count_b": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countCount = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "a bishop",
+        "countPlural=other": "{countCount} bishops"
+      }
+    }
+  ],
+  "piece_count_r": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countCount = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "a rook",
+        "countPlural=other": "{countCount} rooks"
+      }
+    }
+  ],
+  "piece_count_q": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countCount = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "a queen",
+        "countPlural=other": "{countCount} queens"
+      }
+    }
+  ],
+  "piece_moved_now_on": "the piece you moved, now on {square}",
+  "list_none": "none",
+  "factor_material": "material",
+  "factor_development": "development",
+  "factor_king_safety": "king safety",
+  "factor_centre": "control of the center",
+  "factor_mobility": "piece activity",
+  "factor_own_pawns": "your pawn structure",
+  "factor_their_pawns": "your opponent's pawn weaknesses",
+  "factor_passed_pawns": "passed pawns",
+  "factor_outposts": "knight outposts",
+  "factor_open_files": "rooks on open files",
+  "factor_king_activity": "king activity",
+  "detail_material_up": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countCount = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "you're {countCount} pawn up in material",
+        "countPlural=other": "you're {countCount} pawns up in material"
+      }
+    }
+  ],
+  "detail_material_down": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countCount = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "you're {countCount} pawn down in material",
+        "countPlural=other": "you're {countCount} pawns down in material"
+      }
+    }
+  ],
+  "detail_material_level": "material is level",
+  "detail_opening_over": "the opening is over",
+  "detail_undeveloped": "still on their starting squares: {pieces}",
+  "detail_all_developed": "all your knights and bishops are developed",
+  "detail_queen_gone": "your opponent's queen is gone, so your king is fairly safe",
+  "detail_king_shelter": [
+    {
+      "declarations": [
+        "input shield",
+        "input attacks",
+        "local shieldPlural = shield: plural",
+        "local attacksPlural = attacks: plural",
+        "local shieldCount = shield: number",
+        "local attacksCount = attacks: number"
+      ],
+      "selectors": ["shieldPlural", "attacksPlural"],
+      "match": {
+        "shieldPlural=one, attacksPlural=one": "{shieldCount} pawn shielding your king, {attacksCount} attack on the squares around it",
+        "shieldPlural=one, attacksPlural=other": "{shieldCount} pawn shielding your king, {attacksCount} attacks on the squares around it",
+        "shieldPlural=other, attacksPlural=one": "{shieldCount} pawns shielding your king, {attacksCount} attack on the squares around it",
+        "shieldPlural=other, attacksPlural=other": "{shieldCount} pawns shielding your king, {attacksCount} attacks on the squares around it"
+      }
+    }
+  ],
+  "detail_centre": [
+    {
+      "declarations": [
+        "input mine",
+        "input theirs",
+        "local mineCount = mine: number",
+        "local theirsCount = theirs: number"
+      ],
+      "selectors": [],
+      "match": {
+        "": "control of the center: {mineCount} for you, {theirsCount} for your opponent"
+      }
+    }
+  ],
+  "detail_mobility": [
+    {
+      "declarations": [
+        "input mine",
+        "input theirs",
+        "local minePlural = mine: plural",
+        "local mineCount = mine: number",
+        "local theirsCount = theirs: number"
+      ],
+      "selectors": ["minePlural"],
+      "match": {
+        "minePlural=one": "{mineCount} move for your pieces, {theirsCount} for your opponent's",
+        "minePlural=other": "{mineCount} moves for your pieces, {theirsCount} for your opponent's"
+      }
+    }
+  ],
+  "detail_pawns_own": "your pawn weaknesses: {weaknesses}",
+  "detail_pawns_theirs": "your opponent's pawn weaknesses: {weaknesses}",
+  "detail_pawns_own_none": "no pawn weaknesses",
+  "detail_pawns_theirs_none": "your opponent has no pawn weaknesses",
+  "pawns_isolated": [
+    {
+      "declarations": [
+        "input count",
+        "input squares",
+        "local countPlural = count: plural",
+        "local countCount = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "an isolated pawn on {squares}",
+        "countPlural=other": "isolated pawns on {squares}"
+      }
+    }
+  ],
+  "pawns_doubled": [
+    {
+      "declarations": [
+        "input count",
+        "input files",
+        "local countPlural = count: plural",
+        "local countCount = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "doubled pawns on the {files}-file",
+        "countPlural=other": "doubled pawns on the {files} files"
+      }
+    }
+  ],
+  "pawns_backward": [
+    {
+      "declarations": [
+        "input count",
+        "input squares",
+        "local countPlural = count: plural",
+        "local countCount = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "a backward pawn on {squares}",
+        "countPlural=other": "backward pawns on {squares}"
+      }
+    }
+  ],
+  "detail_passed_pawns": "your passed pawns: {mine}; your opponent's: {theirs}",
+  "detail_outposts": "your knights on outposts: {mine}; your opponent's: {theirs}",
+  "detail_open_files": "your rooks on open files: {mine}; your opponent's: {theirs}",
+  "detail_not_endgame": "not an endgame yet",
+  "detail_king_activity": [
+    {
+      "declarations": [
+        "input mineSteps",
+        "input mine",
+        "input theirs",
+        "input theirsSteps",
+        "local mineStepsPlural = mineSteps: plural",
+        "local mineStepsCount = mineSteps: number",
+        "local theirsStepsCount = theirsSteps: number"
+      ],
+      "selectors": ["mineStepsPlural"],
+      "match": {
+        "mineStepsPlural=one": "your king on {mine} is {mineStepsCount} step from the center; your opponent's on {theirs} is {theirsStepsCount}",
+        "mineStepsPlural=other": "your king on {mine} is {mineStepsCount} steps from the center; your opponent's on {theirs} is {theirsStepsCount}"
+      }
+    }
+  ],
+  "detail_checkmated": "your king gets checkmated",
+  "detail_no_mate": "no checkmate",
+  "trigger_checkmated": "You've been checkmated.",
+  "trigger_losing_material": "You're about to lose material.",
+  "trigger_lost_traded": [
+    {
+      "declarations": [
+        "input net",
+        "input lost",
+        "input taken",
+        "local netPlural = net: plural",
+        "local netCount = net: number"
+      ],
+      "selectors": ["netPlural"],
+      "match": {
+        "netPlural=one": "Since that move you've lost {lost} and taken {taken}: overall you're {netCount} pawn down.",
+        "netPlural=other": "Since that move you've lost {lost} and taken {taken}: overall you're {netCount} pawns down."
+      }
+    }
+  ],
+  "trigger_lost_traded_more": [
+    {
+      "declarations": [
+        "input net",
+        "input lost",
+        "input taken",
+        "local netPlural = net: plural",
+        "local netCount = net: number"
+      ],
+      "selectors": ["netPlural"],
+      "match": {
+        "netPlural=one": "Since that move you've lost {lost} and taken {taken}: overall you're {netCount} pawn down, and more is about to fall.",
+        "netPlural=other": "Since that move you've lost {lost} and taken {taken}: overall you're {netCount} pawns down, and more is about to fall."
+      }
+    }
+  ],
+  "trigger_lost": [
+    {
+      "declarations": [
+        "input net",
+        "input lost",
+        "local netPlural = net: plural",
+        "local netCount = net: number"
+      ],
+      "selectors": ["netPlural"],
+      "match": {
+        "netPlural=one": "You've lost {lost}: you're {netCount} pawn worse off than before.",
+        "netPlural=other": "You've lost {lost}: you're {netCount} pawns worse off than before."
+      }
+    }
+  ],
+  "trigger_lost_more": [
+    {
+      "declarations": [
+        "input net",
+        "input lost",
+        "local netPlural = net: plural",
+        "local netCount = net: number"
+      ],
+      "selectors": ["netPlural"],
+      "match": {
+        "netPlural=one": "You've lost {lost}: you're {netCount} pawn worse off than before, and more is about to fall.",
+        "netPlural=other": "You've lost {lost}: you're {netCount} pawns worse off than before, and more is about to fall."
+      }
+    }
+  ],
+  "trigger_development": "You've fallen behind in development ({detail}).",
+  "trigger_king_safety": "Your king has come under fire ({detail}).",
+  "trigger_centre": "Your opponent has taken over the center ({detail}).",
+  "trigger_mobility": "Your pieces have run short of squares ({detail}).",
+  "trigger_own_pawns": "Your pawn structure has been damaged ({detail}).",
+  "trigger_their_pawns": "Your opponent has fixed their pawn weaknesses ({detail}).",
+  "trigger_passed_pawns": "Your opponent now has the more dangerous passed pawns ({detail}).",
+  "trigger_outposts": "Your opponent's knight has found a strong outpost ({detail}).",
+  "trigger_open_files": "Your opponent's rook has taken an open file ({detail}).",
+  "trigger_king_activity": "Your opponent's king has become more active than yours ({detail}).",
+  "hint_castled": "It was when you castled.",
+  "hint_piece_p": "It was a pawn move.",
+  "hint_piece_n": "It was a knight move.",
+  "hint_piece_b": "It was a bishop move.",
+  "hint_piece_r": "It was a rook move.",
+  "hint_piece_q": "It was a queen move.",
+  "hint_piece_k": "It was a king move.",
+  "hint_move": "Look at move {moveNumber}, when you played {san}.",
+  "toast_opponent_spotted": "Your opponent has spotted something…"
+}

@@ -1,19 +1,24 @@
-import { PRINCIPLES, lessonLabel, playedLine, type Lesson, type SessionState } from "@chess-teacher/core";
+import { lessonMove, playedLine, type Lesson, type SessionState } from "@chess-teacher/core";
+import { moveText, principleTitle } from "@chess-teacher/lesson-text";
 import { useState } from "react";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
+import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 
-function outcome(l: Lesson): string {
-  if (l.status === "fixed") return "You fixed it in time ✓";
-  if (l.status === "triggered" && l.deferred) return "Happened at the same time as another lesson";
-  if (l.status === "triggered" && l.foundCause === true) return "Found it yourself ✓";
-  if (l.status === "triggered" && l.foundCause === false) return "Revealed during the game";
+/** What became of a lesson; `tick` marks the outcomes the player can be pleased with. */
+function outcome(l: Lesson): { text: string; tick: boolean } {
+  const plain = (text: string) => ({ text, tick: false });
+  if (l.status === "fixed") return { text: m.outcome_fixed(), tick: true };
+  if (l.status === "triggered" && l.deferred) return plain(m.outcome_deferred());
+  if (l.status === "triggered" && l.foundCause === true) return { text: m.outcome_found(), tick: true };
+  if (l.status === "triggered" && l.foundCause === false) return plain(m.outcome_revealed());
   if (l.status === "triggered")
-    return l.kind === "missed_chance" ? "Shown during the game" : "Not shown during the game";
-  if (l.status === "superseded") return "Overtaken by a later mistake of the same kind";
-  if (l.kind === "consequence") return "You got away with it: a stronger player would have punished it";
-  return "Missed chance";
+    return plain(l.kind === "missed_chance" ? m.outcome_shown() : m.outcome_not_shown());
+  if (l.status === "superseded") return plain(m.outcome_superseded());
+  if (l.kind === "consequence") return plain(m.outcome_got_away());
+  return plain(m.outcome_missed());
 }
 
 /** Post-game review: every lesson, with its explanation and futures on demand. */
@@ -32,41 +37,48 @@ export function Review({
 }) {
   const lessons = state.lessons.filter((l) => l.status !== "rewound");
   const [open, setOpen] = useState<number | null>(null);
+  const locale = getLocale();
   return (
     <section className="review">
-      <h2>Game review</h2>
+      <h2>{m.review_title()}</h2>
       <p className="muted">{result}</p>
       {lessons.length === 0 ? (
-        <p>No clear mistakes found. Well played!</p>
+        <p>{m.review_none()}</p>
       ) : (
         <ul className="review-list">
-          {lessons.map((l) => (
-            <li key={l.id}>
-              <button
-                className="review-item"
-                aria-expanded={open === l.id}
-                onClick={() => setOpen(open === l.id ? null : l.id)}
-              >
-                <span className="review-move">{lessonLabel(l)}</span>
-                <span className="review-principle">{PRINCIPLES[l.principle]!.title}</span>
-                <span className="review-outcome">{outcome(l)}</span>
-              </button>
-              {open === l.id && (
-                <div className="review-detail">
-                  <Explanation lesson={l} />
-                  <Futures lesson={l} played={playedLine(state, l)} />
-                  <LessonFeedback gameId={gameId} lessonId={l.id} />
-                </div>
-              )}
-            </li>
-          ))}
+          {lessons.map((l) => {
+            const o = outcome(l);
+            return (
+              <li key={l.id}>
+                <button
+                  className="review-item"
+                  aria-expanded={open === l.id}
+                  onClick={() => setOpen(open === l.id ? null : l.id)}
+                >
+                  <span className="review-move">{moveText(lessonMove(l), locale)}</span>
+                  <span className="review-principle">{principleTitle(l.principle, locale)}</span>
+                  <span className="review-outcome">
+                    {o.text}
+                    {o.tick && <span aria-hidden> ✓</span>}
+                  </span>
+                </button>
+                {open === l.id && (
+                  <div className="review-detail">
+                    <Explanation lesson={l} />
+                    <Futures lesson={l} played={playedLine(state, l)} />
+                    <LessonFeedback gameId={gameId} lessonId={l.id} />
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
       <div className="actions">
         <button className="primary" onClick={onNewGame}>
-          New game
+          {m.nav_new_game()}
         </button>
-        {onProgress && <button onClick={onProgress}>Your progress</button>}
+        {onProgress && <button onClick={onProgress}>{m.account_progress()}</button>}
       </div>
     </section>
   );

@@ -1,6 +1,8 @@
 import type { ExplanationResponse } from "@chess-teacher/contract";
+import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { Fragment, useEffect, useState, type ReactNode } from "react";
 import { splitMoves } from "../lib/moves.ts";
+import { m } from "../paraglide/messages.js";
 
 /** Text with chess moves picked out so they're easy to spot. */
 function withMoves(text: string): ReactNode[] {
@@ -39,25 +41,19 @@ export function AiExplanation({
     return () => controller.abort();
   }, [load]);
 
-  if (result === "loading") return <p className="ai-note muted">Your coach is writing an explanation…</p>;
+  if (result === "loading") return <p className="ai-note muted">{m.ai_writing()}</p>;
   if (!result) return null;
   if (result.status === "quota") {
-    return (
-      <p className="ai-note muted">You've used this month's AI explanations. Here's what we measured:</p>
-    );
+    return <p className="ai-note muted">{m.ai_quota()}</p>;
   }
   if (result.status !== "ready" || (!result.parts && !result.text)) return null;
 
-  const foot = (
-    <div className="ai-foot muted">
-      Written by AI from the measured facts below · {result.remaining} AI explanations left this month
-    </div>
-  );
+  const foot = <div className="ai-foot muted">{m.ai_foot({ remaining: result.remaining })}</div>;
   if (!result.parts) {
     // Explanations stored before they were structured: one paragraph.
     return (
       <div className="ai">
-        <div className="ai-label">Your coach</div>
+        <div className="ai-label">{m.ai_label()}</div>
         <p>{withMoves(result.text!)}</p>
         {foot}
       </div>
@@ -66,12 +62,18 @@ export function AiExplanation({
   const { headline, what_it_allowed, why_better } = result.parts;
   return (
     <div className="ai">
-      <div className="ai-label">Your coach</div>
+      <div className="ai-label">{m.ai_label()}</div>
       <p className="ai-headline">{withMoves(headline)}</p>
       <dl className="ai-parts">
-        <dt>{missedChance ? "What it missed" : "What it allowed"}</dt>
+        <dt>{missedChance ? m.ai_what_missed() : m.ai_what_allowed()}</dt>
         <dd>{withMoves(what_it_allowed)}</dd>
-        <dt>Why {withMoves(betterMove)} was better</dt>
+        <dt>
+          <ParaglideMessage
+            message={m.ai_why_better}
+            inputs={{ move: betterMove }}
+            markup={{ move: ({ children }) => <span className="move">{children}</span> }}
+          />
+        </dt>
         <dd>{withMoves(why_better)}</dd>
       </dl>
       {foot}

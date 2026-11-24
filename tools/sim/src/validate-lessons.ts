@@ -18,11 +18,10 @@ import {
   classicalVerdict,
   finish,
   gameOf,
-  lessonLabel,
+  lessonMove,
   newSession,
   opponentMove,
   startUserTurn,
-  templateExplanation,
   userMove,
   type ClassicalVerdict,
   type Engines,
@@ -32,6 +31,7 @@ import {
 } from "@chess-teacher/core";
 import type { UciEngine } from "@chess-teacher/engine";
 import { NodeUciEngine, findStockfish } from "@chess-teacher/engine/node";
+import { moveLabel, templateExplanation } from "./prototype-text.ts";
 
 const { values: args } = parseArgs({
   options: {
@@ -135,7 +135,7 @@ async function main() {
     for (const r of list) {
       const l = r.lesson;
       md.push(
-        `### Game ${r.game}, ${lessonLabel(l)} (${l.userColour === "w" ? "white" : "black"}): ${l.feature}, ${l.kind}`,
+        `### Game ${r.game}, ${moveLabel(lessonMove(l))} (${l.userColour === "w" ? "white" : "black"}): ${l.feature}, ${l.kind}`,
         "",
         `**Verdict:** ${r.verdict?.reason ?? "no breakdown available"}  `,
         `**Term gains for the better line:** ${

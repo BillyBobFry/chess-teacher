@@ -5,7 +5,7 @@
  * picks its own free port from 5173. So it works alongside whatever else you're running.
  */
 
-import { spawn } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 import { createServer } from "node:net";
 
 const free = (port) =>
@@ -19,6 +19,9 @@ const free = (port) =>
 let apiPort = Number(process.env.API_PORT ?? 8787);
 if (!process.env.API_PORT) while (!(await free(apiPort))) apiPort += 1;
 
+// The API imports the compiled lesson text, so it must exist before the API starts.
+execSync("pnpm --filter @chess-teacher/lesson-text i18n", { stdio: "inherit" });
+
 const env = { ...process.env, API_PORT: String(apiPort) };
 const child = spawn(
   "pnpm",
@@ -26,11 +29,13 @@ const child = spawn(
     "exec",
     "concurrently",
     "-n",
-    "api,web",
+    "api,web,i18n",
     "-c",
-    "blue,green",
+    "blue,green,gray",
     "pnpm --filter @chess-teacher/api dev",
     "pnpm --filter @chess-teacher/web dev",
+    // Lesson text for the API and the web app, recompiled when apps/web/messages changes.
+    "pnpm --filter @chess-teacher/lesson-text i18n:watch",
   ],
   { env, stdio: "inherit" },
 );

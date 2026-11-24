@@ -2,7 +2,8 @@
  * End-to-end smoke test of the production build (.vercel/output), served locally by
  * scripts/serve-vercel-output.mjs with an embedded Postgres and the fake LLM, driven in
  * headless Chromium:
- *   landing page → create an account → play 1. e4 → reload and resume →
+ *   landing page → create an account → play 1. e4 → play 2. Nf3 by keyboard alone →
+ *   the abandon-game dialog → reload and resume →
  *   a recorded game at a reveal (wrong guess → hint → answer → AI explanation → futures →
  *   rewind) → end a game and review it → sign out and back in → phone layout.
  * Fails on any console error. Screenshots go to the directory given.
@@ -25,7 +26,7 @@ import {
   type SessionState,
 } from "@chess-teacher/core";
 import { RecordedEngine, type RecordedCall } from "@chess-teacher/engine";
-// Playwright is pre-installed globally in dev/CI containers rather than a project dependency.
+// Browsers: `pnpm --filter @chess-teacher/web exec playwright install chromium` once.
 import type { BrowserType, Page, devices as Devices } from "playwright";
 
 const require = createRequire(import.meta.url);
@@ -96,15 +97,21 @@ const gameBody = (state: SessionState, reveal: object | null = null) => ({
   finished: false,
 });
 
-/** Wait until the first move row has both White's and Black's moves. */
-const opponentReplied = (page: Page) =>
+/** Wait until move row `row` (from 1) has both White's and Black's moves. */
+const opponentReplied = (page: Page, row = 1) =>
   page.waitForFunction(
-    () => (document.querySelectorAll(".moves li span")[2]?.textContent ?? "").length > 0,
-    null,
+    (r) => (document.querySelectorAll(".moves li span")[r * 3 - 1]?.textContent ?? "").length > 0,
+    row,
     {
       timeout: 60_000,
     },
   );
+
+// Exact: "Getting ready for your move…" also contains "your move" (hasText ignores case).
+const YOUR_MOVE = /^Your move$/;
+
+/** The name of the focused element, as a screen reader would start reading it. */
+const focusedText = (page: Page) => page.evaluate(() => document.activeElement?.textContent ?? "");
 
 // ---- server: the production build, with a fresh embedded database
 
@@ -146,6 +153,8 @@ async function step(name: string, fn: () => Promise<void>) {
 
 try {
   const context = await browser.newContext({
+    // The copy assertions below are the en-GB catalogue; the phone checks en-US.
+    locale: "en-GB",
     viewport: { width: 1280, height: 860 },
     deviceScaleFactor: scale,
   });
@@ -175,28 +184,58 @@ try {
 
   await step("start a game and play 1. e4", async () => {
     await page.getByRole("button", { name: "Start game" }).click();
-    await page.getByRole("status").filter({ hasText: "Your move" }).waitFor({ timeout: 60_000 });
-    // Select the pawn and wait until its legal-move dots show, then move. (A click that lands
-    // as the board finishes preparing can be ignored, so retry once.)
-    const selected = () =>
-      page
-        .waitForFunction(
-          () =>
-            (document.querySelector("#main-square-e4 > div")?.getAttribute("style") ?? "").includes("radial"),
-          null,
-          { timeout: 5_000 },
-        )
-        .then(() => true)
-        .catch(() => false);
+    await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 60_000 });
+    // Select the pawn with the pointer and wait until e4 shows as a legal move, then move.
     await page.locator("#main-square-e2").click();
-    if (!(await selected())) {
-      await page.locator("#main-square-e2").click();
-      if (!(await selected())) throw new Error("couldn't select the e2 pawn");
-    }
+    await page.getByRole("gridcell", { name: /^e4, empty, you can move here$/ }).waitFor({ timeout: 5_000 });
     await page.locator("#main-square-e4").click();
     await opponentReplied(page);
-    await page.getByRole("status").filter({ hasText: "Your move" }).waitFor({ timeout: 30_000 });
+    await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 30_000 });
     await shot("2-game");
+  });
+
+  await step("play 2. Nf3 with the keyboard alone (UX-100)", async () => {
+    // Tab from the header until focus reaches the board.
+    await page.getByRole("button", { name: "New game" }).focus();
+    for (let i = 0; i < 10; i++) {
+      await page.keyboard.press("Tab");
+      if (await page.evaluate(() => document.activeElement?.getAttribute("role") === "gridcell")) break;
+    }
+    await page.keyboard.press("Control+End"); // h1, bottom right from White's side
+    await page.keyboard.press("ArrowLeft");
+    if (!(await focusedText(page)).startsWith("g1, white knight")) {
+      throw new Error(`expected focus on the g1 knight, got "${await focusedText(page)}"`);
+    }
+    await page.keyboard.press("Enter");
+    await page.getByText(/^Picked up white knight on g1\. It can move to /).waitFor();
+    await page.keyboard.press("ArrowUp");
+    await page.keyboard.press("ArrowUp");
+    await page.keyboard.press("ArrowLeft");
+    if (!(await focusedText(page)).startsWith("f3, empty, you can move here")) {
+      throw new Error(`expected f3 as a target, got "${await focusedText(page)}"`);
+    }
+    await shot("2b-keyboard-selected");
+    await page.keyboard.press("Enter");
+    await page.locator(".moves").getByText("Nf3", { exact: true }).waitFor({ timeout: 30_000 });
+    await opponentReplied(page, 2);
+    // The board describes the last move in words (UX-106).
+    await page.getByText(/^Black's last move: \w/).waitFor();
+    await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 30_000 });
+  });
+
+  await step("new game mid-game asks first, in a dialog (UX-15)", async () => {
+    await page.getByRole("button", { name: "New game" }).click();
+    const dialog = page.getByRole("dialog", { name: "Abandon this game?" });
+    await dialog.waitFor();
+    if ((await focusedText(page)) !== "Keep playing") throw new Error("the safe choice isn't focused");
+    await shot("2c-abandon-dialog");
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden" });
+    await page.getByRole("button", { name: "New game" }).click();
+    await dialog.getByRole("button", { name: "Abandon game" }).click();
+    await page.getByRole("heading", { name: "Learn from your own mistakes" }).waitFor();
+    await page.getByRole("button", { name: "Back to the current game" }).click();
+    await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 30_000 });
   });
 
   await step("reload: still signed in, game resumes from the server", async () => {
@@ -243,7 +282,7 @@ try {
 
   await step("rewind to before the mistake", async () => {
     await page.getByRole("button", { name: /^Rewind to before/ }).click();
-    await page.getByRole("status").filter({ hasText: "Your move" }).waitFor({ timeout: 60_000 });
+    await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 60_000 });
     const rows = await page.locator(".moves li").count();
     if (rows !== Math.ceil(lesson.ply / 2))
       throw new Error(`expected ${Math.ceil(lesson.ply / 2)} rows, got ${rows}`);
@@ -284,7 +323,7 @@ try {
     await page.getByLabel("Password").fill(PASSWORD);
     await page.getByRole("button", { name: "Sign in" }).click();
     // Back to the most recent unfinished game (the rewound one).
-    await page.getByRole("status").filter({ hasText: "Your move" }).waitFor({ timeout: 60_000 });
+    await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 60_000 });
   });
 
   await step("licences", async () => {
@@ -297,9 +336,13 @@ try {
 
   const phone = await browser.newContext({
     ...devices["iPhone 13"],
+    locale: "en-US",
     storageState: await context.storageState(),
   });
   const mobile = await phone.newPage();
+  // The desktop session saved its detected locale (en-GB) with the sign-in; drop it so this
+  // browser's own language decides.
+  await mobile.addInitScript(() => localStorage.removeItem("PARAGLIDE_LOCALE"));
   mobile.on("pageerror", (e) => unexpected.push(e.message));
   await step("phone layout", async () => {
     await mobile.goto(`${BASE}/app/`);
@@ -310,6 +353,11 @@ try {
     await mobile.reload();
     await mobile.getByText("The better move, then…").first().waitFor({ timeout: 30_000 });
     await mobile.getByText("Your coach", { exact: true }).waitFor({ timeout: 30_000 });
+    // The browser asks for en-US, so the app speaks it (UX-39).
+    await mobile.getByRole("button", { name: "Licenses" }).waitFor();
+    if ((await mobile.evaluate(() => document.documentElement.lang)) !== "en-US") {
+      throw new Error("<html lang> doesn't follow the locale");
+    }
     await mobile.screenshot({ path: join(outDir, "7-phone-reveal.png"), fullPage: true });
     if (await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)) {
       throw new Error("horizontal scroll on phone");

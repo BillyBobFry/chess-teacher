@@ -13,7 +13,7 @@ import {
   isGameOver,
   isLegal,
   isUserTurn,
-  lessonLabel,
+  lessonMove,
   newSession,
   opponentMove,
   recordFoundCause,
@@ -24,8 +24,12 @@ import {
   type Colour,
   type GameEvent,
 } from "@chess-teacher/core";
+import { hintText, moveText } from "@chess-teacher/lesson-text";
 import { api } from "../api/client.ts";
+import { errorText } from "../api/errors.ts";
 import { getEngines } from "../engine/engines.ts";
+import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import { ConflictError, Saver, createGame, loadActiveGame, type SavedGame } from "./storage.ts";
 
 export type Busy = null | "loading" | "engine" | "preparing" | "checking" | "opponent";
@@ -74,7 +78,8 @@ export function useGame(opts: { llmEnabled: boolean }) {
       const key = `${gameId}/${lessonId}`;
       if (!explanations.current.has(key)) {
         const p = api
-          .requestExplanation(gameId, lessonId)
+          // Written in the player's language (UX-41).
+          .requestExplanation(gameId, lessonId, { locale: getLocale() })
           .catch((): ExplanationResponse => ({ status: "error", remaining: 0 }));
         explanations.current.set(key, p);
         void p.then(refreshMe);
@@ -103,7 +108,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
   const attachSaver = useCallback(
     (g: SavedGame) => {
       saver.current = new Saver(g.stateVersion, onSaved, (err) => {
-        setError(err.message);
+        setError(err instanceof ConflictError ? err.message : errorText(err));
         if (err instanceof ConflictError) {
           // Another device moved on: load the latest version instead of overwriting it.
           void loadActiveGame().then((latest) => {
@@ -152,12 +157,12 @@ export function useGame(opts: { llmEnabled: boolean }) {
         } else if (e.kind === "fixed") {
           toast(
             lesson.kind === "consequence"
-              ? `Nice! ${lessonLabel(lesson)} had left a weakness, and you fixed it before it cost you.`
-              : `Nice! You found the better idea you missed with ${lessonLabel(lesson)}.`,
+              ? m.toast_fixed({ move: moveText(lessonMove(lesson), getLocale()) })
+              : m.toast_found_chance({ move: moveText(lessonMove(lesson), getLocale()) }),
             "good",
           );
         } else if (e.kind === "warning") {
-          toast(e.text);
+          toast(m.toast_opponent_spotted());
         }
       }
       return { ...g, reveal };
@@ -192,7 +197,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorText(err));
     } finally {
       running.current = false;
       setBusy(null);
@@ -215,7 +220,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : String(err));
+        setError(errorText(err));
         setLoaded(true);
         setBusy(null);
       });
@@ -241,7 +246,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
             commit(handle({ ...gameRef.current, state: r.state }, r.events));
           }
         } catch (err) {
-          setError(err instanceof Error ? err.message : String(err));
+          setError(errorText(err));
         } finally {
           running.current = false;
           setPendingMove(null);
@@ -368,7 +373,8 @@ export function useGame(opts: { llmEnabled: boolean }) {
     const g = game;
     if (!g?.reveal || g.reveal.attempts === 0) return null;
     const lesson = g.state.lessons.find((l) => l.id === g.reveal!.lessonId);
-    return lesson ? (hints(lesson)[g.reveal.attempts - 1] ?? null) : null;
+    const hint = lesson ? hints(lesson)[g.reveal.attempts - 1] : undefined;
+    return hint ? hintText(hint, getLocale()) : null;
   })();
 
   return {

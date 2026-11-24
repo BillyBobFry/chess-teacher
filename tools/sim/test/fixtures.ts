@@ -4,17 +4,22 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import {
   DEFAULT_CONFIG,
-  facts,
-  hints,
-  lessonLabel,
+  lessonMove,
   recentUserMoves,
-  templateExplanation,
   type Colour,
   type Lesson,
   type SessionState,
   type TeachingConfig,
 } from "@chess-teacher/core";
 import type { RecordedCall } from "@chess-teacher/engine";
+import {
+  detailText,
+  factsText,
+  hintTexts,
+  moveLabel,
+  templateExplanation,
+  triggerText,
+} from "../src/prototype-text.ts";
 
 export const FIXTURES = join(import.meta.dirname, "..", "fixtures");
 
@@ -59,7 +64,7 @@ export function configOf(g: FixtureGame): TeachingConfig {
 const EVENT_KINDS: Record<string, string> = { chance_gone: "chanceGone" };
 export const pyEventKind = (k: string): string => EVENT_KINDS[k] ?? k;
 
-/** A TypeScript lesson in the same shape the Python recorder wrote. */
+/** A TypeScript lesson in the same shape the Python recorder wrote, worded as the prototype did. */
 export function lessonAsFixture(state: SessionState, l: Lesson): Record<string, unknown> {
   return {
     id: l.id,
@@ -81,19 +86,19 @@ export function lessonAsFixture(state: SessionState, l: Lesson): Record<string, 
     userValues: l.userValues,
     bestValues: l.bestValues,
     divergence: l.divergence,
-    baselineDetail: l.baselineDetail,
-    userDetail: l.userDetail,
-    bestDetail: l.bestDetail,
+    baselineDetail: detailText(l.baselineDetail),
+    userDetail: detailText(l.userDetail),
+    bestDetail: detailText(l.bestDetail),
     hangingAfter: l.hangingAfter,
     status: l.status,
     resolvedPly: l.resolvedPly,
-    triggerText: l.triggerText,
+    triggerText: triggerText(l.trigger),
     deferred: l.deferred,
     chanceMove: l.chanceMove,
-    label: lessonLabel(l),
-    facts: facts(l),
-    hints: hints(l),
+    label: moveLabel(lessonMove(l)),
+    facts: factsText(l),
+    hints: hintTexts(l),
     template: templateExplanation(l),
-    recentUserMoves: recentUserMoves(state, l).map(([, label]) => label),
+    recentUserMoves: recentUserMoves(state, l).map(([, move]) => moveLabel(move)),
   };
 }

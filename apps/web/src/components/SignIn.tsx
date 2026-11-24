@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { authClient } from "../api/client.ts";
+import { authErrorText } from "../api/errors.ts";
+import { m } from "../paraglide/messages.js";
 
 export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
@@ -18,7 +20,7 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
         ? await authClient.signUp.email({ name: name || email.split("@")[0]!, email, password })
         : await authClient.signIn.email({ email, password });
     setBusy(false);
-    if (error) setError(error.message ?? "Something went wrong. Please try again.");
+    if (error) setError(authErrorText(error));
   };
 
   const google = () =>
@@ -26,20 +28,17 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
 
   return (
     <section className="sign-in">
-      <h1>{mode === "signIn" ? "Welcome back" : "Create your account"}</h1>
-      <p className="muted">
-        {mode === "signIn"
-          ? "Sign in to carry on where you left off."
-          : "Your games and lessons are saved to your account, so you can pick up on any device."}
-      </p>
+      <h1>{mode === "signIn" ? m.sign_in_title() : m.sign_up_title()}</h1>
+      <p className="muted">{mode === "signIn" ? m.sign_in_intro() : m.sign_up_intro()}</p>
 
       {googleEnabled && (
         <>
           <button className="google" onClick={google} disabled={busy}>
-            <span aria-hidden>G</span> Continue with Google
+            {/* Google's mark, not text. */}
+            <span aria-hidden>{"G"}</span> {m.sign_in_google()}
           </button>
           <div className="divider">
-            <span>or</span>
+            <span>{m.sign_in_or()}</span>
           </div>
         </>
       )}
@@ -47,12 +46,12 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
       <form onSubmit={submit}>
         {mode === "signUp" && (
           <label>
-            Name
+            {m.field_name()}
             <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
           </label>
         )}
         <label>
-          Email
+          {m.field_email()}
           <input
             type="email"
             required
@@ -62,7 +61,7 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
           />
         </label>
         <label>
-          Password
+          {m.field_password()}
           <input
             type="password"
             required
@@ -78,12 +77,12 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
           </p>
         )}
         <button className="primary big" type="submit" disabled={busy}>
-          {mode === "signIn" ? "Sign in" : "Create account"}
+          {mode === "signIn" ? m.sign_in_submit() : m.sign_up_submit()}
         </button>
       </form>
 
       <p className="switch">
-        {mode === "signIn" ? "New here? " : "Already have an account? "}
+        {mode === "signIn" ? m.sign_in_new_here() : m.sign_up_have_account()}{" "}
         <button
           className="link"
           onClick={() => {
@@ -91,7 +90,7 @@ export function SignIn({ googleEnabled }: { googleEnabled: boolean }) {
             setError(null);
           }}
         >
-          {mode === "signIn" ? "Create an account" : "Sign in"}
+          {mode === "signIn" ? m.sign_in_to_sign_up() : m.sign_in_submit()}
         </button>
       </p>
     </section>

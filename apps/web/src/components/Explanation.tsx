@@ -1,49 +1,72 @@
 import { facts, type Lesson } from "@chess-teacher/core";
+import {
+  detailText,
+  factorText,
+  listText,
+  principleText,
+  principleTitle,
+  undefendedText,
+} from "@chess-teacher/lesson-text";
+import { ParaglideMessage } from "@inlang/paraglide-js-react";
+import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 
 /** The lesson's explanation, built from the same measured facts an LLM would receive. */
 export function Explanation({ lesson }: { lesson: Lesson }) {
   const f = facts(lesson);
+  const locale = getLocale();
   const mate = lesson.feature === "mate";
   return (
     <div className="explanation">
       <p className="lead">
-        On move {f.move_number} you played <strong>{f.you_played}</strong>. <strong>{f.better_was}</strong>{" "}
-        was better.
+        <ParaglideMessage
+          message={m.explanation_lead}
+          inputs={{ moveNumber: f.move_number, played: f.you_played, better: f.better_was }}
+          markup={{ strong: ({ children }) => <strong>{children}</strong> }}
+        />
       </p>
       {mate ? (
-        <p>After your move, your opponent had a forced checkmate.</p>
+        <p>{m.explanation_mate()}</p>
       ) : lesson.kind === "consequence" ? (
         <dl className="facts">
-          <dt>Before your move</dt>
-          <dd>{f.before_your_move}</dd>
-          <dt>Where your move leads</dt>
-          <dd>{f.end_of_your_line}</dd>
-          <dt>Where the better move leads</dt>
-          <dd>{f.end_of_better_line}</dd>
+          <dt>{m.facts_before()}</dt>
+          <dd>{detailText(f.before_your_move, locale)}</dd>
+          <dt>{m.facts_your_line()}</dt>
+          <dd>{detailText(f.end_of_your_line, locale)}</dd>
+          <dt>{m.facts_better_line()}</dt>
+          <dd>{detailText(f.end_of_better_line, locale)}</dd>
         </dl>
       ) : (
         <>
           <p>
-            Your move wasn't a disaster, but {f.better_was} would have{" "}
             {lesson.feature === "their_pawns"
-              ? "left your opponent with pawn weaknesses"
-              : `improved ${f.key_factor}`}
-            .
+              ? m.explanation_missed_pawns({ better: f.better_was })
+              : m.explanation_missed_improved({
+                  better: f.better_was,
+                  factor: factorText(f.key_factor, locale),
+                })}
           </p>
           <dl className="facts">
-            <dt>Where the better move leads</dt>
-            <dd>{f.end_of_better_line}</dd>
-            <dt>Where your move leads</dt>
-            <dd>{f.end_of_your_line}</dd>
+            <dt>{m.facts_better_line()}</dt>
+            <dd>{detailText(f.end_of_better_line, locale)}</dd>
+            <dt>{m.facts_your_line()}</dt>
+            <dd>{detailText(f.end_of_your_line, locale)}</dd>
           </dl>
         </>
       )}
       {lesson.principle === "hanging" && f.pieces_left_undefended_by_your_move.length > 0 && (
-        <p>Your move left this undefended: {f.pieces_left_undefended_by_your_move.join(", ")}.</p>
+        <p>
+          {m.explanation_undefended({
+            pieces: listText(
+              f.pieces_left_undefended_by_your_move.map((u) => undefendedText(u, locale)),
+              locale,
+            ),
+          })}
+        </p>
       )}
       <div className="principle">
-        <div className="principle-title">{f.principle.title}</div>
-        <p>{f.principle.explanation}</p>
+        <div className="principle-title">{principleTitle(f.principle, locale)}</div>
+        <p>{principleText(f.principle, locale)}</p>
       </div>
     </div>
   );

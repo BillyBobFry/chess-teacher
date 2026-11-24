@@ -1,13 +1,24 @@
 /**
  * LLM explanations. The model sees only the lesson's measured facts (from the core's
- * `facts()`), never the board, and its output is rejected if it mentions any square that
- * isn't in those facts. The template explanation is always the fallback.
+ * `facts()`, worded in en-GB from the message catalogue), never the board, and its output is
+ * rejected if it mentions any square that isn't in those facts. It writes in the player's
+ * locale. The template explanation is always the fallback.
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import type { LessonFacts } from "@chess-teacher/core";
+import { CONSEQUENCE, type LessonFacts } from "@chess-teacher/core";
+import {
+  baseLocale,
+  detailText,
+  factorText,
+  principleText,
+  principleTitle,
+  undefendedText,
+  type Locale,
+} from "@chess-teacher/lesson-text";
 
-export const PROMPT_VERSION = 3;
+/** 4: facts worded from the catalogue, and the explanation written in the player's locale. */
+export const PROMPT_VERSION = 4;
 
 export const SYSTEM_PROMPT = `You are a friendly chess coach. Your student knows how the pieces move but \
 not the strategy. You will receive facts about one of their moves. A chess engine and \
@@ -37,6 +48,14 @@ is the point.
 Use only the facts given. Do not analyse the position yourself, and do not mention any \
 move or square that does not appear in the facts. If the facts don't say why something \
 happened, don't guess. Plain text in each part: no markdown.`;
+
+/** The language the explanation is written in, by name ("British English"), for the prompt. */
+export const languageName = (locale: Locale): string =>
+  new Intl.DisplayNames(["en"], { type: "language" }).of(locale) ?? locale;
+
+export const systemPrompt = (locale: Locale): string =>
+  `${SYSTEM_PROMPT}\n\nWrite every part in ${languageName(locale)} (${locale}), with its spelling and ` +
+  `conventions. Keep moves and squares in standard algebraic notation, as in the facts.`;
 
 /** The explanation's structure, enforced by the API's structured outputs. */
 export interface ExplanationParts {
@@ -108,19 +127,36 @@ export function parseParts(raw: string | null | undefined): ExplanationParts | n
 }
 
 /**
- * The facts as the model sees them: the predicted lines are labelled as predictions, so the
- * model doesn't describe them as moves that happened (they haven't: explanations are
- * written when a lesson is created, before the game moves on).
+ * The facts as the model sees them, worded in en-GB whatever language it writes in. The
+ * predicted lines are labelled as predictions, so the model doesn't describe them as moves
+ * that happened (they haven't: explanations are written when a lesson is created, before the
+ * game moves on).
  */
 export function promptFacts(f: LessonFacts) {
-  const { your_line, better_line, you_played, ...rest } = f;
-  delete (rest as Partial<LessonFacts>).lines_diverge_after_ply;
-  delete (rest as Partial<LessonFacts>).what_happened_in_the_game;
+  const locale = baseLocale;
   return {
-    move_played: you_played,
-    ...rest,
-    predicted_continuation_after_your_move: your_line,
-    predicted_continuation_after_better_move: better_line,
+    move_played: f.you_played,
+    move_number: f.move_number,
+    player_colour: f.player_colour,
+    better_was: f.better_was,
+    evaluation_cost_in_pawns: f.evaluation_cost_in_pawns,
+    lesson_type:
+      f.lesson_type === CONSEQUENCE
+        ? "something went wrong because of this move"
+        : "a better opportunity was missed",
+    key_factor: factorText(f.key_factor, locale),
+    before_your_move: detailText(f.before_your_move, locale),
+    end_of_your_line: detailText(f.end_of_your_line, locale),
+    end_of_better_line: detailText(f.end_of_better_line, locale),
+    pieces_left_undefended_by_your_move: f.pieces_left_undefended_by_your_move.map((u) =>
+      undefendedText(u, locale),
+    ),
+    principle: {
+      title: principleTitle(f.principle, locale),
+      explanation: principleText(f.principle, locale),
+    },
+    predicted_continuation_after_your_move: f.your_line,
+    predicted_continuation_after_better_move: f.better_line,
   };
 }
 
@@ -128,13 +164,14 @@ export async function explainLesson(
   client: LlmClient,
   model: string,
   facts: LessonFacts,
+  locale: Locale,
 ): Promise<ExplanationResult> {
   const factJson = JSON.stringify(promptFacts(facts), null, 2);
   const body = {
     model,
     max_tokens: 2000,
     output_config: { effort: "low", format: { type: "json_schema", schema: PARTS_SCHEMA } },
-    system: SYSTEM_PROMPT,
+    system: systemPrompt(locale),
     messages: [{ role: "user", content: `Facts about the mistake:\n${factJson}` }],
     ...(FALLBACK_MODELS.has(model)
       ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" }
