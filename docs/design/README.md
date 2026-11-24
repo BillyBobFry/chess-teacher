@@ -67,7 +67,9 @@ added later.
   from `paraglide/runtime.js` and pass it to every `Intl` formatter. There is no language
   setting in the UI yet (UX-54: it appears when a second language does).
 - **Adding a locale:** add `messages/<locale>.json` with every key, register it in `locales` in
-  `settings.json` and in the React Aria locales in `apps/web/vite.config.ts` (components.md),
-  check the layout in the longest locale (UX-40), review that language's punctuation and wording items (UX-31), and decide how moves are written (UX-106).
+  `settings.json`, check the layout in the longest locale (UX-40), review that language's
+  punctuation and wording items (UX-31), and decide how moves are written (UX-106). React Aria
+  picks up the new language from `settings.json`; check its own strings read well in it
+  (components.md).
 - **Not in the catalogue yet:** the static landing page `apps/web/landing/`. See Known gaps in
   [`ux-principles.md`](ux-principles.md).

@@ -36,6 +36,10 @@ on react-chessboard (UX-100), not a primitive.
 - **Meet the rules once, in the primitive:** 44px targets (UX-23), named transitions and
   reduced motion (UX-25, UX-26), button states (UX-12). Callers then get them for free.
 - **Text arrives as props or children**, never as a literal inside the primitive (UX-32).
+- **Check that attributes reach the element.** React Aria passes through only the props it
+  knows, and TypeScript doesn't check hyphenated attributes, so something like
+  `aria-keyshortcuts` can vanish without an error. A primitive that needs one declares it as a
+  prop and sets it on the element itself (see `ui/Button`).
 - **`className` is for placement only**: margin, width, grid or flex placement. Colour,
   typography and state styling belong to the primitive's variants; if a caller needs a
   different look, add a variant. Classes are merged with `tailwind-merge` (through `tv()`), so a
@@ -83,8 +87,9 @@ search"), translated for its supported locales. `main.tsx` wraps the app in
 one exception to UX-32. When we ship a locale React Aria doesn't cover, or one of its strings
 reads wrong, pass our own label from the catalogue through the component's label prop.
 
-`@react-aria/optimize-locales-plugin` in `vite.config.ts` drops the locales we don't ship from
-the bundle; adding a locale means adding it there too (see [`README.md`](README.md)).
+`@react-aria/optimize-locales-plugin` in `vite.config.ts` drops the languages we don't ship from
+the bundle. It reads them from `project.inlang/settings.json`, so a new locale needs no change
+there.
 
 ## Migration
 
