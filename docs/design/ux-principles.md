@@ -70,7 +70,7 @@ or what the user typed on error.
 
 **UX-15 Undo removals; confirm what cannot be undone.** Removing something still on screen happens
 at once and offers Undo, with no confirmation. Throwing away something the server cannot restore
-(abandoning a game in progress, deleting an account) asks first in a dialog that names it, with a
+(resigning a game in progress, deleting an account) asks first in a dialog that names it, with a
 danger confirm and no Undo. Never use `window.confirm`: it can't be styled, translated by us or
 tested well.
 
@@ -216,6 +216,7 @@ buttons, headings and errors. The glossary (en-GB; each locale keeps its own lis
 | rewind            | go back to before the mistake and play on from there                               | undo, take back                      |
 | undo, redo        | remove the player's latest move and the opponent's reply; play them again          | take back, takeback, rewind          |
 | carry on          | continue the game after a lesson                                                   | resume, continue                     |
+| resign            | end the game before it's over, as a loss; starting a new game mid-game does it too | abandon, forfeit, end game, quit     |
 | sign in, sign out | start and end a session; a new player's button is "Create account"                 | log in, log out, register            |
 
 **UX-60 Copy mechanics.** Sentence case for every piece of UI text, buttons and headings included.
