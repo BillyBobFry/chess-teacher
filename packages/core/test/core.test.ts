@@ -1,5 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { Game, newSession, pyRound, settledBalance, variationSan } from "../src/index.ts";
+import {
+  Game,
+  MATE_SCORE,
+  gameOutcome,
+  newSession,
+  opponentMove,
+  pyRound,
+  resign,
+  settledBalance,
+  upgradeSession,
+  variationSan,
+  type Engine,
+  type SavedSessionState,
+} from "../src/index.ts";
+
+/** 1. f3 e5 2. g4 Qh4#: Black mates. */
+const FOOLS_MATE = ["f2f3", "e7e5", "g2g4", "d8h4"];
 
 describe("pyRound", () => {
   it("rounds like Python's round(), including ties to even", () => {
@@ -45,5 +61,66 @@ describe("newSession", () => {
   it("produces plain JSON state", () => {
     const s = newSession({ userColour: "w" });
     expect(JSON.parse(JSON.stringify(s))).toEqual(s);
+  });
+});
+
+describe("resign", () => {
+  it("finishes the game as resigned", () => {
+    const s = resign({ ...newSession({ userColour: "w" }), moves: ["e2e4", "e7e5"] });
+    expect(s.resigned).toBe(true);
+    expect(s.lessons.filter((l) => l.status === "pending")).toEqual([]);
+  });
+
+  it("keeps the real result of a game already over by the rules", () => {
+    const s = resign({ ...newSession({ userColour: "w" }), moves: FOOLS_MATE });
+    expect(s.resigned).toBe(false);
+    expect(gameOutcome(s)).toBe("lost");
+  });
+});
+
+describe("gameOutcome", () => {
+  it("reads checkmate from the user's side", () => {
+    const mated = { ...newSession({ userColour: "w" }), moves: FOOLS_MATE };
+    expect(gameOutcome(mated)).toBe("lost");
+    expect(gameOutcome({ ...mated, userColour: "b" })).toBe("won");
+  });
+
+  it("counts resigning as a loss, and an unrecorded early stop as ended", () => {
+    const early = { ...newSession({ userColour: "w" }), moves: ["e2e4"] };
+    expect(gameOutcome(resign(early))).toBe("lost");
+    expect(gameOutcome(early)).toBe("ended");
+  });
+});
+
+describe("opponentMove", () => {
+  it("scores the opponent's checkmate as lost, without asking the engine", async () => {
+    const engine: Engine = {
+      analyse: () => Promise.reject(new Error("a finished game needs no analysis")),
+      play: () => Promise.resolve("d8h4"),
+    };
+    const s = { ...newSession({ userColour: "w" }), moves: FOOLS_MATE.slice(0, 3) };
+    const r = await opponentMove(s, { analyst: engine, weak: engine });
+    expect(r.state.scores[3]).toBe(-MATE_SCORE);
+  });
+});
+
+describe("upgradeSession", () => {
+  it("gives a version 2 save no evaluations and no resignation", () => {
+    const saved: SavedSessionState = { ...newSession({ userColour: "b" }), version: 2, moves: ["e2e4"] };
+    delete saved.scores;
+    delete saved.resigned;
+    const upgraded = upgradeSession(saved);
+    expect(upgraded.scores).toEqual([]);
+    expect(upgraded.resigned).toBe(false);
+    expect(upgraded.version).toBe(3);
+  });
+
+  it("drops scores for moves the save no longer has", () => {
+    const saved: SavedSessionState = {
+      ...newSession({ userColour: "w" }),
+      moves: ["e2e4"],
+      scores: [20, -15, 30],
+    };
+    expect(upgradeSession(saved).scores).toEqual([20]);
   });
 });

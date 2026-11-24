@@ -77,6 +77,7 @@ describe("takeBack", () => {
           const back = defined(takeBack(after), "a takeback");
           expect(back.moves).toEqual(p.before.moves);
           expect(back.opponentModes).toEqual(p.before.opponentModes);
+          expect(back.scores).toEqual(p.before.scores);
           expect(isUserTurn(back)).toBe(true);
           expect(gameOf(back).fen).toBe(gameOf(p.before).fen);
           for (const { kind, lessonId } of p.events) {

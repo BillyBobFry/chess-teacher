@@ -17,6 +17,7 @@ import {
   newSession,
   opponentMove,
   recordFoundCause,
+  resign as resignGame,
   rewind,
   startUserTurn,
   takeBack,
@@ -280,10 +281,10 @@ export function useGame(opts: { llmEnabled: boolean }) {
   const newGame = useCallback(
     async (o: NewGameOptions) => {
       const colour = o.colour === "random" ? (Math.random() < 0.5 ? "w" : "b") : o.colour;
-      // An unfinished game being abandoned is finished first, so it shows up as done.
+      // Starting a new game resigns an unfinished one, so it shows up as done.
       const old = gameRef.current;
       if (old && !old.finished) {
-        commit({ ...old, state: finish(old.state), reveal: null, finished: true });
+        commit({ ...old, state: resignGame(old.state), reveal: null, finished: true });
         await saver.current?.flush();
       }
       const { depth } = await engines(o.opponentSkill);
@@ -384,10 +385,10 @@ export function useGame(opts: { llmEnabled: boolean }) {
     void advance();
   }, [advance, commit, setRedoStates]);
 
-  const endGame = useCallback(() => {
+  const resign = useCallback(() => {
     const g = gameRef.current;
     if (!g || g.finished) return;
-    commit({ ...g, state: finish(g.state), reveal: null, finished: true });
+    commit({ ...g, state: resignGame(g.state), reveal: null, finished: true });
   }, [commit]);
 
   /**
@@ -438,7 +439,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
     redo,
     canUndo: canStep(game, !!pendingMove) && canTakeBack(game.state),
     canRedo: canStep(game, !!pendingMove) && redoStates.length > 0,
-    endGame,
+    resign,
     explanation,
     dismissError: () => setError(null),
   };

@@ -194,6 +194,15 @@ describe("games", () => {
     expect((await call("/api/games", { method: "POST", cookie, json: newGameBody(state) })).status).toBe(400);
   });
 
+  it("rejects games with malformed scores or resignation", async () => {
+    const { call, signUp } = await setup();
+    const cookie = await signUp("erin@example.com");
+    for (const bad of [{ resigned: "yes" }, { scores: ["x"] }]) {
+      const json = { ...newGameBody(), state: { ...newSession({ userColour: "w" }), ...bad } };
+      expect((await call("/api/games", { method: "POST", cookie, json })).status).toBe(400);
+    }
+  });
+
   it("keeps each user's games private", async () => {
     const { call, signUp } = await setup();
     const alice = await signUp("alice@example.com");

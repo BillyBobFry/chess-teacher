@@ -21,6 +21,9 @@ export const SessionStateSchema = z.looseObject({
   lessons: z.array(z.looseObject({ id: z.number().int() })).max(400),
   opponentModes: z.array(z.enum(["normal", "levelled"])).max(1200),
   analysis: z.looseObject({ fen: z.string() }).nullable(),
+  // Optional: saves from version 2 and earlier have neither.
+  scores: z.array(z.number().int().nullable()).max(1200).optional(),
+  resigned: z.boolean().optional(),
 });
 
 export const RevealSchema = z.object({

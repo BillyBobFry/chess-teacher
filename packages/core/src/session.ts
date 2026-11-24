@@ -29,8 +29,11 @@ import { chooseOpponentMove, type OpponentMode } from "./opponent.ts";
 import type { Detail, MoveRef } from "./text.ts";
 import { verifyLesson } from "./validate.ts";
 
-/** 2: lessons hold their details and trigger as data, not English text. */
-export const SESSION_STATE_VERSION = 2;
+/**
+ * 2: lessons hold their details and trigger as data, not English text.
+ * 3: the evaluation after each move (`scores`), and whether the player resigned.
+ */
+export const SESSION_STATE_VERSION = 3;
 
 export interface SessionState {
   version: number;
@@ -45,6 +48,15 @@ export interface SessionState {
   analysis: { fen: string; candidates: Candidate[] } | null;
   /** Strategic lessons not taught because the classical evaluation disagreed. */
   unverified?: number;
+  /**
+   * The engine's evaluation after each move, from the user's side, in centipawns (mates as
+   * ±(MATE_SCORE − plies)). Indexed like `moves`; null where the position wasn't analysed.
+   * Recorded from analysis the game does anyway, so it costs no extra engine time. It can be
+   * shorter than `moves` while a move's analysis is still to come.
+   */
+  scores: (number | null)[];
+  /** The player ended the game before it was over by the rules. */
+  resigned: boolean;
 }
 
 export type GameEventKind = "created" | "warning" | "triggered" | "chanceGone" | "fixed" | "expired";
@@ -74,6 +86,8 @@ export function newSession(opts: {
     lessons: [],
     opponentModes: [],
     analysis: null,
+    scores: [],
+    resigned: false,
   };
 }
 
@@ -94,6 +108,21 @@ const resolve = (l: Lesson, status: LessonStatus, game: Game): void => {
 
 const event = (kind: GameEventKind, lesson: Lesson): GameEvent => ({ kind, lessonId: lesson.id });
 
+/** Record the evaluation (user's side) of the position after the latest move. */
+function recordScore(s: SessionState, score: number): void {
+  const index = s.moves.length - 1;
+  if (index < 0) return;
+  while (s.scores.length < index) s.scores.push(null);
+  s.scores[index] = score;
+}
+
+/** Moves taken back or rewound take their evaluations with them. */
+function backTo(s: SessionState, moves: number): void {
+  s.moves = s.moves.slice(0, moves);
+  s.scores = s.scores.slice(0, moves);
+  s.analysis = null;
+}
+
 /** The lesson the opponent is currently trying to demonstrate (the biggest pending one). */
 export function activeLesson(s: SessionState): Lesson | null {
   let best: Lesson | null = null;
@@ -111,6 +140,9 @@ async function analysis(s: SessionState, game: Game, engines: Engines): Promise<
         });
     s.analysis = { fen: game.fen, candidates };
   }
+  // Only ever called on the user's turn, so the side to move's score is the user's.
+  const best = s.analysis.candidates[0];
+  if (best) recordScore(s, best.score);
   return s.analysis.candidates;
 }
 
@@ -167,6 +199,7 @@ export async function userMove(state: SessionState, move: string, engines: Engin
     ? []
     : await engines.analyst.analyse(game.fen, { depth: s.config.analysisDepth, multipv: 1 });
   const userScore = scoreAfter(game, after, s.userColour);
+  recordScore(s, userScore);
 
   // Did the user fix something before it was punished?
   for (const lesson of pending(s)) {
@@ -216,6 +249,8 @@ export async function opponentMove(
   game.push(move);
   s.moves.push(move);
   s.opponentModes.push(mode);
+  // A game over needs no engine to score; otherwise the user's next turn analyses it.
+  if (game.isGameOver()) recordScore(s, scoreAfter(game, [], s.userColour));
   s.analysis = null;
   return { state: s, events: checkConsequences(s, game), move, mode };
 }
@@ -253,16 +288,40 @@ export function finish(state: SessionState): SessionState {
   return s;
 }
 
+/**
+ * The player ends the game: a loss, then the review. A game already over by the rules (a
+ * lesson can open on the move that ends it) keeps its real result.
+ */
+export function resign(state: SessionState): SessionState {
+  const s = finish(state);
+  s.resigned = !gameOf(s).isGameOver();
+  return s;
+}
+
+/** How a finished game ended for the user. */
+export type GameOutcome =
+  | "won"
+  | "drawn"
+  | "lost"
+  /** Stopped early by a version that didn't record resigning. */
+  | "ended";
+
+export function gameOutcome(s: SessionState): GameOutcome {
+  const game = gameOf(s);
+  if (game.isCheckmate()) return game.turn === s.userColour ? "lost" : "won";
+  if (game.isGameOver()) return "drawn";
+  return s.resigned ? "lost" : "ended";
+}
+
 /** Go back to the position before a lesson's mistake. */
 export function rewind(state: SessionState, lessonId: number): SessionState {
   const s = clone(state);
   const target = s.lessons.find((l) => l.id === lessonId);
   if (!target) throw new Error(`No lesson ${lessonId}`);
-  s.moves = s.moves.slice(0, target.ply - plyOf(s.startFen));
+  backTo(s, target.ply - plyOf(s.startFen));
   for (const l of s.lessons) {
     if (l.ply >= target.ply && l !== target && l.status === "pending") l.status = "rewound";
   }
-  s.analysis = null;
   return s;
 }
 
@@ -290,7 +349,7 @@ export function takeBack(state: SessionState): SessionState | null {
   const ply = plyOf(s.startFen) + index;
   // Every move taken back after the user's own was an opponent's reply, logged in opponentModes.
   const replies = s.moves.length - index - 1;
-  s.moves = s.moves.slice(0, index);
+  backTo(s, index);
   s.opponentModes = s.opponentModes.slice(0, Math.max(0, s.opponentModes.length - replies));
   for (const l of s.lessons) {
     if (l.status === "triggered" || l.status === "rewound") continue;
@@ -301,7 +360,6 @@ export function takeBack(state: SessionState): SessionState | null {
       l.resolvedPly = null;
     }
   }
-  s.analysis = null;
   return s;
 }
 
@@ -365,30 +423,43 @@ type LessonV1 = Omit<Lesson, "baselineDetail" | "userDetail" | "bestDetail" | "t
 };
 
 /** A session as any version saved it. */
-export type SavedSessionState = Omit<SessionState, "lessons"> & { lessons: (Lesson | LessonV1)[] };
+export type SavedSessionState = Omit<SessionState, "lessons" | "scores" | "resigned"> & {
+  lessons: (Lesson | LessonV1)[];
+  scores?: (number | null)[];
+  resigned?: boolean;
+};
 
 /**
  * Bring a saved session up to the current version. Details are measured again from the
  * lesson's own positions, so they come out exactly as they would have been. A version 1
  * consequence's trigger can't always be rebuilt (the game may have been rewound past it),
- * so it keeps its saved text.
+ * so it keeps its saved text. Version 2 and earlier recorded no evaluations or resignations.
  */
 export function upgradeSession(saved: SavedSessionState): SessionState {
-  if (saved.version >= SESSION_STATE_VERSION) return saved as SessionState;
-  const lessons = (saved.lessons as LessonV1[]).map((old): Lesson => {
-    const { triggerText, ...rest } = old;
-    return {
-      ...rest,
-      ...upgradedDetails(old),
-      trigger:
-        old.status !== "triggered"
-          ? null
-          : old.kind === MISSED_CHANCE
-            ? { kind: "chance_gone" }
-            : { kind: "legacy", text: triggerText },
-    };
-  });
-  return { ...saved, version: SESSION_STATE_VERSION, lessons };
+  const lessons =
+    saved.version >= 2 ? (saved.lessons as Lesson[]) : (saved.lessons as LessonV1[]).map(upgradedLesson);
+  return {
+    ...saved,
+    version: SESSION_STATE_VERSION,
+    lessons,
+    // A tab running an older version may have taken moves back without their scores.
+    scores: (saved.scores ?? []).slice(0, saved.moves.length),
+    resigned: saved.resigned ?? false,
+  };
+}
+
+function upgradedLesson(old: LessonV1): Lesson {
+  const { triggerText, ...rest } = old;
+  return {
+    ...rest,
+    ...upgradedDetails(old),
+    trigger:
+      old.status !== "triggered"
+        ? null
+        : old.kind === MISSED_CHANCE
+          ? { kind: "chance_gone" }
+          : { kind: "legacy", text: triggerText },
+  };
 }
 
 function upgradedDetails(l: LessonV1): Pick<Lesson, "baselineDetail" | "userDetail" | "bestDetail"> {
