@@ -1,13 +1,10 @@
 /** Wires the API together from the environment: database, auth, LLM client. */
 
-import { join } from "node:path";
 import { createApp } from "./app.ts";
 import { createAuth } from "./auth.ts";
-import { connect } from "./db/client.ts";
+import { connect, MIGRATIONS } from "./db/client.ts";
 import { readEnv, type Env } from "./env.ts";
 import { createFakeLlmClient, createLlmClient, type LlmClient } from "./explain.ts";
-
-export const MIGRATIONS = join(import.meta.dirname, "..", "drizzle");
 
 export async function createServer(opts: { env?: Env; llm?: LlmClient | null; migrate?: boolean } = {}) {
   const env = opts.env ?? readEnv();

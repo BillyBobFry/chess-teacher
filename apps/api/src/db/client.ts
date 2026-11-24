@@ -4,11 +4,15 @@
  * development and tests need no database setup at all.
  */
 
+import { join } from "node:path";
 import { neon } from "@neondatabase/serverless";
 import { drizzle as drizzleNeon } from "drizzle-orm/neon-http";
 import { migrate as migrateNeon } from "drizzle-orm/neon-http/migrator";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import * as schema from "./schema.ts";
+
+/** Here, not in server.ts, so the migrate CLI loads only database code: the Vercel build migrates before generating i18n. */
+export const MIGRATIONS = join(import.meta.dirname, "..", "..", "drizzle");
 
 export type Db = PgDatabase<PgQueryResultHKT, typeof schema>;
 
