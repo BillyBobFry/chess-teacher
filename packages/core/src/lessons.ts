@@ -95,6 +95,12 @@ export const DEFAULT_CONFIG: TeachingConfig = {
 /** A lesson is plain data, so a game in progress can be saved and resumed anywhere. */
 export interface Lesson {
   id: number;
+  /**
+   * The line of play the mistake was made on: the game's current line (`SessionState.line`)
+   * or one it left behind (`SessionState.branches`). What really happened after the mistake
+   * is in that line's moves.
+   */
+  line: number;
   ply: number;
   userColour: Colour;
   fenBefore: string;
@@ -172,6 +178,8 @@ function lineValues(fen: string, line: string[], color: Colour): Measurements[] 
 
 export function detectMistake(
   lessonId: number,
+  /** The line of play the move was made on (`SessionState.line`). */
+  line: number,
   fenBefore: string,
   userMove: string,
   gameAfter: Game,
@@ -202,6 +210,7 @@ export function detectMistake(
 
   const base = {
     id: lessonId,
+    line,
     ply: plyOf(fenBefore),
     userColour,
     fenBefore,

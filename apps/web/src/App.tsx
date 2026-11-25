@@ -1,12 +1,14 @@
 import type { ConfigResponse } from "@chess-teacher/contract";
-import { gameOf, gameOutcome, isUserTurn, type Game, type SessionState } from "@chess-teacher/core";
+import { gameOf, isUserTurn } from "@chess-teacher/core";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, authClient } from "./api/client.ts";
 import { Board, orientationOf } from "./components/Board.tsx";
+import { Games } from "./components/Games.tsx";
 import { Licences } from "./components/Licences.tsx";
 import { MoveList } from "./components/MoveList.tsx";
 import { NewGame } from "./components/NewGame.tsx";
+import { PastGame } from "./components/PastGame.tsx";
 import { Progress } from "./components/Progress.tsx";
 import { Reveal } from "./components/Reveal.tsx";
 import { Alert } from "./ui/Alert.tsx";
@@ -18,6 +20,7 @@ import { Toasts } from "./ui/Toast.tsx";
 import { Review } from "./components/Review.tsx";
 import { SignIn } from "./components/SignIn.tsx";
 import { useGame, type Busy } from "./game/useGame.ts";
+import { resultText } from "./lib/result.ts";
 import { m } from "./paraglide/messages.js";
 
 const BUSY_TEXT: Record<Exclude<Busy, null>, () => string> = {
@@ -47,19 +50,6 @@ function stepKey(e: KeyboardEvent): "undo" | "redo" | null {
   if (key === "z") return e.shiftKey ? "redo" : "undo";
   if (key === "y" && e.ctrlKey && !e.metaKey && !e.shiftKey) return "redo";
   return null;
-}
-
-function resultText(game: Game, state: SessionState): string {
-  switch (gameOutcome(state)) {
-    case "won":
-      return m.result_won();
-    case "lost":
-      return state.resigned ? m.result_resigned() : m.result_lost();
-    case "drawn":
-      return game.chess.isStalemate() ? m.result_stalemate() : m.result_draw();
-    case "ended":
-      return m.result_ended();
-  }
 }
 
 function Shell({
@@ -92,6 +82,10 @@ function Shell({
     </div>
   );
 }
+
+/** What the signed-in player is looking at: the game (or choosing a new one), or a page from the account menu. */
+type Page = { kind: "play" } | { kind: "progress" } | { kind: "games" } | { kind: "pastGame"; id: string };
+const PLAY: Page = { kind: "play" };
 
 /** Signed out → sign-in screen; signed in → the game. */
 export function App() {
@@ -152,10 +146,16 @@ function GameApp({
 }) {
   const g = useGame({ llmEnabled });
   const [choosing, setChoosing] = useState(false);
-  const [showProgress, setShowProgress] = useState(false);
+  const [page, setPage] = useState<Page>(PLAY);
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
   const [confirmingResign, setConfirmingResign] = useState(false);
   const saved = g.game;
+  const chooseNewGame = () => {
+    setPage(PLAY);
+    setChoosing(true);
+  };
+  // Starting a new game resigns one in progress, so that asks first (UX-15).
+  const requestNewGame = () => (saved && !saved.finished ? setConfirmingNewGame(true) : chooseNewGame());
 
   const board = useMemo(() => {
     if (!saved) return null;
@@ -193,11 +193,7 @@ function GameApp({
           {m.nav_resign()}
         </Button>
       )}
-      {saved && !choosing && (
-        <Button onPress={() => (saved.finished ? setChoosing(true) : setConfirmingNewGame(true))}>
-          {m.nav_new_game()}
-        </Button>
-      )}
+      {saved && !choosing && <Button onPress={requestNewGame}>{m.nav_new_game()}</Button>}
       {saved && board && (
         <ConfirmDialog
           open={confirmingResign}
@@ -220,7 +216,7 @@ function GameApp({
           cancelLabel={m.confirm_new_game_cancel()}
           onClose={(confirmed) => {
             setConfirmingNewGame(false);
-            if (confirmed) setChoosing(true);
+            if (confirmed) chooseNewGame();
           }}
         />
       )}
@@ -244,7 +240,8 @@ function GameApp({
               </>
             }
           >
-            <MenuItem onAction={() => setShowProgress(true)}>{m.account_progress()}</MenuItem>
+            <MenuItem onAction={() => setPage({ kind: "games" })}>{m.account_games()}</MenuItem>
+            <MenuItem onAction={() => setPage({ kind: "progress" })}>{m.account_progress()}</MenuItem>
             <MenuItem onAction={() => void authClient.signOut().then(() => window.location.reload())}>
               {m.account_sign_out()}
             </MenuItem>
@@ -262,12 +259,40 @@ function GameApp({
     );
   }
 
-  if (showProgress) {
+  if (page.kind === "progress") {
     return (
       <Shell nav={nav} onLicences={onLicences}>
         <main className="page">
-          <Progress onBack={() => setShowProgress(false)} />
+          <Progress onBack={() => setPage(PLAY)} />
         </main>
+      </Shell>
+    );
+  }
+
+  if (page.kind === "games") {
+    return (
+      <Shell nav={nav} onLicences={onLicences}>
+        <main className="page">
+          <Games
+            onOpen={(id) => setPage({ kind: "pastGame", id })}
+            onNewGame={requestNewGame}
+            onBack={() => setPage(PLAY)}
+          />
+        </main>
+      </Shell>
+    );
+  }
+
+  if (page.kind === "pastGame") {
+    return (
+      <Shell nav={nav} onLicences={onLicences}>
+        <PastGame
+          key={page.id}
+          id={page.id}
+          onBack={() => setPage({ kind: "games" })}
+          onNewGame={requestNewGame}
+          onProgress={() => setPage({ kind: "progress" })}
+        />
       </Shell>
     );
   }
@@ -339,7 +364,7 @@ function GameApp({
               state={state}
               result={resultText(board.game, state)}
               onNewGame={() => setChoosing(true)}
-              onProgress={() => setShowProgress(true)}
+              onProgress={() => setPage({ kind: "progress" })}
             />
           ) : revealLesson && saved.reveal ? (
             <Reveal

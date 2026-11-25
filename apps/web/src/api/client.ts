@@ -46,6 +46,7 @@ export const api = {
   me: () => request<MeResponse>("/me"),
   progress: () => request<ProgressResponse>("/me/progress"),
   activeGames: () => request<GameSummary[]>("/games?status=active"),
+  finishedGames: () => request<GameSummary[]>("/games?status=finished"),
   game: (id: string) => request<GameRecord>(`/games/${id}`),
   createGame: (body: CreateGameBody) => request<GameRecord>("/games", { method: "POST", json: body }),
   saveGame: (id: string, body: SaveGameBody) =>

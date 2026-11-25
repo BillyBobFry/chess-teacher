@@ -5,6 +5,8 @@ import {
   canTakeBack,
   gameOf,
   isUserTurn,
+  playedLine,
+  plyOf,
   takeBack,
   type GameEvent,
   type Lesson,
@@ -96,5 +98,34 @@ describe("takeBack", () => {
       }
     }
     expect(checked).toBeGreaterThan(0);
+  });
+
+  it("keeps the line as a branch when it undoes the moves of a lesson the player was shown, and only then", async () => {
+    let kept = 0;
+    for (const { name } of loadGames()) {
+      const { points } = await replay(name);
+      for (const p of points) {
+        for (const after of [p.afterMove, p.afterReply]) {
+          if (!after) continue;
+          const back = defined(takeBack(after), "a takeback");
+          const start = plyOf(after.startFen);
+          const shown = after.lessons.filter(
+            (l) =>
+              l.status === "triggered" && l.resolvedPly !== null && l.resolvedPly - start > back.moves.length,
+          );
+          if (shown.length === 0) {
+            expect(back.line).toBe(after.line);
+            expect(back.branches).toEqual(after.branches);
+            continue;
+          }
+          kept++;
+          expect(back.branches.at(-1)).toEqual({ id: after.line, moves: after.moves });
+          expect(back.line).not.toBe(after.line);
+          // The review still shows what really happened after each of those mistakes.
+          for (const l of shown) expect(playedLine(back, lessonIn(back, l.id))).toEqual(playedLine(after, l));
+        }
+      }
+    }
+    expect(kept).toBeGreaterThan(0);
   });
 });

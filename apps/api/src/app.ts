@@ -18,8 +18,10 @@ import type {
 import {
   Game,
   facts,
+  gameOutcome,
   isPrincipleId,
   playedLine,
+  reviewLessons,
   upgradeSession,
   variationSan,
   type Lesson,
@@ -103,10 +105,18 @@ export function createApp(deps: AppDeps) {
 
   const remaining = (used: number) => Math.max(0, env.explanationsPerMonth - used);
 
-  /** Moves must be legal from the start position; the server can check that much. */
-  function checkMoves(state: { startFen: string; moves: string[] }): ApiErrorCode | null {
+  /**
+   * Moves must be legal from the start position, on every line; the server can check that much.
+   * Each line has its own id, the line being played the latest, and every lesson is on one of them.
+   */
+  function checkGame(state: CreateGameBody["state"]): ApiErrorCode | null {
+    const line = state.line ?? 0;
+    const branches = state.branches ?? [];
+    const ids = new Set([line, ...branches.map((b) => b.id)]);
+    if (ids.size !== branches.length + 1 || branches.some((b) => b.id > line)) return "invalid_request";
+    if (state.lessons.some((l) => l.line !== undefined && !ids.has(l.line))) return "invalid_request";
     try {
-      new Game(state.startFen, state.moves);
+      for (const moves of [state.moves, ...branches.map((b) => b.moves)]) new Game(state.startFen, moves);
       return null;
     } catch {
       return "illegal_move";
@@ -193,26 +203,33 @@ export function createApp(deps: AppDeps) {
 
   // ------------------------------------------------------------------ games
 
+  /** The user's latest games: `?status=active` for unfinished ones, `?status=finished` for done. */
   app.get("/games", async (c) => {
-    const activeOnly = c.req.query("status") === "active";
+    const status = c.req.query("status");
+    const userId = eq(games.userId, c.get("userId"));
     const rows = await db
       .select()
       .from(games)
       .where(
-        activeOnly
-          ? and(eq(games.userId, c.get("userId")), eq(games.finished, false))
-          : eq(games.userId, c.get("userId")),
+        status === "active"
+          ? and(userId, eq(games.finished, false))
+          : status === "finished"
+            ? and(userId, eq(games.finished, true))
+            : userId,
       )
       .orderBy(desc(games.updatedAt))
       .limit(20);
     return c.json<GameSummary[]>(
       rows.map((r) => {
-        const s = r.state as GameRecord["state"];
+        // Read as saved: what's summarised here is the same in every version.
+        const s = r.state as SavedSessionState;
         return {
           id: r.id,
           userColour: s.userColour,
           moves: s.moves.length,
           finished: r.finished,
+          outcome: r.finished ? gameOutcome({ ...s, resigned: s.resigned ?? false }) : null,
+          lessons: reviewLessons(s).length,
           updatedAt: r.updatedAt.toISOString(),
         };
       }),
@@ -221,7 +238,7 @@ export function createApp(deps: AppDeps) {
 
   app.post("/games", limit, zValidator("json", CreateGameBody), async (c) => {
     const body = c.req.valid("json");
-    const problem = checkMoves(body.state);
+    const problem = checkGame(body.state);
     if (problem) return c.json(failure(problem), 400);
     const [row] = await db
       .insert(games)
@@ -245,7 +262,7 @@ export function createApp(deps: AppDeps) {
     const body = c.req.valid("json");
     const userId = c.get("userId");
     const id = c.req.param("id");
-    const problem = checkMoves(body.state);
+    const problem = checkGame(body.state);
     if (problem) return c.json(failure(problem), 400);
     if (!/^[0-9a-f-]{36}$/.test(id)) return c.json(failure("not_found"), 404);
     // Only saves based on the latest version succeed, so two devices can't overwrite each other.

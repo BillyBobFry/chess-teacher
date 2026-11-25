@@ -5,7 +5,8 @@
  *   landing page → create an account → play 1. e4 → play 2. Nf3 by keyboard alone →
  *   the new-game dialog → reload and resume →
  *   a recorded game at a reveal (wrong guess → hint → answer → AI explanation → futures →
- *   rewind) → resign a game and review it → sign out and back in → phone layout.
+ *   rewind) → resign and see the earlier try in the review → resign a game and review it →
+ *   past games, with the coach's explanation kept → sign out and back in → phone layout.
  * Fails on any console error. Screenshots go to the directory given.
  *
  * Usage: node scripts/build-vercel.mjs && pnpm --filter @chess-teacher/web smoke <dir> [--scale 2]
@@ -17,6 +18,7 @@ import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+  lessonMove,
   newSession,
   opponentMove,
   startUserTurn,
@@ -26,6 +28,7 @@ import {
   type TeachingConfig,
 } from "@chess-teacher/core";
 import { RecordedEngine, type RecordedCall } from "@chess-teacher/engine";
+import { moveText } from "@chess-teacher/lesson-text";
 // Browsers: `pnpm --filter @chess-teacher/web exec playwright install chromium` once.
 import type { BrowserType, Page, devices as Devices } from "playwright";
 
@@ -288,6 +291,14 @@ try {
       throw new Error(`expected ${Math.ceil(lesson.ply / 2)} rows, got ${rows}`);
   });
 
+  await step("resign after rewinding: the review shows the earlier try as a branch", async () => {
+    await page.getByRole("button", { name: "Resign" }).click();
+    await page.getByRole("button", { name: "Resign game" }).click();
+    await page.getByRole("heading", { name: "Game review" }).waitFor();
+    await page.getByText(/^Your earlier try from /).waitFor();
+    await shot("4b-review-branch", true);
+  });
+
   await step("resign a game with no lessons: no praise (UX-30)", async () => {
     await postGame(page, gameBody({ ...newSession({ userColour: "w" }), moves: ["e2e4", "e7e5"] }));
     await page.reload();
@@ -321,6 +332,38 @@ try {
     if (await page.getByRole("menu").count()) throw new Error("account menu still open");
     await shot("6b-progress", true);
     await page.getByRole("button", { name: "Back" }).click();
+  });
+
+  await step("past games, from the account menu, open their review", async () => {
+    await page.getByRole("button", { name: "Account" }).click();
+    await page.getByRole("menuitem", { name: "Your games" }).click();
+    await page.getByRole("heading", { name: "Your games" }).waitFor();
+    const rows = page.getByRole("grid", { name: "Finished games" }).getByRole("row");
+    await rows.first().waitFor();
+    if ((await rows.count()) < 3) throw new Error(`expected 3 finished games, got ${await rows.count()}`);
+    await shot("6c-games", true);
+    // The newest: the game resigned with lessons.
+    await rows.first().click();
+    await page.getByRole("heading", { name: "Game review" }).waitFor({ timeout: 30_000 });
+    await page.getByText("You resigned.").first().waitFor();
+    await page.locator(".review").getByRole("button", { expanded: false }).first().click();
+    await page.locator("figcaption").filter({ hasText: "What happened" }).waitFor();
+    await page.getByRole("button", { name: "Back to your games" }).click();
+    await page.getByRole("heading", { name: "Your games" }).waitFor();
+    // The oldest: the game whose lesson was revealed, so its review shows the coach's explanation.
+    await rows.nth(2).click();
+    await page.getByRole("heading", { name: "Game review" }).waitFor({ timeout: 30_000 });
+    await page
+      .locator(".review")
+      .getByRole("button")
+      .filter({ hasText: moveText(lessonMove(lesson), "en-GB") })
+      .click();
+    await page.getByText("Your coach", { exact: true }).waitFor();
+    await page.locator(".ai-headline").filter({ hasText: "(Sample)" }).waitFor();
+    await shot("6d-past-game-coach", true);
+    await page.getByRole("button", { name: "Back to your games" }).click();
+    await page.getByRole("heading", { name: "Your games" }).waitFor();
+    await page.getByRole("button", { name: "Back", exact: true }).click();
   });
 
   await step("sign out and back in", async () => {

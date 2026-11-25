@@ -18,12 +18,20 @@ export const SessionStateSchema = z.looseObject({
   moves: z.array(uci).max(1200),
   userColour: z.enum(["w", "b"]),
   config: z.looseObject({}),
-  lessons: z.array(z.looseObject({ id: z.number().int() })).max(400),
+  // `line`: optional, as saves from version 3 and earlier have none.
+  lessons: z.array(z.looseObject({ id: z.number().int(), line: z.number().int().optional() })).max(400),
   opponentModes: z.array(z.enum(["normal", "levelled"])).max(1200),
   analysis: z.looseObject({ fen: z.string() }).nullable(),
   // Optional: saves from version 2 and earlier have neither.
   scores: z.array(z.number().int().nullable()).max(1200).optional(),
   resigned: z.boolean().optional(),
+  // Optional: saves from version 3 and earlier have neither. Each branch is made by going back
+  // past a revealed lesson, which then stays on it, so there are never more branches than lessons.
+  line: z.number().int().min(0).optional(),
+  branches: z
+    .array(z.object({ id: z.number().int().min(0), moves: z.array(uci).max(1200) }))
+    .max(400)
+    .optional(),
 });
 
 export const RevealSchema = z.object({
@@ -59,11 +67,18 @@ export interface GameRecord {
   updatedAt: string;
 }
 
+/** How a game ended for the player (core's `GameOutcome`); "ended" is an early stop not recorded as resigning. */
+export type GameOutcome = "won" | "drawn" | "lost" | "ended";
+
 export interface GameSummary {
   id: string;
   userColour: "w" | "b";
   moves: number;
   finished: boolean;
+  /** For a finished game; null while it's being played. */
+  outcome: GameOutcome | null;
+  /** Lessons the review shows. */
+  lessons: number;
   updatedAt: string;
 }
 

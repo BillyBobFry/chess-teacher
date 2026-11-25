@@ -3,12 +3,15 @@ import {
   DEFAULT_CONFIG,
   Game,
   MATE_SCORE,
+  SESSION_STATE_VERSION,
   detectMistake,
   gameOutcome,
   newSession,
   opponentMove,
   pyRound,
   resign,
+  reviewTree,
+  rewind,
   settledBalance,
   upgradeSession,
   userMove,
@@ -16,9 +19,29 @@ import {
   type Candidate,
   type Engine,
   type Engines,
+  type Lesson,
+  type LessonStatus,
+  type ReviewLine,
   type SavedSessionState,
   type TeachingConfig,
 } from "../src/index.ts";
+
+/** A real lesson, placed by hand: for tests that read only where and on which line it was. */
+function lesson(id: number, line: number, ply: number, status: LessonStatus = "triggered"): Lesson {
+  const fen = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 2";
+  const base = detectMistake(
+    1,
+    0,
+    fen,
+    "f3g5",
+    new Game(fen, ["f3g5"]),
+    [{ move: "b1c3", score: 30, pv: ["b1c3", "b8c6", "f1c4", "g8f6"] }],
+    [{ move: "d8g5", score: 300, pv: ["d8g5", "d2d4", "g5g6"] }],
+    DEFAULT_CONFIG,
+  );
+  if (!base) throw new Error("expected a lesson");
+  return { ...base, id, line, ply, status };
+}
 
 /** 1. f3 e5 2. g4 Qh4#: Black mates. */
 const FOOLS_MATE = ["f2f3", "e7e5", "g2g4", "d8h4"];
@@ -118,7 +141,19 @@ describe("upgradeSession", () => {
     const upgraded = upgradeSession(saved);
     expect(upgraded.scores).toEqual([]);
     expect(upgraded.resigned).toBe(false);
-    expect(upgraded.version).toBe(3);
+    expect(upgraded.version).toBe(SESSION_STATE_VERSION);
+  });
+
+  it("puts every lesson of a version 3 save on its one line", () => {
+    const unlined: Omit<Lesson, "line"> & { line?: number } = lesson(1, 0, 2);
+    delete unlined.line;
+    const saved: SavedSessionState = { ...newSession({ userColour: "w" }), version: 3, lessons: [unlined] };
+    delete saved.line;
+    delete saved.branches;
+    const upgraded = upgradeSession(saved);
+    expect(upgraded.line).toBe(0);
+    expect(upgraded.branches).toEqual([]);
+    expect(upgraded.lessons.map((l) => l.line)).toEqual([0]);
   });
 
   it("drops scores for moves the save no longer has", () => {
@@ -139,7 +174,7 @@ describe("detectMistake", () => {
     best: Candidate,
     reply: Candidate,
     cfg: TeachingConfig = DEFAULT_CONFIG,
-  ) => detectMistake(1, fen, move, new Game(fen, [move]), [best], [reply], cfg);
+  ) => detectMistake(1, 0, fen, move, new Game(fen, [move]), [best], [reply], cfg);
 
   it("teaches a free piece left on the board as a missed chance, not a blunder", () => {
     // Black's queen on g5 is attacked by the knight on f3 and undefended.
@@ -246,5 +281,87 @@ describe("credit for material lessons", () => {
     expect(s.lessons.map((l) => l.status)).toEqual(["pending"]);
     s = (await userMove(s, "g5f7", engines)).state;
     expect(s.lessons.map((l) => l.status)).toEqual(["superseded"]);
+  });
+});
+
+describe("reviewTree", () => {
+  type Shape = number | { from: number; move: string | undefined; items: Shape[] };
+  const shape = (line: ReviewLine): Shape[] =>
+    line.items.map((i) =>
+      i.kind === "lesson"
+        ? i.lesson.id
+        : { from: i.line.from, move: i.line.firstMove?.san, items: shape(i.line) },
+    );
+
+  it("hangs each line left behind off the line played next, with lessons where their mistakes were", () => {
+    const state = {
+      ...newSession({ userColour: "w" }),
+      // The game ended on line 3. Line 0 went 3. Bb5 where line 3 went 3. Bc4; line 1 went
+      // 2. d4 and line 2 went 1... c5, which has no lessons.
+      line: 3,
+      moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "g8f6"],
+      branches: [
+        { id: 0, moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5", "a7a6"] },
+        { id: 1, moves: ["e2e4", "e7e5", "d2d4"] },
+        { id: 2, moves: ["e2e4", "c7c5"] },
+      ],
+      lessons: [
+        lesson(1, 0, 0), // on line 0, but on the moves it shares with the game's line
+        lesson(2, 0, 4),
+        lesson(3, 1, 2),
+        lesson(4, 3, 4),
+        lesson(5, 3, 2, "rewound"), // undone: not reviewed
+      ],
+    };
+    expect(shape(reviewTree(state))).toEqual([
+      1,
+      { from: 2, move: "d4", items: [3] },
+      // Played before the game's 3. Bc4, so it comes first.
+      { from: 4, move: "Bb5", items: [2] },
+      4,
+    ]);
+  });
+
+  it("puts two tries from the same move side by side, oldest first", () => {
+    const state = {
+      ...newSession({ userColour: "w" }),
+      line: 2,
+      moves: ["e2e4", "e7e5", "f1c4"],
+      branches: [
+        { id: 0, moves: ["e2e4", "e7e5", "f1b5"] },
+        { id: 1, moves: ["e2e4", "e7e5", "d1h5"] },
+      ],
+      lessons: [lesson(1, 0, 2), lesson(2, 1, 2)],
+    };
+    expect(shape(reviewTree(state))).toEqual([
+      { from: 2, move: "Bb5", items: [1] },
+      { from: 2, move: "Qh5", items: [2] },
+    ]);
+  });
+
+  it("is a plain list for a game that was never rewound", () => {
+    const state = { ...newSession({ userColour: "w" }), moves: ["e2e4", "e7e5"], lessons: [lesson(2, 0, 0)] };
+    expect(shape(reviewTree(state))).toEqual([2]);
+  });
+});
+
+describe("rewind", () => {
+  it("reopens lessons resolved by the moves going, and keeps the line's own outcomes on it", () => {
+    const resolved = (l: Lesson, resolvedPly: number): Lesson => ({ ...l, resolvedPly });
+    const state = {
+      ...newSession({ userColour: "w" }),
+      moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "g8f6"],
+      lessons: [
+        resolved(lesson(1, 0, 0, "fixed"), 3), // fixed by a move that goes
+        resolved(lesson(2, 0, 2), 4), // rewound to
+        resolved(lesson(3, 0, 4, "fixed"), 5), // made and fixed on the line left behind
+      ],
+    };
+    const r = rewind(state, 2);
+    const byId = (id: number) => r.lessons.find((l) => l.id === id);
+    expect(r.branches).toEqual([{ id: 0, moves: state.moves }]);
+    expect(byId(1)).toMatchObject({ status: "pending", resolvedPly: null, line: r.line });
+    expect(byId(2)).toMatchObject({ status: "triggered", line: 0 });
+    expect(byId(3)).toMatchObject({ status: "fixed", line: 0 });
   });
 });

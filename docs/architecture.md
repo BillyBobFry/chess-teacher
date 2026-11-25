@@ -120,6 +120,8 @@ interface SessionState {
   config: TeachingConfig;
   lessons: Lesson[]; // pending ones included, with their trigger conditions
   opponentModes: ("normal" | "levelled")[];
+  line: number; // the id of the line being played; each lesson records its line
+  branches: { id: number; moves: string[] }[]; // lines left behind by going back past a revealed lesson
 }
 
 function step(
@@ -167,6 +169,7 @@ GET  /api/config                                  is Google sign-in / are AI exp
 GET|POST /api/auth/*                              Better Auth (sign up, sign in, Google, sign out)
 GET  /api/me                                      user + AI explanation allowance
 GET  /api/games?status=active                     recent unfinished games
+GET  /api/games?status=finished                   recent finished games, with outcome and lesson count
 POST /api/games                                   create a game (session state)
 GET  /api/games/:id                               load a game (resume on any device)
 PUT  /api/games/:id                               save { state, reveal, finished, expectedVersion };

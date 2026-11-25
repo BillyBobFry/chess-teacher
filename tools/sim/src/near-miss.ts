@@ -147,7 +147,7 @@ async function main() {
       const after = gameAfter.isGameOver()
         ? []
         : await analyst.analyse(gameAfter.fen, { depth: Number(args.depth), multipv: 1 });
-      const probe = detectMistake(0, fenBefore, move, gameAfter, cands, after, {
+      const probe = detectMistake(0, 0, fenBefore, move, gameAfter, cands, after, {
         ...state.config,
         strategicThreshold: LOW,
       });

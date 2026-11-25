@@ -2,10 +2,12 @@
 
 import { describe, expect, it } from "vitest";
 import {
+  Game,
   gameOf,
   isUserTurn,
   playedLine,
   recentUserMoves,
+  reviewTree,
   rewind,
   startUserTurn,
   type SessionState,
@@ -47,5 +49,33 @@ describe("rewind", () => {
     // The position before the mistake was analysed in the recording, so a fresh replay engine can continue.
     const next = await startUserTurn(rewound, enginesFor(g));
     expect(next.state.analysis?.fen).toBe(lesson.fenBefore);
+
+    // The line left behind is kept, so the review can still show what happened after the mistake,
+    // even once a different move has been played in its place.
+    expect(rewound.branches).toEqual([{ id: state.line, moves: state.moves }]);
+    expect(rewound.line).not.toBe(state.line);
+    const other = new Game(lesson.fenBefore).chess
+      .moves({ verbose: true })
+      .find((mv) => mv.lan !== lesson.userMove);
+    if (!other) throw new Error("no other move to play");
+    const playedOn: SessionState = { ...rewound, moves: [...rewound.moves, other.lan] };
+    const kept = playedOn.lessons.find((l) => l.id === lesson.id);
+    if (!kept) throw new Error("the lesson rewound to is gone");
+    expect(playedLine(playedOn, kept)).toEqual(played);
+
+    // In the review it sits on the line left behind, which leaves the game's line at the mistake.
+    const tree = reviewTree(playedOn);
+    const branch = tree.items.find((i) => i.kind === "line");
+    expect(branch?.kind === "line" && branch.line.from).toBe(lesson.ply);
+    expect(branch?.kind === "line" && branch.line.items).toContainEqual({
+      kind: "lesson",
+      lesson: kept,
+    });
+    // Lessons told before the mistake carry on with the game's line.
+    for (const l of playedOn.lessons) {
+      if (l.status !== "rewound" && l.resolvedPly !== null && l.resolvedPly <= lesson.ply) {
+        expect(l.line).toBe(playedOn.line);
+      }
+    }
   });
 });

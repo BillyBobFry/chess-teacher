@@ -24,8 +24,11 @@ export interface SavedGame {
 
 export async function loadActiveGame(): Promise<SavedGame | null> {
   const [latest] = await api.activeGames();
-  if (!latest) return null;
-  const g = await api.game(latest.id);
+  return latest ? loadGame(latest.id) : null;
+}
+
+export async function loadGame(id: string): Promise<SavedGame> {
+  const g = await api.game(id);
   return {
     version: 1,
     id: g.id,
