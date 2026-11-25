@@ -76,13 +76,13 @@ packages/
              - native module for React Native                            [later]
   api/       Zod schemas for every request/response; generated OpenAPI.  [MS3]
 tools/
-  sim/       Simulation harness, parity tests against the Python prototype, benchmarks.
+  sim/       Simulation harness, recorded games for tests, feature parity with the Python prototype.
 apps/
   web/       Vite + React SPA: the game UI.                              [MS2]
   api/       (in apps/web or alongside) Hono API on Vercel Functions.    [MS3]
   site/      Marketing site (Astro), if and when marketing outgrows one page. [later]
   mobile/    Expo app.                                                   [later]
-prototype/   The Python prototype: the reference for parity tests, removed when no longer needed.
+prototype/   The Python prototype: the source of the feature parity fixtures, removed when no longer needed.
 ```
 
 Rule enforced by lint: **`packages/core` may not import Node built-ins, DOM APIs or

@@ -1,8 +1,8 @@
 # Python prototype
 
-The original prototype of the teaching loop. It is now the **reference implementation**:
-the TypeScript core in `packages/core` is tested against fixtures recorded from it
-(`record_fixtures.py`). New work happens in TypeScript; this folder will be removed once
+The original prototype of the teaching loop. The strategic features in `packages/core` are
+still tested against fixtures recorded from it (`record_fixtures.py`); lesson detection and
+the session have moved on, so whole games no longer match. New work happens in TypeScript; this folder will be removed once
 it's no longer needed for comparison or research.
 
 ## Setup

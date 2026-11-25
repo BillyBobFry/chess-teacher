@@ -1,7 +1,8 @@
 /**
  * An engine that replays recorded output. Stockfish's results vary from run to run, so
- * tests replay what the Python prototype's engine actually returned; any difference in
- * lessons is then down to the teaching code, not the engine.
+ * tests replay what a real engine returned when the game was recorded
+ * (tools/sim/src/record-games.ts); any difference in lessons is then down to the teaching
+ * code, not the engine.
  */
 
 import type { Candidate, Engine } from "@chess-teacher/core";

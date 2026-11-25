@@ -3,18 +3,16 @@
 import { describe, expect, it } from "vitest";
 import {
   FEATURE_TERMS,
+  MATE_FEATURE,
   classicalVerdict,
   lineEndFen,
-  newSession,
-  opponentMove,
-  startUserTurn,
   userMove,
   type ClassicalEval,
+  type Engines,
   type EvalTrace,
   type SessionState,
 } from "@chess-teacher/core";
-import { RecordedEngine } from "@chess-teacher/engine";
-import { configOf, loadGames } from "./fixtures.ts";
+import { enginesFor, loadGames, startOf, step } from "./games.ts";
 
 const MIDDLEGAME = "r1bq1rk1/pp2bppp/2n1pn2/3p4/2PP4/2N1PN2/PP3PPP/R2QKB1R w KQ - 0 9";
 const trace = (terms: Record<string, number>): EvalTrace => ({
@@ -57,42 +55,32 @@ describe("classicalVerdict", () => {
   });
 });
 
-describe("verification in a game", () => {
-  // The first recorded game with a strategic lesson, and the step that created it.
-  const target = (() => {
-    for (const { game } of loadGames()) {
-      const lesson = game.lessons.find((l) => l.feature !== "material" && l.feature !== "mate");
-      if (!lesson) continue;
-      let ply = 0;
-      const step = game.steps.findIndex((s) => {
-        if (s.type === "startUserTurn") return false;
-        const created = s.type === "userMove" && ply === lesson.ply;
-        ply += 1;
-        return created;
-      });
-      return { game, lesson, step };
+// The first recorded strategic lesson, and the game and step that created it.
+const target = await (async () => {
+  for (const { game } of loadGames()) {
+    const engines = enginesFor(game);
+    let state = startOf(game);
+    for (const [i, s] of game.steps.entries()) {
+      const r = await step(state, s, engines);
+      const created = r.events.find((e) => e.kind === "created");
+      const lesson = created && r.state.lessons.find((l) => l.id === created.lessonId);
+      if (s.type === "userMove" && lesson && lesson.feature !== "material" && lesson.feature !== MATE_FEATURE)
+        return { game, lesson, step: i, move: s.move };
+      state = r.state;
     }
-    throw new Error("no strategic lesson in the fixtures");
-  })();
+  }
+  throw new Error("no strategic lesson in the recorded games");
+})();
 
-  async function stateBefore(): Promise<{
-    state: SessionState;
-    analyst: RecordedEngine;
-    weak: RecordedEngine;
-  }> {
-    const g = target.game;
-    const analyst = new RecordedEngine(g.engineCalls.analyst);
-    const weak = new RecordedEngine(g.engineCalls.weak);
-    let state = newSession({ userColour: g.userColour, config: configOf(g) });
-    for (const step of g.steps.slice(0, target.step)) {
-      if (step.type === "startUserTurn") state = (await startUserTurn(state, { analyst, weak })).state;
-      else if (step.type === "userMove") state = (await userMove(state, step.move!, { analyst, weak })).state;
-      else state = (await opponentMove(state, { analyst, weak })).state;
-    }
-    return { state, analyst, weak };
+describe("verification in a game", () => {
+  async function stateBefore(): Promise<{ state: SessionState; engines: Engines }> {
+    const engines = enginesFor(target.game);
+    let state = startOf(target.game);
+    for (const s of target.game.steps.slice(0, target.step)) state = (await step(state, s, engines)).state;
+    return { state, engines };
   }
 
-  const bestEnd = lineEndFen(target.lesson.fenBefore as string, target.lesson.bestLine as string[]);
+  const bestEnd = lineEndFen(target.lesson.fenBefore, target.lesson.bestLine);
   const terms = FEATURE_TERMS[target.lesson.feature as keyof typeof FEATURE_TERMS]!;
   const classical = (agree: boolean): ClassicalEval => ({
     // When agreeing: a clear gain on the lesson's own terms at the end of the better line
@@ -108,12 +96,8 @@ describe("verification in a game", () => {
   });
 
   it("keeps the lesson when the classical evaluation agrees", async () => {
-    const { state, analyst, weak } = await stateBefore();
-    const r = await userMove(state, target.game.steps[target.step]!.move!, {
-      analyst,
-      weak,
-      classical: classical(true),
-    });
+    const { state, engines } = await stateBefore();
+    const r = await userMove(state, target.move, { ...engines, classical: classical(true) });
     const lesson = r.state.lessons.at(-1)!;
     expect(lesson.ply).toBe(target.lesson.ply);
     expect(lesson.verification).toMatch(/main reason/);
@@ -121,13 +105,9 @@ describe("verification in a game", () => {
   });
 
   it("drops the lesson when it doesn't", async () => {
-    const { state, analyst, weak } = await stateBefore();
+    const { state, engines } = await stateBefore();
     const before = state.lessons.length;
-    const r = await userMove(state, target.game.steps[target.step]!.move!, {
-      analyst,
-      weak,
-      classical: classical(false),
-    });
+    const r = await userMove(state, target.move, { ...engines, classical: classical(false) });
     expect(r.state.lessons.length).toBe(before);
     expect(r.state.unverified).toBe(1);
     expect(r.events.some((e) => e.kind === "created")).toBe(false);

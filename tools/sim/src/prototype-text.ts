@@ -1,10 +1,11 @@
 /**
- * The Python prototype's English, for the parity tests and the simulation reports.
+ * The Python prototype's English, for the feature parity test, the simulation reports and
+ * the version 1 save upgrade test.
  *
  * The core returns lesson text as data; the app renders it from its message catalogue in
  * the player's language. The prototype (prototype/teacher) wrote sentences instead, and its
  * recorded fixtures hold those sentences. Rendering the core's data the prototype's way, word
- * for word, keeps the parity tests exact about every fact the core measured, without tying
+ * for word, keeps the feature parity test exact about every fact the core measured, without tying
  * the app's copy to the prototype's.
  */
 

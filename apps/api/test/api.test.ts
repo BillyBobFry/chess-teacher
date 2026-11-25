@@ -1,6 +1,6 @@
 /**
  * API integration tests: real Hono app, real Better Auth, real Postgres (PGlite in memory),
- * fake LLM client. Game states with real lessons come from the parity fixtures.
+ * fake LLM client. Game states with real lessons come from a recorded game (tools/sim/games).
  */
 
 import { readFileSync } from "node:fs";
@@ -11,9 +11,9 @@ import {
   opponentMove,
   startUserTurn,
   userMove,
-  DEFAULT_CONFIG,
   type Engines,
   type SessionState,
+  type TeachingConfig,
 } from "@chess-teacher/core";
 import { RecordedEngine, type RecordedCall } from "@chess-teacher/engine";
 import { readEnv } from "../src/env.ts";
@@ -26,11 +26,10 @@ const EN_GB = { locale: "en-GB" };
 /** A game state with several lessons, from a recorded game. */
 async function stateWithLessons(): Promise<SessionState> {
   const fx = JSON.parse(
-    readFileSync(join(import.meta.dirname, "../../../tools/sim/fixtures/game-01.json"), "utf8"),
+    readFileSync(join(import.meta.dirname, "../../../tools/sim/games/game-01.json"), "utf8"),
   ) as {
     userColour: "w" | "b";
-    depth: number;
-    config: object;
+    config: TeachingConfig;
     steps: { type: string; move?: string }[];
     engineCalls: { analyst: RecordedCall[]; weak: RecordedCall[] };
   };
@@ -38,10 +37,7 @@ async function stateWithLessons(): Promise<SessionState> {
     analyst: new RecordedEngine(fx.engineCalls.analyst),
     weak: new RecordedEngine(fx.engineCalls.weak),
   };
-  let s = newSession({
-    userColour: fx.userColour,
-    config: { ...DEFAULT_CONFIG, ...fx.config, analysisDepth: fx.depth },
-  });
+  let s = newSession({ userColour: fx.userColour, config: fx.config });
   for (const step of fx.steps) {
     if (step.type === "startUserTurn") s = (await startUserTurn(s, engines)).state;
     else if (step.type === "userMove") s = (await userMove(s, step.move!, engines)).state;

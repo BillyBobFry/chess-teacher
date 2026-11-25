@@ -2,6 +2,7 @@ node_modules/
 prototype/
 pnpm-lock.yaml
 tools/sim/fixtures/
+tools/sim/games/
 **/reports/
 apps/web/public/stockfish/
 apps/web/public/stockfish11/

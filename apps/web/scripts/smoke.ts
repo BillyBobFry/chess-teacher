@@ -21,9 +21,9 @@ import {
   opponentMove,
   startUserTurn,
   userMove,
-  DEFAULT_CONFIG,
   type Engines,
   type SessionState,
+  type TeachingConfig,
 } from "@chess-teacher/core";
 import { RecordedEngine, type RecordedCall } from "@chess-teacher/engine";
 // Browsers: `pnpm --filter @chess-teacher/web exec playwright install chromium` once.
@@ -43,26 +43,22 @@ const BASE = `http://localhost:${PORT}`;
 const EMAIL = "smoke@example.com";
 const PASSWORD = "correct horse battery";
 
-// ---- recorded game states, from the parity fixtures
+// ---- recorded game states, from tools/sim/games
 
 interface Fixture {
   userColour: "w" | "b";
-  depth: number;
-  config: Record<string, unknown>;
+  config: TeachingConfig;
   steps: { type: string; move?: string }[];
   engineCalls: { analyst: RecordedCall[]; weak: RecordedCall[] };
 }
 
 async function recordedStates(file: string) {
-  const fx = JSON.parse(readFileSync(join(repo, "tools/sim/fixtures", file), "utf8")) as Fixture;
+  const fx = JSON.parse(readFileSync(join(repo, "tools/sim/games", file), "utf8")) as Fixture;
   const engines: Engines = {
     analyst: new RecordedEngine(fx.engineCalls.analyst),
     weak: new RecordedEngine(fx.engineCalls.weak),
   };
-  let state: SessionState = newSession({
-    userColour: fx.userColour,
-    config: { ...DEFAULT_CONFIG, ...fx.config, analysisDepth: fx.depth },
-  });
+  let state: SessionState = newSession({ userColour: fx.userColour, config: fx.config });
   let atTrigger: { state: SessionState; lessonId: number } | null = null;
   for (const step of fx.steps) {
     if (step.type === "startUserTurn") state = (await startUserTurn(state, engines)).state;
@@ -135,7 +131,7 @@ await new Promise<void>((resolve, reject) => {
 
 // ---- run
 
-const { atTrigger, end } = await recordedStates("game-01.json");
+const { atTrigger, end } = await recordedStates("game-07.json");
 const lesson = atTrigger.state.lessons.find((l) => l.id === atTrigger.lessonId)!;
 const browser = await chromium.launch();
 const errors: string[] = [];

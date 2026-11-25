@@ -21,7 +21,7 @@ coached-game bundles (see `docs/concept.md` §9).
 | `packages/contract` | API request/response schemas (Zod), shared by the API and its clients.                                                                                                                                                |
 | `packages/core`     | The teaching logic, in pure TypeScript (runs in the browser, Node and React Native): strategic features, lesson detection, triggers, the teaching opponent, explanations, and the game session as serialisable state. |
 | `packages/engine`   | Engine adapters: UCI protocol parser, a replay engine for tests, and a Node adapter for a Stockfish process (`@chess-teacher/engine/node`).                                                                           |
-| `tools/sim`         | Simulation harness, parity tests against the Python prototype, profiling.                                                                                                                                             |
+| `tools/sim`         | Simulation harness, recorded-game tests, feature parity with the Python prototype, profiling.                                                                                                                         |
 | `prototype`         | The original Python prototype, benchmarks and research tools. Kept as the reference implementation for now.                                                                                                           |
 
 ## Running locally
@@ -46,7 +46,7 @@ start fresh). Optional settings go in `apps/api/.env`; see `apps/api/.env.exampl
 Other commands:
 
 ```bash
-pnpm check        # typecheck + lint + all unit, parity and API tests
+pnpm check        # typecheck + lint + all unit, replay, parity and API tests
 pnpm build        # production build in Vercel's format (.vercel/output)
 pnpm serve        # serve that build locally on :3000, API included
 pnpm smoke <dir>  # build, then the end-to-end browser test (needs Playwright + Chromium)
@@ -85,14 +85,12 @@ pnpm --filter @chess-teacher/sim exec tsx src/validate-lessons.ts --games 24 --o
 
 - **Feature parity:** all 11 strategic features measured on 268 positions (both colours)
   must exactly match the Python prototype.
-- **Game parity:** 8 recorded games are replayed through the TypeScript core using the
-  Python prototype's recorded engine output. Opponent moves, every event at every step,
-  and every lesson (facts, explanation text, hints) must match exactly.
-- **Resume:** the same games, saving and reloading the session state as JSON after every
-  step, must produce identical results.
-- Unit tests for the UCI parser, the eval-breakdown parser, the Stockfish adapter, rewind,
-  the classical-evaluation verdict rules, and a recorded game where a strategic lesson is
-  kept or dropped depending on the second opinion.
+- **Recorded games:** 8 games played by a simulated student against the teaching opponent,
+  with every engine result recorded, replayed through the core with no engine. They test
+  takeback, rewind and the classical-evaluation check in real positions, and that saving
+  and reloading the session state as JSON after every step changes nothing.
+- Unit tests for the UCI parser, the eval-breakdown parser, the Stockfish adapter and the
+  classical-evaluation verdict rules.
 - **API tests:** the real Hono app with Better Auth on an in-memory Postgres: sign-up and
   sign-in, privacy between users, saving with version conflicts, illegal-move rejection,
   explanation caching, the guardrail, and the monthly allowance (with a fake LLM).
@@ -101,8 +99,12 @@ pnpm --filter @chess-teacher/sim exec tsx src/validate-lessons.ts --games 24 --o
   Stockfish, resuming after a reload, a reveal with the AI explanation and rewind, the
   review, signing out and in, the phone layout, and no console errors.
 
-To re-record the fixtures (needs the Python prototype set up, see `prototype/README.md`):
+To re-record the games, when a change to the core asks the engine about different
+positions (the replay then fails with "no recorded analysis"):
 
 ```bash
-prototype/.venv/bin/python prototype/record_fixtures.py --games 8 --out tools/sim/fixtures
+pnpm --filter @chess-teacher/sim exec tsx src/record-games.ts --engine "node $PWD/node_modules/.pnpm/stockfish@19.0.1/node_modules/stockfish/bin/stockfish-19-single.js"
 ```
+
+Leave out `--engine` if Stockfish is installed natively. The feature fixtures came from the
+Python prototype (`prototype/record_fixtures.py`).
