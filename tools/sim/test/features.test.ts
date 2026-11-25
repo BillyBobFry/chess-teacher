@@ -1,6 +1,7 @@
 /**
- * Every strategic feature, measured on ~270 positions, must match the Python prototype
- * exactly: the value, and the detail as the prototype worded it.
+ * Every strategic feature, measured on ~270 positions, must match the values recorded from
+ * the Python prototype the core was ported from: the value, and the detail as the prototype
+ * worded it. The recording is frozen (the prototype has been removed).
  */
 
 import { readFileSync } from "node:fs";
@@ -18,7 +19,7 @@ interface Row {
 
 const rows = JSON.parse(readFileSync(join(FIXTURES, "features.json"), "utf8")) as Row[];
 
-describe("feature parity with the Python prototype", () => {
+describe("features match the recorded values", () => {
   it(`covers ${rows.length} positions`, () => expect(rows.length).toBeGreaterThan(200));
 
   for (const colour of ["w", "b"] as Colour[]) {

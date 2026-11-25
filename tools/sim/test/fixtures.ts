@@ -1,4 +1,4 @@
-/** The feature fixtures recorded from the Python prototype by prototype/record_fixtures.py. */
+/** The feature values recorded from the Python prototype the core was ported from. Frozen. */
 
 import { join } from "node:path";
 

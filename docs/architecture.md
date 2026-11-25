@@ -2,7 +2,7 @@
 
 Status: **agreed** (Milestones 1–4 complete). Records the decisions made so far, why they
 were made, and what is still open. The product concept is in [`concept.md`](concept.md);
-the measurements behind several decisions are in [`../bench/README.md`](../bench/README.md).
+the measurements behind several decisions are in [`benchmarks.md`](benchmarks.md).
 
 ---
 
@@ -76,13 +76,12 @@ packages/
              - native module for React Native                            [later]
   api/       Zod schemas for every request/response; generated OpenAPI.  [MS3]
 tools/
-  sim/       Simulation harness, recorded games for tests, feature parity with the Python prototype.
+  sim/       Simulation harness, recorded games and feature fixtures for tests.
 apps/
   web/       Vite + React SPA: the game UI.                              [MS2]
   api/       (in apps/web or alongside) Hono API on Vercel Functions.    [MS3]
   site/      Marketing site (Astro), if and when marketing outgrows one page. [later]
   mobile/    Expo app.                                                   [later]
-prototype/   The Python prototype: the source of the feature parity fixtures, removed when no longer needed.
 ```
 
 Rule enforced by lint: **`packages/core` may not import Node built-ins, DOM APIs or
@@ -226,8 +225,8 @@ Vercel rewrites, or move the app to `app.example.com`; neither changes the app o
   in `explanations`, and cached by a hash of the facts plus prompt version.
 - Only the structured facts are sent. The guardrail rejects any output that mentions a
   square not in the facts; the template is used instead.
-- Model choice and pricing come from the LLM benchmark (`bench/llm_bench.py`), which still
-  needs to be run with an API key.
+- Model choice and pricing come from an LLM benchmark, which still needs writing against
+  `apps/api/src/explain.ts` and running with an API key (see `benchmarks.md`).
 
 ## 9. Doors left open
 
@@ -263,7 +262,8 @@ legal check before charging money, particularly for the app stores.
    (6 games per configuration): 90% of predicted consequences landed with the teaching
    opponent vs 61% without, consistent with the Python results; ~64 ms per user move
    including the engine at depth 10 (native Stockfish).
-7. The Python prototype moved to `prototype/`.
+7. The Python prototype moved to `prototype/` (removed once the TypeScript core had
+   moved on from it).
 
 Performance note: the teaching code itself costs a few milliseconds per move. The one hot
 spot (resolving exchanges for the material count) was rewritten from chess.js move
