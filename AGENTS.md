@@ -3,8 +3,8 @@
 Chess Teacher teaches chess strategy by letting a player's mistakes come back to bite them,
 then helping them work out which move caused it. A pnpm monorepo: `apps/web` (Vite + React
 SPA, Stockfish in Web Workers), `apps/api` (Hono, Better Auth, Drizzle), `packages/core` (the
-teaching logic, pure TypeScript), `packages/engine`, `packages/contract` (Zod API schemas),
-`tools/sim`, and `prototype` (the Python reference implementation).
+teaching logic, pure TypeScript), `packages/engine`, `packages/contract` (Zod API schemas)
+and `tools/sim` (simulations, and the recorded games and feature values tests replay).
 
 This file is an index. Read the file that matches the task when you touch that area, and treat
 it as mandatory; don't load everything up front.
@@ -31,10 +31,11 @@ it as mandatory; don't load everything up front.
 - **`packages/core` stays platform-independent** (D3): no DOM, Node built-ins, network or
   storage, so it runs unchanged in the browser, Node and React Native. ESLint enforces it;
   never disable that rule. Code that needs the platform goes in an app or an adapter.
-- **Parity with the Python prototype is exact.** The feature and game parity tests in
-  `tools/sim` must match the prototype's recorded output. Never edit a fixture, a recorded
-  game or an expected value to make a test pass; re-record fixtures only the way the README
-  says, and say why in the PR.
+- **Recorded test data is never edited to pass a test.** The feature values in
+  `tools/sim/fixtures` were recorded from the Python prototype the core was ported from, and
+  are frozen. The games in `tools/sim/games` are re-recorded only with
+  `tools/sim/src/record-games.ts`, when the core asks the engine about different positions,
+  and the PR says why. Never edit a recording or an expected value to make a test pass.
 - **The server is the trust boundary** (D4): identity, saved games, LLM spend, quotas. It
   never runs Stockfish. UI gating (UX-16) is presentation only; the server check stays.
 - **Never spend real LLM tokens** unless Will asks. Use `FAKE_LLM=1` locally and in tests; never set or read a
