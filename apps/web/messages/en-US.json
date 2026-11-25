@@ -60,6 +60,7 @@
     }
   ],
   "account_progress": "Your progress",
+  "account_games": "Your games",
   "account_sign_out": "Sign out",
   "game_back_to_current": "Back to the current game",
   "status_paused": "Game paused",
@@ -140,6 +141,8 @@
   "review_title": "Game review",
   "review_none": "No clear mistakes found. Well played!",
   "review_none_neutral": "No clear mistakes found in the moves you played.",
+  "review_branch": "Your earlier try from {move}",
+  "review_branch_note": "When you went back and played a different move, what you played first is indented under that move.",
   "outcome_fixed": "You fixed it in time",
   "outcome_deferred": "Happened at the same time as another lesson",
   "outcome_found": "Found it yourself",
@@ -211,6 +214,33 @@
   "feedback_send": "Send",
   "feedback_thanks": "Thanks: that helps us improve the lessons.",
   "progress_title": "Your progress",
+  "games_title": "Your games",
+  "games_list": "Finished games",
+  "games_empty": "No finished games yet. When you finish or resign a game, its review is kept here.",
+  "games_error": "Your games didn't load. Check your connection and try again.",
+  "games_retry": "Try again",
+  "games_as_white": "As White",
+  "games_as_black": "As Black",
+  "games_won": "Won",
+  "games_lost": "Lost",
+  "games_drawn": "Drawn",
+  "games_ended": "Ended",
+  "games_lessons": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countValue = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countValue} lesson",
+        "countPlural=other": "{countValue} lessons"
+      }
+    }
+  ],
+  "games_back": "Back to your games",
+  "game_load_error": "This game didn't load. Check your connection and try again.",
   "progress_error": "Couldn't load your progress. Please try again.",
   "progress_empty": "Nothing yet. Play a game: every lesson you meet is counted here by the principle it teaches.",
   "progress_summary": [

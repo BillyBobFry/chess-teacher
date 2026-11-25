@@ -199,6 +199,40 @@ describe("games", () => {
     }
   });
 
+  it("checks the moves of every line left behind, and that each lesson is on a line", async () => {
+    const { call, signUp } = await setup();
+    const cookie = await signUp("fay@example.com");
+    const base = { ...newSession({ userColour: "w" }), line: 1, moves: ["d2d4"] };
+    const post = (state: object) =>
+      call("/api/games", { method: "POST", cookie, json: newGameBody(state as SessionState) });
+    expect((await post({ ...base, branches: [{ id: 0, moves: ["e2e4", "e7e5"] }] })).status).toBe(201);
+    expect(await (await post({ ...base, branches: [{ id: 0, moves: ["e2e5"] }] })).json()).toEqual({
+      error: "illegal_move",
+    });
+    // Two lines with one id, a line left behind after the one being played, and a lesson on a
+    // line the game doesn't have.
+    expect((await post({ ...base, branches: [{ id: 1, moves: ["e2e4"] }] })).status).toBe(400);
+    expect((await post({ ...base, branches: [{ id: 2, moves: ["e2e4"] }] })).status).toBe(400);
+    const lesson = { ...recorded.lessons[0], line: 7 };
+    expect((await post({ ...base, lessons: [lesson] })).status).toBe(400);
+  });
+
+  it("lists finished games with their outcome and lessons", async () => {
+    const { call, signUp } = await setup();
+    const cookie = await signUp("gus@example.com");
+    await call("/api/games", { method: "POST", cookie, json: newGameBody() });
+    const finished = { ...newGameBody({ ...recorded, resigned: true }), finished: true };
+    const done = await (await call("/api/games", { method: "POST", cookie, json: finished })).json();
+    const list = await (await call("/api/games?status=finished", { cookie })).json();
+    expect(list).toHaveLength(1);
+    expect(list[0]).toMatchObject({
+      id: done.id,
+      finished: true,
+      outcome: "lost",
+      lessons: recorded.lessons.filter((l) => l.status !== "rewound").length,
+    });
+  });
+
   it("keeps each user's games private", async () => {
     const { call, signUp } = await setup();
     const alice = await signUp("alice@example.com");

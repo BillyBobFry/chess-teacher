@@ -61,6 +61,12 @@ and redo it. A lesson made by a move they undo is dropped, so a mistake undone b
 bites is never taught; a lesson already revealed stays. This trades some teaching for
 letting the player explore, and was chosen deliberately.
 
+After the game, the **review** lists every lesson as a tree of the lines played. When the
+player went back past a lesson they had been shown (by rewinding, or undoing that far) and
+played on differently, what they played first is kept and hangs off the move they went
+back to, with its own lessons and what really happened after each. Finished games and their
+reviews stay in the player's account, under "Your games".
+
 Because the rule is simply _"reveal when the consequence lands"_, tactics and strategy
 are handled the same way: a hanging piece is revealed one move later; a weak pawn might
 be revealed eight moves later.

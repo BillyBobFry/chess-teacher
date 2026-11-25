@@ -1,7 +1,18 @@
-import { gameOutcome, lessonMove, playedLine, type Lesson, type SessionState } from "@chess-teacher/core";
+import {
+  gameOutcome,
+  lessonMove,
+  playedLine,
+  reviewLessons,
+  reviewTree,
+  type Lesson,
+  type ReviewLine,
+  type SessionState,
+} from "@chess-teacher/core";
 import { moveText, principleTitle } from "@chess-teacher/lesson-text";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { api } from "../api/client.ts";
 import type { Key } from "../ui/Disclosure.tsx";
+import { AiExplanation } from "./AiExplanation.tsx";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
@@ -24,7 +35,11 @@ function outcome(l: Lesson): { text: string; tick: boolean } {
   return plain(m.outcome_missed());
 }
 
-/** Post-game review: every lesson, with its explanation and futures on demand. */
+/**
+ * Post-game review: every lesson, with its explanations and futures on demand. Where the player
+ * went back and played on differently, what they played first hangs off the move they went
+ * back to, indented, with its own lessons: a tree of the lines they played.
+ */
 export function Review({
   gameId,
   state,
@@ -38,11 +53,12 @@ export function Review({
   onNewGame: () => void;
   onProgress?: () => void;
 }) {
-  const lessons = state.lessons.filter((l) => l.status !== "rewound");
+  const lessons = reviewLessons(state);
+  const tree = useMemo(() => reviewTree(state), [state]);
+  const branched = tree.items.some((i) => i.kind === "line");
   // Praise for a clean game is only earned by finishing it without losing (UX-30).
   const earned = ["won", "drawn"].includes(gameOutcome(state));
   const [open, setOpen] = useState<Key | null>(null);
-  const locale = getLocale();
   return (
     <section className="review">
       <h2>{m.review_title()}</h2>
@@ -50,35 +66,12 @@ export function Review({
       {lessons.length === 0 ? (
         <p>{earned ? m.review_none() : m.review_none_neutral()}</p>
       ) : (
-        <DisclosureGroup className="mb-4" expanded={open} onExpandedChange={setOpen}>
-          {lessons.map((l) => {
-            const o = outcome(l);
-            return (
-              <Disclosure
-                key={l.id}
-                id={l.id}
-                summary={
-                  <span className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-0.5">
-                    <span className="row-span-2 font-semibold">{moveText(lessonMove(l), locale)}</span>
-                    <span>{principleTitle(l.principle, locale)}</span>
-                    <span className="text-sm text-fg-muted">
-                      {o.text}
-                      {o.tick && <span aria-hidden> ✓</span>}
-                    </span>
-                  </span>
-                }
-              >
-                {open === l.id && (
-                  <>
-                    <Explanation lesson={l} />
-                    <Futures lesson={l} played={playedLine(state, l)} />
-                    <LessonFeedback gameId={gameId} lessonId={l.id} />
-                  </>
-                )}
-              </Disclosure>
-            );
-          })}
-        </DisclosureGroup>
+        <>
+          {branched && <p className="text-sm text-fg-muted">{m.review_branch_note()}</p>}
+          <DisclosureGroup className="mb-4" expanded={open} onExpandedChange={setOpen}>
+            <Line line={tree} state={state} gameId={gameId} open={open} />
+          </DisclosureGroup>
+        </>
       )}
       <div className="actions">
         <Button variant="primary" onPress={onNewGame}>
@@ -87,5 +80,86 @@ export function Review({
         {onProgress && <Button onPress={onProgress}>{m.account_progress()}</Button>}
       </div>
     </section>
+  );
+}
+
+/** One line of play: its lessons, and the lines left behind from it, in the order they happened. */
+function Line({
+  line,
+  state,
+  gameId,
+  open,
+}: {
+  line: ReviewLine;
+  state: SessionState;
+  gameId: string;
+  open: Key | null;
+}) {
+  const locale = getLocale();
+  return (
+    <ol className="m-0 list-none p-0">
+      {line.items.map((item) =>
+        item.kind === "lesson" ? (
+          <li key={`lesson-${item.lesson.id}`}>
+            <LessonRow lesson={item.lesson} state={state} gameId={gameId} open={open === item.lesson.id} />
+          </li>
+        ) : (
+          <li key={`line-${item.line.id}`} className="mt-3 mb-1 border-s-2 border-border ps-3">
+            {item.line.firstMove && (
+              <p className="m-0 text-sm font-semibold text-fg-muted">
+                {m.review_branch({ move: moveText(item.line.firstMove, locale) })}
+              </p>
+            )}
+            <Line line={item.line} state={state} gameId={gameId} open={open} />
+          </li>
+        ),
+      )}
+    </ol>
+  );
+}
+
+function LessonRow({
+  lesson,
+  state,
+  gameId,
+  open,
+}: {
+  lesson: Lesson;
+  state: SessionState;
+  gameId: string;
+  open: boolean;
+}) {
+  const locale = getLocale();
+  const o = outcome(lesson);
+  const played = playedLine(state, lesson);
+  // Only an explanation already written at the reveal: the review never asks for a new one,
+  // which would spend the player's allowance on lessons they were never shown.
+  const loadExplanation = useCallback(
+    () => api.explanation(gameId, lesson.id).catch(() => null),
+    [gameId, lesson.id],
+  );
+  return (
+    <Disclosure
+      id={lesson.id}
+      summary={
+        <span className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-0.5">
+          <span className="row-span-2 font-semibold">{moveText(lessonMove(lesson), locale)}</span>
+          <span>{principleTitle(lesson.principle, locale)}</span>
+          <span className="text-sm text-fg-muted">
+            {o.text}
+            {o.tick && <span aria-hidden> ✓</span>}
+          </span>
+        </span>
+      }
+    >
+      {open && (
+        <>
+          <AiExplanation load={loadExplanation} lesson={lesson} played={played} />
+          <Explanation lesson={lesson} />
+          <Futures lesson={lesson} played={played} />
+          <LessonFeedback gameId={gameId} lessonId={lesson.id} />
+        </>
+      )}
+    </Disclosure>
   );
 }

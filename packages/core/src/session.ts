@@ -32,8 +32,20 @@ import { verifyLesson } from "./validate.ts";
 /**
  * 2: lessons hold their details and trigger as data, not English text.
  * 3: the evaluation after each move (`scores`), and whether the player resigned.
+ * 4: lines of play left behind by going back past a revealed lesson (`line`, `branches`).
  */
-export const SESSION_STATE_VERSION = 3;
+export const SESSION_STATE_VERSION = 4;
+
+/**
+ * A line of play the game left behind: the player went back to before a lesson they had been
+ * shown (a rewind, or undoing that far), and played on differently from there.
+ */
+export interface Branch {
+  /** The line's id, as its lessons hold it in `Lesson.line`. */
+  id: number;
+  /** All its moves, from the start position (the part it shares with other lines included). */
+  moves: string[];
+}
 
 export interface SessionState {
   version: number;
@@ -57,6 +69,10 @@ export interface SessionState {
   scores: (number | null)[];
   /** The player ended the game before it was over by the rules. */
   resigned: boolean;
+  /** The id of the line being played (`moves`), as its lessons hold it in `Lesson.line`. */
+  line: number;
+  /** Lines left behind, oldest first. */
+  branches: Branch[];
 }
 
 export type GameEventKind = "created" | "warning" | "triggered" | "chanceGone" | "fixed" | "expired";
@@ -88,6 +104,8 @@ export function newSession(opts: {
     analysis: null,
     scores: [],
     resigned: false,
+    line: 0,
+    branches: [],
   };
 }
 
@@ -96,7 +114,7 @@ export function newSession(opts: {
 // JSON round-trip: works on every platform, and keeps the state honest about being serialisable.
 const clone = (s: SessionState): SessionState => JSON.parse(JSON.stringify(s)) as SessionState;
 
-export const gameOf = (s: SessionState): Game => new Game(s.startFen, s.moves);
+export const gameOf = (s: Pick<SessionState, "startFen" | "moves">): Game => new Game(s.startFen, s.moves);
 
 const pending = (s: SessionState, kind?: LessonKind): Lesson[] =>
   s.lessons.filter((l) => l.status === "pending" && (kind === undefined || l.kind === kind));
@@ -116,8 +134,27 @@ function recordScore(s: SessionState, score: number): void {
   s.scores[index] = score;
 }
 
-/** Moves taken back or rewound take their evaluations with them. */
+/**
+ * Moves taken back or rewound take their evaluations with them. Call it after updating the
+ * lessons' statuses. If a revealed lesson's real moves are among those going, the line is kept
+ * as a branch first, so the review can still show what happened, and play goes on as a new
+ * line: only the player's going back past a lesson they were shown makes one.
+ */
 function backTo(s: SessionState, moves: number): void {
+  const start = plyOf(s.startFen);
+  // The lesson's story (its mistake to its outcome) goes past where play goes back to.
+  const pastCut = (l: Lesson) => l.resolvedPly !== null && l.resolvedPly - start > moves;
+  const old = s.line;
+  if (s.lessons.some((l) => l.line === old && l.status === "triggered" && pastCut(l))) {
+    s.branches.push({ id: old, moves: s.moves });
+    s.line = Math.max(old, ...s.branches.map((b) => b.id)) + 1;
+    // Lessons told entirely before the cut, and those still pending, carry on with the new line.
+    for (const l of s.lessons) {
+      if (l.line === old && l.status !== "rewound" && (l.status === "pending" || !pastCut(l))) {
+        l.line = s.line;
+      }
+    }
+  }
   s.moves = s.moves.slice(0, moves);
   s.scores = s.scores.slice(0, moves);
   s.analysis = null;
@@ -228,7 +265,7 @@ export async function userMove(state: SessionState, move: string, engines: Engin
     }
   }
 
-  let lesson = detectMistake(s.lessons.length + 1, fenBefore, move, game, cands, after, s.config);
+  let lesson = detectMistake(s.lessons.length + 1, s.line, fenBefore, move, game, cands, after, s.config);
   if (lesson && engines.classical && s.config.verifyStrategic !== false) {
     const verdict = await verifyLesson(lesson, engines.classical);
     if (verdict.reason !== "not a strategic feature") {
@@ -324,7 +361,9 @@ export type GameOutcome =
   /** Stopped early by a version that didn't record resigning. */
   | "ended";
 
-export function gameOutcome(s: SessionState): GameOutcome {
+export function gameOutcome(
+  s: Pick<SessionState, "startFen" | "moves" | "userColour" | "resigned">,
+): GameOutcome {
   const game = gameOf(s);
   if (game.isCheckmate()) return game.turn === s.userColour ? "lost" : "won";
   if (game.isGameOver()) return "drawn";
@@ -336,10 +375,17 @@ export function rewind(state: SessionState, lessonId: number): SessionState {
   const s = clone(state);
   const target = s.lessons.find((l) => l.id === lessonId);
   if (!target) throw new Error(`No lesson ${lessonId}`);
-  backTo(s, target.ply - plyOf(s.startFen));
   for (const l of s.lessons) {
-    if (l.ply >= target.ply && l !== target && l.status === "pending") l.status = "rewound";
+    if (l.line !== s.line || l === target || l.status === "triggered" || l.status === "rewound") continue;
+    if (l.ply >= target.ply) {
+      if (l.status === "pending") l.status = "rewound";
+    } else if (l.resolvedPly !== null && l.resolvedPly > target.ply) {
+      // Fixed, expired or overtaken by moves that are going: it's pending again on the new line.
+      l.status = "pending";
+      l.resolvedPly = null;
+    }
   }
+  backTo(s, target.ply - plyOf(s.startFen));
   return s;
 }
 
@@ -367,10 +413,9 @@ export function takeBack(state: SessionState): SessionState | null {
   const ply = plyOf(s.startFen) + index;
   // Every move taken back after the user's own was an opponent's reply, logged in opponentModes.
   const replies = s.moves.length - index - 1;
-  backTo(s, index);
   s.opponentModes = s.opponentModes.slice(0, Math.max(0, s.opponentModes.length - replies));
   for (const l of s.lessons) {
-    if (l.status === "triggered" || l.status === "rewound") continue;
+    if (l.line !== s.line || l.status === "triggered" || l.status === "rewound") continue;
     if (l.ply >= ply) {
       l.status = "rewound";
     } else if (l.resolvedPly !== null && l.resolvedPly > ply) {
@@ -378,6 +423,7 @@ export function takeBack(state: SessionState): SessionState | null {
       l.resolvedPly = null;
     }
   }
+  backTo(s, index);
   return s;
 }
 
@@ -420,31 +466,49 @@ export function userMovesAgo(s: SessionState, lesson: Lesson): number {
   return Math.max(1, Math.ceil((gameOf(s).ply - lesson.ply) / 2));
 }
 
+/** All the moves of a line of play, from the start position: the current line or a branch. */
+export function movesOfLine(s: SessionState, line: number): string[] {
+  if (line === s.line) return s.moves;
+  const branch = s.branches.find((b) => b.id === line);
+  if (!branch) throw new Error(`No line ${line}`);
+  return branch.moves;
+}
+
 /**
  * The moves actually played from a lesson's mistake (included) up to when it was resolved
  * (revealed, fixed or expired), or up to now if it's still pending. Capped at `maxPlies`.
+ * A lesson on a line the game has left behind reads that line's moves.
  */
 export function playedLine(s: SessionState, lesson: Lesson, maxPlies = 16): string[] {
+  const moves = movesOfLine(s, lesson.line);
   const start = lesson.ply - plyOf(s.startFen);
-  const end = (lesson.resolvedPly ?? gameOf(s).ply) - plyOf(s.startFen);
-  return s.moves.slice(start, Math.min(end, start + maxPlies, s.moves.length));
+  const end = (lesson.resolvedPly ?? plyOf(s.startFen) + moves.length) - plyOf(s.startFen);
+  return moves.slice(start, Math.min(end, start + maxPlies, moves.length));
 }
 
 // ------------------------------------------------------------------ saved games
 
 /** A lesson as version 1 saved it: details and trigger as English text. */
-type LessonV1 = Omit<Lesson, "baselineDetail" | "userDetail" | "bestDetail" | "trigger"> & {
+type LessonV1 = Omit<Lesson, "baselineDetail" | "userDetail" | "bestDetail" | "trigger" | "line"> & {
   baselineDetail: string;
   userDetail: string;
   bestDetail: string;
   triggerText: string;
 };
 
+/** A lesson as version 3 and earlier saved it: no line, because there was only one. */
+type LessonV3 = Omit<Lesson, "line"> & { line?: number };
+
 /** A session as any version saved it. */
-export type SavedSessionState = Omit<SessionState, "lessons" | "scores" | "resigned"> & {
-  lessons: (Lesson | LessonV1)[];
+export type SavedSessionState = Omit<
+  SessionState,
+  "lessons" | "scores" | "resigned" | "line" | "branches"
+> & {
+  lessons: (LessonV3 | LessonV1)[];
   scores?: (number | null)[];
   resigned?: boolean;
+  line?: number;
+  branches?: Branch[];
 };
 
 /**
@@ -452,10 +516,13 @@ export type SavedSessionState = Omit<SessionState, "lessons" | "scores" | "resig
  * lesson's own positions, so they come out exactly as they would have been. A version 1
  * consequence's trigger can't always be rebuilt (the game may have been rewound past it),
  * so it keeps its saved text. Version 2 and earlier recorded no evaluations or resignations.
+ * Version 3 and earlier kept no lines left behind: every lesson is on the one line there is.
  */
 export function upgradeSession(saved: SavedSessionState): SessionState {
-  const lessons =
-    saved.version >= 2 ? (saved.lessons as Lesson[]) : (saved.lessons as LessonV1[]).map(upgradedLesson);
+  const line = saved.line ?? 0;
+  const lessons = (
+    saved.version >= 2 ? (saved.lessons as LessonV3[]) : (saved.lessons as LessonV1[]).map(upgradedLesson)
+  ).map((l) => ({ ...l, line: l.line ?? line }));
   return {
     ...saved,
     version: SESSION_STATE_VERSION,
@@ -463,10 +530,12 @@ export function upgradeSession(saved: SavedSessionState): SessionState {
     // A tab running an older version may have taken moves back without their scores.
     scores: (saved.scores ?? []).slice(0, saved.moves.length),
     resigned: saved.resigned ?? false,
+    line,
+    branches: saved.branches ?? [],
   };
 }
 
-function upgradedLesson(old: LessonV1): Lesson {
+function upgradedLesson(old: LessonV1): LessonV3 {
   const { triggerText, ...rest } = old;
   return {
     ...rest,
