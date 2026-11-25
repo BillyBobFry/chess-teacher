@@ -12,8 +12,6 @@
  * It also sorts the lessons the app really taught into tactics/strategy × blunder/missed,
  * to size the "you missed it" vs "you blundered" split.
  *
- * Lesson detection itself is unchanged, so parity with the Python prototype is unaffected.
- *
  * Usage: pnpm --filter @chess-teacher/sim exec tsx src/near-miss.ts --games 12 --low 35 --out ../../reports
  *   --engine "node /path/to/stockfish.js" if Stockfish isn't installed natively.
  */

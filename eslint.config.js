@@ -12,7 +12,6 @@ export default tseslint.config(
   {
     ignores: [
       "**/node_modules/**",
-      "prototype/**",
       "**/dist/**",
       "apps/web/public/**",
       "apps/web/src/paraglide/**",

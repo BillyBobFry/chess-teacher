@@ -1,12 +1,12 @@
 /**
- * The Python prototype's English, for the feature parity test, the simulation reports and
- * the version 1 save upgrade test.
+ * Lesson text in the Python prototype's English, for the feature test, the simulation reports
+ * and the version 1 save upgrade test.
  *
  * The core returns lesson text as data; the app renders it from its message catalogue in
- * the player's language. The prototype (prototype/teacher) wrote sentences instead, and its
- * recorded fixtures hold those sentences. Rendering the core's data the prototype's way, word
- * for word, keeps the feature parity test exact about every fact the core measured, without tying
- * the app's copy to the prototype's.
+ * the player's language. The prototype the core was ported from (since removed) wrote
+ * sentences instead, and the recorded feature values hold those sentences, as do version 1
+ * saves. Rendering the core's data the prototype's way, word for word, keeps those tests exact
+ * about every fact the core measured, without tying the app's copy to the prototype's.
  */
 
 import {
@@ -38,7 +38,7 @@ const PIECE_NAMES: Record<PieceType, string> = {
   k: "king",
 };
 
-/** prototype/teacher/principles.py */
+/** The prototype's principle titles and texts. */
 export const PRINCIPLES: Record<PrincipleId, { title: string; text: string }> = {
   hanging: {
     title: "Don't leave pieces undefended",
@@ -159,7 +159,7 @@ const list = (squares: string[]): string => squares.join(", ");
 const sides = (mine: string[], theirs: string[], label: string): string =>
   `your ${label}: ${list(mine) || "none"}; theirs: ${list(theirs) || "none"}`;
 
-/** prototype/teacher/features.py: each feature's detail. */
+/** Each feature's detail, as the prototype worded it. */
 export function detailText(d: Detail): string {
   switch (d.kind) {
     case "material":
@@ -214,7 +214,7 @@ const pieces = (counts: PieceCount[]): string =>
     .map((c) => (c.count > 1 ? `${c.count} ${PIECE_NAMES[c.piece]}s` : `a ${PIECE_NAMES[c.piece]}`))
     .join(", ");
 
-/** prototype/teacher/lessons.py describe_consequence, and the missed chance's trigger. */
+/** What happened in the game, as the prototype worded it. */
 export function triggerText(t: Trigger | null): string {
   if (!t) return "";
   switch (t.kind) {
@@ -264,7 +264,7 @@ const hintText = (h: Hint): string => {
 
 export const hintTexts = (l: Lesson): string[] => hints(l).map(hintText);
 
-/** prototype/teacher/explain.py facts(): the same keys, with English values. */
+/** The lesson's facts, with English values. */
 export function factsText(l: Lesson) {
   const f = facts(l);
   const p = PRINCIPLES[f.principle];
@@ -286,7 +286,7 @@ export function factsText(l: Lesson) {
   };
 }
 
-/** prototype/teacher/explain.py template_explanation(). */
+/** The prototype's template explanation, used in the simulation reports. */
 export function templateExplanation(l: Lesson): string {
   const p = PRINCIPLES[l.principle];
   const f = FEATURE_LABELS[l.feature] ?? l.feature;

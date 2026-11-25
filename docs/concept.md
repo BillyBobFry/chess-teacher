@@ -291,7 +291,7 @@ app ✓ · 3 accounts, server, AI explanations ✓ · **4 lesson quality** · 5 
 
 ## 12. Prototype 1 findings (Nov 2026)
 
-A command-line prototype (`prototype/play.py`, `prototype/simulate.py`) implements the core loop: mistake
+A command-line prototype in Python (since replaced by the TypeScript core) implements the core loop: mistake
 detection, feature comparison across the two futures, pending lessons with checkable
 triggers, the teaching opponent, find-the-cause, explanations and rewind. It was tested
 by simulating games between a weak engine "student" (Stockfish skill 0) and the teaching

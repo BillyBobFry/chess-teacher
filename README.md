@@ -21,8 +21,7 @@ coached-game bundles (see `docs/concept.md` §9).
 | `packages/contract` | API request/response schemas (Zod), shared by the API and its clients.                                                                                                                                                |
 | `packages/core`     | The teaching logic, in pure TypeScript (runs in the browser, Node and React Native): strategic features, lesson detection, triggers, the teaching opponent, explanations, and the game session as serialisable state. |
 | `packages/engine`   | Engine adapters: UCI protocol parser, a replay engine for tests, and a Node adapter for a Stockfish process (`@chess-teacher/engine/node`).                                                                           |
-| `tools/sim`         | Simulation harness, recorded-game tests, feature parity with the Python prototype, profiling.                                                                                                                         |
-| `prototype`         | The original Python prototype, benchmarks and research tools. Kept as the reference implementation for now.                                                                                                           |
+| `tools/sim`         | Simulation harness, recorded games and feature fixtures for tests, profiling.                                                                                                                                         |
 
 ## Running locally
 
@@ -38,15 +37,15 @@ wherever the API ended up), and sign-in accepts any `localhost` port locally. Lo
 uses an embedded Postgres stored in `apps/api/.data` (delete the folder to
 start fresh). Optional settings go in `apps/api/.env`; see `apps/api/.env.example`:
 
-- `ANTHROPIC_API_KEY`: real AI explanations (costs money; see `prototype/bench` for the
-  cost benchmark). Without it the app uses the template explanations.
+- `ANTHROPIC_API_KEY`: real AI explanations (costs money). Without it the app uses the
+  template explanations.
 - `FAKE_LLM=1`: canned "explanations" with no key and no cost, to try the AI flow.
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`: Google sign-in.
 
 Other commands:
 
 ```bash
-pnpm check        # typecheck + lint + all unit, replay, parity and API tests
+pnpm check        # typecheck + lint + all unit, replay, feature and API tests
 pnpm build        # production build in Vercel's format (.vercel/output)
 pnpm serve        # serve that build locally on :3000, API included
 pnpm smoke <dir>  # build, then the end-to-end browser test (needs Playwright + Chromium)
@@ -83,8 +82,9 @@ pnpm --filter @chess-teacher/sim exec tsx src/validate-lessons.ts --games 24 --o
 
 ## Tests
 
-- **Feature parity:** all 11 strategic features measured on 268 positions (both colours)
-  must exactly match the Python prototype.
+- **Features:** all 11 strategic features measured on 268 positions (both colours) must
+  match the recorded values exactly. They were recorded from the Python prototype the core
+  was ported from, and are frozen: never edit them to make a test pass.
 - **Recorded games:** 8 games played by a simulated student against the teaching opponent,
   with every engine result recorded, replayed through the core with no engine. They test
   takeback, rewind and the classical-evaluation check in real positions, and that saving
@@ -106,5 +106,4 @@ positions (the replay then fails with "no recorded analysis"):
 pnpm --filter @chess-teacher/sim exec tsx src/record-games.ts --engine "node $PWD/node_modules/.pnpm/stockfish@19.0.1/node_modules/stockfish/bin/stockfish-19-single.js"
 ```
 
-Leave out `--engine` if Stockfish is installed natively. The feature fixtures came from the
-Python prototype (`prototype/record_fixtures.py`).
+Leave out `--engine` if Stockfish is installed natively.
