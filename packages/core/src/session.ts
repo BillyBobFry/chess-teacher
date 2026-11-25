@@ -6,9 +6,9 @@
  * any step and resumed later on any device (architecture decision D10).
  */
 
-import { Position, type Colour } from "./board.ts";
+import { Position, opposite, type Colour } from "./board.ts";
 import type { Candidate, Engines } from "./engine.ts";
-import { FEATURES_BY_NAME, type Measurement } from "./features.ts";
+import { FEATURES_BY_NAME, material, settledBalance, type Measurement } from "./features.ts";
 import { Game, STANDARD_START, fullmoveOf, isLegal, plyOf, sanOf, turnOf } from "./game.ts";
 import {
   CONSEQUENCE,
@@ -212,6 +212,22 @@ export async function userMove(state: SessionState, move: string, engines: Engin
     }
   }
 
+  // A bad move that leaves material to be taken muddies the credit for older material lessons
+  // even when it isn't taught itself (in a position already lost, say): whatever falls next
+  // may be its fault, so those lessons go to the review.
+  const best = cands[0];
+  const posAfter = new Position(game.fen);
+  const onBoard = material(posAfter, s.userColour) - material(posAfter, opposite(s.userColour));
+  if (
+    best &&
+    best.score - userScore >= s.config.threshold &&
+    settledBalance(game.fen, s.userColour) < onBoard - 0.5
+  ) {
+    for (const older of pending(s, CONSEQUENCE)) {
+      if (older.feature === "material") resolve(older, "superseded", game);
+    }
+  }
+
   let lesson = detectMistake(s.lessons.length + 1, fenBefore, move, game, cands, after, s.config);
   if (lesson && engines.classical && s.config.verifyStrategic !== false) {
     const verdict = await verifyLesson(lesson, engines.classical);
@@ -223,6 +239,8 @@ export async function userMove(state: SessionState, move: string, engines: Engin
       }
     }
   }
+  // Below the normal threshold, a strategic lesson is only trusted once the classical check agrees.
+  if (lesson && lesson.verification === undefined && lessonGap(lesson) < s.config.threshold) lesson = null;
   if (lesson) {
     // Credit assignment: once a newer mistake affects the same factor, we can no longer
     // tell which move caused what, so the older lesson goes to the review.

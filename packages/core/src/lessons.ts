@@ -23,6 +23,12 @@ export const MATE_FEATURE = "mate";
 /** Opponent weaknesses are opportunities: losing one is a missed chance, not a consequence. */
 const OPPORTUNITY_FEATURES = new Set<string>(["their_pawns"]);
 
+/**
+ * Before this move, the engine's small preferences between normal opening moves aren't
+ * lessons, so strategic lessons need the full threshold.
+ */
+const LOWER_BAR_FROM_MOVE = 3;
+
 export type LessonKind = typeof CONSEQUENCE | typeof MISSED_CHANCE;
 export type LessonFeature = FeatureName | typeof MATE_FEATURE;
 export type LessonStatus = "pending" | "triggered" | "fixed" | "expired" | "superseded" | "rewound";
@@ -30,6 +36,13 @@ export type LessonStatus = "pending" | "triggered" | "fixed" | "expired" | "supe
 export interface TeachingConfig {
   /** Minimum eval gap (centipawns) before we consider teaching. */
   threshold: number;
+  /**
+   * Minimum eval gap for strategic lessons once the opening is under way. Strategic mistakes
+   * cost little per move, so they rarely reach `threshold`; the classical check (not the gap)
+   * is what keeps these lessons honest. Missing in games saved before it existed, which keep
+   * `threshold`.
+   */
+  strategicThreshold?: number;
   /** Don't nitpick moves that leave the user clearly winning. */
   stillWinning: number;
   /** Don't teach in positions that were already lost. */
@@ -62,6 +75,7 @@ export interface TeachingConfig {
 
 export const DEFAULT_CONFIG: TeachingConfig = {
   threshold: 70,
+  strategicThreshold: 35,
   stillWinning: 300,
   hopeless: -500,
   linePlies: 8,
@@ -140,6 +154,14 @@ export function scoreAfter(gameAfter: Game, after: Candidate[], userColour: Colo
   return after.length ? neg(after[0]!.score) : 0;
 }
 
+/** Queens of both colours left on the board after a line. */
+function queensAfter(fen: string, line: string[]): number {
+  const game = new Game(fen);
+  for (const m of line) game.push(m);
+  const pos = new Position(game.fen);
+  return pos.pieces("q", "w").length + pos.pieces("q", "b").length;
+}
+
 function lineValues(fen: string, line: string[], color: Colour): Measurements[] {
   const game = new Game(fen);
   return line.map((m) => {
@@ -164,7 +186,8 @@ export function detectMistake(
 
   const userScore = scoreAfter(gameAfter, after, userColour);
   const gap = best.score - userScore;
-  if (gap < cfg.threshold || userScore >= cfg.stillWinning || best.score <= cfg.hopeless) return null;
+  const lowestBar = Math.min(cfg.threshold, cfg.strategicThreshold ?? cfg.threshold);
+  if (gap < lowestBar || userScore >= cfg.stillWinning || best.score <= cfg.hopeless) return null;
 
   const tail = after.length ? after[0]!.pv : [];
   let userLine = [userMove, ...cleanLine(gameAfter.fen, tail, cfg.linePlies - 1)];
@@ -229,6 +252,10 @@ export function detectMistake(
   const persistentGap = (name: FeatureName): number =>
     end >= 1 ? Math.min(normGap(name, end), normGap(name, end - 1)) : normGap(name, end);
 
+  // A queen has more moves than any other piece, so a line that trades queens off looks like
+  // a big loss of activity even when the pieces left are just as active.
+  const queensDiffer = queensAfter(fenBefore, userLine) !== queensAfter(fenBefore, bestLine);
+
   // Material is the most concrete lesson, so it wins whenever it explains the gap.
   let chosen: FeatureName | null = null;
   if (normGap("material", end) >= 1) {
@@ -236,7 +263,7 @@ export function detectMistake(
   } else {
     let top: [number, FeatureName] | null = null;
     for (const f of FEATURES) {
-      if (f.name === "material") continue;
+      if (f.name === "material" || (f.name === "mobility" && queensDiffer)) continue;
       const v = persistentGap(f.name);
       // Same tie-break as Python's max() over (value, name) tuples.
       if (!top || v > top[0] || (v === top[0] && f.name > top[1])) top = [v, f.name];
@@ -244,6 +271,11 @@ export function detectMistake(
     if (top && top[0] >= 1) chosen = top[1];
   }
   if (chosen === null) return null; // the engine prefers another move, but nothing we measure explains why
+  // Strategic lessons get the lower bar, except where it can't be trusted: in the first few
+  // moves, and for king activity, which the classical check can't verify.
+  const lowerBar =
+    chosen !== "material" && chosen !== "king_activity" && fullmoveOf(fenBefore) >= LOWER_BAR_FROM_MOVE;
+  if (gap < (lowerBar ? lowestBar : cfg.threshold)) return null;
 
   const feat = FEATURES_BY_NAME[chosen];
   const [baseV, baseD] = baseline[chosen];
@@ -270,8 +302,29 @@ export function detectMistake(
 
   let principle: PrincipleId = feat.principle;
   if (chosen === "material") {
-    const oppReply = userLine[1];
-    principle = oppReply !== undefined && hangingAfter.includes(uciParts(oppReply).to) ? "hanging" : "safety";
+    const balance = (pos: Position) => material(pos, userColour) - material(pos, opposite(userColour));
+    // Measured after the user's move, so a capture they just made counts as theirs.
+    const afterMove = balance(posAfter);
+    // The engine's line may lose material and win it back later with a trick the user would
+    // also have to find, so judge the line by the lowest balance it holds for two plies.
+    const held = userVals.map((v, i) => Math.max(v.material[0], (userVals[i + 1] ?? v).material[0]));
+    const lowest = Math.min(userV, ...held);
+    if (lowest >= afterMove - 0.5) {
+      // The user's line loses nothing of their own: the better move would have won material.
+      // That's a chance they missed, not a blunder.
+      kind = MISSED_CHANCE;
+      triggerAt = userV;
+      // The settled balance before the move already counts captures that were on offer.
+      principle = baseV > balance(new Position(fenBefore)) + 0.5 ? "free_material" : "forcing_moves";
+    } else {
+      if ((baseV - lowest) / feat.unit >= 0.9) {
+        kind = CONSEQUENCE;
+        triggerAt = baseV - 0.75 * (baseV - lowest);
+      }
+      const oppReply = userLine[1];
+      principle =
+        oppReply !== undefined && hangingAfter.includes(uciParts(oppReply).to) ? "hanging" : "safety";
+    }
   }
 
   return {

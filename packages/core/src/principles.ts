@@ -6,6 +6,8 @@
 export const PRINCIPLE_IDS = [
   "hanging",
   "safety",
+  "free_material",
+  "forcing_moves",
   "develop",
   "king_safety",
   "centre",

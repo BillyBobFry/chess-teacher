@@ -36,6 +36,10 @@ export function principleTitle(id: PrincipleId, locale: Locale): string {
       return m.principle_hanging_title({}, o);
     case "safety":
       return m.principle_safety_title({}, o);
+    case "free_material":
+      return m.principle_free_material_title({}, o);
+    case "forcing_moves":
+      return m.principle_forcing_moves_title({}, o);
     case "develop":
       return m.principle_develop_title({}, o);
     case "king_safety":
@@ -66,6 +70,10 @@ export function principleText(id: PrincipleId, locale: Locale): string {
       return m.principle_hanging_text({}, o);
     case "safety":
       return m.principle_safety_text({}, o);
+    case "free_material":
+      return m.principle_free_material_text({}, o);
+    case "forcing_moves":
+      return m.principle_forcing_moves_text({}, o);
     case "develop":
       return m.principle_develop_text({}, o);
     case "king_safety":

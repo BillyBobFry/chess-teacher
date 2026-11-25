@@ -1,6 +1,6 @@
 /**
  * API integration tests: real Hono app, real Better Auth, real Postgres (PGlite in memory),
- * fake LLM client. Game states with real lessons come from the parity fixtures.
+ * fake LLM client. Game states with real lessons come from a recorded game (tools/sim/games).
  */
 
 import { readFileSync } from "node:fs";
@@ -11,9 +11,9 @@ import {
   opponentMove,
   startUserTurn,
   userMove,
-  DEFAULT_CONFIG,
   type Engines,
   type SessionState,
+  type TeachingConfig,
 } from "@chess-teacher/core";
 import { RecordedEngine, type RecordedCall } from "@chess-teacher/engine";
 import { readEnv } from "../src/env.ts";
@@ -26,11 +26,10 @@ const EN_GB = { locale: "en-GB" };
 /** A game state with several lessons, from a recorded game. */
 async function stateWithLessons(): Promise<SessionState> {
   const fx = JSON.parse(
-    readFileSync(join(import.meta.dirname, "../../../tools/sim/fixtures/game-01.json"), "utf8"),
+    readFileSync(join(import.meta.dirname, "../../../tools/sim/games/game-01.json"), "utf8"),
   ) as {
     userColour: "w" | "b";
-    depth: number;
-    config: object;
+    config: TeachingConfig;
     steps: { type: string; move?: string }[];
     engineCalls: { analyst: RecordedCall[]; weak: RecordedCall[] };
   };
@@ -38,10 +37,7 @@ async function stateWithLessons(): Promise<SessionState> {
     analyst: new RecordedEngine(fx.engineCalls.analyst),
     weak: new RecordedEngine(fx.engineCalls.weak),
   };
-  let s = newSession({
-    userColour: fx.userColour,
-    config: { ...DEFAULT_CONFIG, ...fx.config, analysisDepth: fx.depth },
-  });
+  let s = newSession({ userColour: fx.userColour, config: fx.config });
   for (const step of fx.steps) {
     if (step.type === "startUserTurn") s = (await startUserTurn(s, engines)).state;
     else if (step.type === "userMove") s = (await userMove(s, step.move!, engines)).state;
@@ -396,22 +392,26 @@ describe("progress", () => {
 });
 
 describe("AI prompt facts", () => {
-  it("labels the engine's lines as predictions, not moves from the game", async () => {
+  it("gives the moves really played apart from the engine's predictions", async () => {
     const { promptFacts, SYSTEM_PROMPT } = await import("../src/explain.ts");
     const { facts } = await import("@chess-teacher/core");
-    const f = promptFacts(facts(recorded.lessons[0]!));
-    expect(Object.keys(f)).toEqual(
-      expect.arrayContaining(["move_played", "predicted_continuation_after_your_move"]),
-    );
+    const f = promptFacts(facts(recorded.lessons[0]!), {
+      movesPlayed: "15. e4 dxe4 16. fxe4",
+      trigger: { kind: "losing_material" },
+    });
+    expect(f).toMatchObject({
+      moves_played_in_the_game: "15. e4 dxe4 16. fxe4",
+      what_happened_in_the_game: "You're about to lose material.",
+    });
+    expect(f).toHaveProperty("predicted_continuation_after_your_move");
     expect(f).not.toHaveProperty("your_line");
-    expect(f).not.toHaveProperty("what_happened_in_the_game");
-    expect(SYSTEM_PROMPT).toMatch(/have NOT happened/);
+    expect(SYSTEM_PROMPT).toMatch(/has NOT happened/);
   });
 
   it("words the facts in en-GB from the catalogue", async () => {
     const { promptFacts } = await import("../src/explain.ts");
     const { facts } = await import("@chess-teacher/core");
-    const f = promptFacts(facts(recorded.lessons[0]!));
+    const f = promptFacts(facts(recorded.lessons[0]!), { movesPlayed: "", trigger: null });
     for (const value of [f.key_factor, f.before_your_move, f.end_of_your_line, f.principle.title]) {
       expect(typeof value).toBe("string");
       expect(value).not.toBe("");
@@ -441,6 +441,25 @@ describe("explanation language", () => {
     const url = `/api/games/${game.id}/lessons/${recorded.lessons[0]!.id}/explanation`;
     await call(url, { method: "POST", cookie, json: { locale: "en-US" } });
     expect(seen.system).toMatch(/American English \(en-US\)/);
+  });
+
+  it("tells the model the moves really played since the lesson's move", async () => {
+    const { llm, seen } = capture();
+    const { call, signUp } = await setup({ llm });
+    const cookie = await signUp("ola@example.com");
+    const game = await (
+      await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
+    ).json();
+    const lesson = recorded.lessons[0]!;
+    await call(`/api/games/${game.id}/lessons/${lesson.id}/explanation`, {
+      method: "POST",
+      cookie,
+      json: EN_GB,
+    });
+    const { playedLine, variationSan } = await import("@chess-teacher/core");
+    const played = variationSan(lesson.fenBefore, playedLine(recorded, lesson));
+    const sent = (seen as { messages?: { content: string }[] }).messages?.[0]?.content ?? "";
+    expect(JSON.parse(sent.replace(/^[^{]*/, ""))).toMatchObject({ moves_played_in_the_game: played });
   });
 
   it("falls back to en-GB for a locale we don't ship", async () => {
@@ -534,7 +553,13 @@ describe("structured explanations", () => {
     };
     const { explainLesson } = await import("../src/explain.ts");
     const { facts } = await import("@chess-teacher/core");
-    const r = await explainLesson(llm as never, "claude-opus-5-5", facts(recorded.lessons[0]!), "en-GB");
+    const r = await explainLesson(
+      llm as never,
+      "claude-opus-5-5",
+      facts(recorded.lessons[0]!),
+      { movesPlayed: "", trigger: null },
+      "en-GB",
+    );
     expect(body.output_config?.format?.type).toBe("json_schema");
     expect(r.parts?.headline).toBe("Your move left a weakness");
   });

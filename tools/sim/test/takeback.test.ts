@@ -5,17 +5,12 @@ import {
   canTakeBack,
   gameOf,
   isUserTurn,
-  newSession,
-  opponentMove,
-  startUserTurn,
   takeBack,
-  userMove,
   type GameEvent,
   type Lesson,
   type SessionState,
 } from "@chess-teacher/core";
-import { RecordedEngine } from "@chess-teacher/engine";
-import { configOf, loadGames } from "./fixtures.ts";
+import { enginesFor, loadGames, startOf, step } from "./games.ts";
 
 interface Point {
   /** The state at the start of the user's turn, before their move. */
@@ -43,24 +38,19 @@ async function replay(name: string): Promise<{ first: SessionState; points: Poin
     loadGames().find((x) => x.name === name),
     name,
   );
-  const e = {
-    analyst: new RecordedEngine(g.engineCalls.analyst),
-    weak: new RecordedEngine(g.engineCalls.weak),
-  };
-  let state: SessionState = newSession({ userColour: g.userColour, config: configOf(g) });
+  const e = enginesFor(g);
+  let state = startOf(g);
   const first = state;
   const points: Point[] = [];
-  for (const step of g.steps) {
-    if (step.type === "startUserTurn") state = (await startUserTurn(state, e)).state;
-    else if (step.type === "userMove") {
-      const r = await userMove(state, defined(step.move, "a recorded move"), e);
+  for (const s of g.steps) {
+    const r = await step(state, s, e);
+    if (s.type === "userMove") {
       points.push({ before: state, events: r.events, afterMove: r.state, afterReply: null });
-      state = r.state;
-    } else {
-      state = (await opponentMove(state, e)).state;
+    } else if (s.type === "opponentMove") {
       const last = points.at(-1);
-      if (last && !last.afterReply) last.afterReply = state;
+      if (last && !last.afterReply) last.afterReply = r.state;
     }
+    state = r.state;
   }
   return { first, points };
 }

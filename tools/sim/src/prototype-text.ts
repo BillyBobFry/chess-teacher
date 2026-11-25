@@ -1,10 +1,11 @@
 /**
- * The Python prototype's English, for the parity tests and the simulation reports.
+ * The Python prototype's English, for the feature parity test, the simulation reports and
+ * the version 1 save upgrade test.
  *
  * The core returns lesson text as data; the app renders it from its message catalogue in
  * the player's language. The prototype (prototype/teacher) wrote sentences instead, and its
  * recorded fixtures hold those sentences. Rendering the core's data the prototype's way, word
- * for word, keeps the parity tests exact about every fact the core measured, without tying
+ * for word, keeps the feature parity test exact about every fact the core measured, without tying
  * the app's copy to the prototype's.
  */
 
@@ -50,6 +51,19 @@ export const PRINCIPLES: Record<PrincipleId, { title: string; text: string }> = 
     text:
       "Before every move, ask: what can my opponent capture, which checks do they " +
       "have, and what does their last move threaten?",
+  },
+  // Added after the port: the prototype files every material lesson under the two above.
+  free_material: {
+    title: "Take free material",
+    text:
+      "When your opponent leaves a piece or pawn you can win, take it. Before every move, " +
+      "look at everything you can capture.",
+  },
+  forcing_moves: {
+    title: "Look for forcing moves",
+    text:
+      "Checks, captures and threats force your opponent to respond. Before a quiet move, " +
+      "look at yours: one of them may win material.",
   },
   develop: {
     title: "Develop your knights and bishops first",
