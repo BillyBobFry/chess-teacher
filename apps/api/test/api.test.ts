@@ -343,7 +343,44 @@ describe("explanations", () => {
         json: EN_GB,
       })
     ).json();
-    expect(res).toEqual({ status: "rejected", coachedGamesRemaining: 30 });
+    expect(res).toEqual({ status: "rejected", coachedGamesRemaining: 30, canRetry: true });
+  });
+
+  it("writes a failed explanation again when asked, up to a limit", async () => {
+    const llm = fakeLlm();
+    const create = llm.beta.messages.create;
+    let failing = true;
+    llm.beta.messages.create = async () => {
+      if (!failing) return create();
+      llm.calls += 1;
+      throw new Error("overloaded");
+    };
+    const { call, signUp } = await setup({ llm });
+    const cookie = await signUp("fin@example.com");
+    const game = await (
+      await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
+    ).json();
+    const url = (id: number) => `/api/games/${game.id}/lessons/${id}/explanation`;
+    const post = async (id: number) => (await call(url(id), { method: "POST", cookie, json: EN_GB })).json();
+
+    expect(await post(lessonIds[0]!)).toEqual({ status: "error", coachedGamesRemaining: 30, canRetry: true });
+    failing = false;
+    expect(await post(lessonIds[0]!)).toEqual({
+      status: "ready",
+      parts: llm.parts,
+      coachedGamesRemaining: 29,
+    });
+
+    failing = true;
+    const answers = [];
+    for (let i = 0; i < 8; i++) answers.push(await post(lessonIds[1]!));
+    expect(answers.map((a) => a.canRetry)).toEqual([true, true, true, true, true, false, false, false]);
+    expect(await (await call(url(lessonIds[1]!), { cookie })).json()).toEqual({
+      status: "error",
+      coachedGamesRemaining: 29,
+      canRetry: false,
+    });
+    expect(llm.calls).toBe(2 + 6);
   });
 
   it("lets the coach name a square a piece stands on", async () => {
@@ -752,7 +789,7 @@ describe("structured explanations", () => {
         json: EN_GB,
       })
     ).json();
-    expect(res).toEqual({ status: "error", coachedGamesRemaining: 30 });
+    expect(res).toEqual({ status: "error", coachedGamesRemaining: 30, canRetry: true });
   });
 
   it("asks the API for the three-part structure", async () => {

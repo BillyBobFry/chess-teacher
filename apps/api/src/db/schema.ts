@@ -121,6 +121,8 @@ export const explanations = pgTable(
     outputTokens: integer("output_tokens"),
     costUsd: doublePrecision("cost_usd"),
     error: text("error"),
+    /** How many times it has been generated: a failed one is tried again, up to a limit. */
+    attempts: integer("attempts").notNull().default(1),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },

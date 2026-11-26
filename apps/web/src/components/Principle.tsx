@@ -1,7 +1,8 @@
-import type { PrincipleDetailResponse, PrincipleGame, PrincipleKind } from "@chess-teacher/contract";
+import type { PrincipleGame, PrincipleKind } from "@chess-teacher/contract";
 import type { Lesson } from "@chess-teacher/core";
-import { useCallback, useEffect, useId, useState } from "react";
-import { api } from "../api/client.ts";
+import { useQuery } from "@tanstack/react-query";
+import { useId, useState } from "react";
+import { principleQuery } from "../api/queries.ts";
 import { principleCopy } from "../lib/principles.ts";
 import { outcomeText } from "../lib/result.ts";
 import { goBackTo, hrefOf } from "../lib/router.ts";
@@ -25,25 +26,11 @@ const keyOf = (gameId: string, lessonId: number) => `${gameId}:${lessonId}`;
 export function Principle({ kind, id }: { kind: PrincipleKind; id: string }) {
   const locale = getLocale();
   const copy = principleCopy(kind, id, locale);
-  const [data, setData] = useState<PrincipleDetailResponse | null>(null);
-  const [error, setError] = useState(false);
+  const { data, isError, isFetching, refetch } = useQuery(principleQuery(kind, id));
+  // A retry in flight shows as loading, not as the error it is retrying.
+  const error = isError && !isFetching;
   const [open, setOpen] = useState<Key | null>(null);
-
-  const fetchLessons = useCallback(
-    () =>
-      api
-        .principle(kind, id)
-        .then(setData)
-        .catch(() => setError(true)),
-    [kind, id],
-  );
-  useEffect(() => {
-    void fetchLessons();
-  }, [fetchLessons]);
-  const retry = () => {
-    setError(false);
-    void fetchLessons();
-  };
+  const retry = () => void refetch();
 
   return (
     <section>

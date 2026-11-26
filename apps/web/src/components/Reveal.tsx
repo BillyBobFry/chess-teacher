@@ -8,14 +8,13 @@ import {
   type Lesson,
   type SessionState,
 } from "@chess-teacher/core";
-import type { ExplanationResponse } from "@chess-teacher/contract";
 import { moveText, triggerText } from "@chess-teacher/lesson-text";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { useState } from "react";
+import type { ExplanationQuery } from "../api/queries.ts";
 import type { RevealState } from "../game/storage.ts";
 import { lessonMoves, lineMoves } from "../lib/moves.ts";
-import { AiExplanation, coachConcept, useAiExplanation } from "./AiExplanation.tsx";
-import { Explanation } from "./Explanation.tsx";
+import { LessonExplanation } from "./AiExplanation.tsx";
 import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
 import { Board, orientationOf } from "./Board.tsx";
@@ -31,7 +30,8 @@ interface Props {
   lesson: Lesson;
   reveal: RevealState;
   hint: string | null;
-  loadExplanation: (signal: AbortSignal) => Promise<ExplanationResponse | null>;
+  /** The coach's explanation; null when the server has no coach. */
+  explanation: ExplanationQuery | null;
   onGuess: (ply: number) => void;
   onShowAnswer: () => void;
   onRewind: () => void;
@@ -45,7 +45,7 @@ export function Reveal({
   lesson,
   reveal,
   hint,
-  loadExplanation,
+  explanation,
   onGuess,
   onShowAnswer,
   onRewind,
@@ -54,7 +54,6 @@ export function Reveal({
   const locale = getLocale();
   const ago = userMovesAgo(state, lesson);
   const move = moveText(lessonMove(lesson), locale);
-  const ai = useAiExplanation(loadExplanation);
   const missedMaterial =
     lesson.source === "features" ? lesson.feature === "material" : lesson.mistake === "misses_material";
   const headline =
@@ -109,8 +108,7 @@ export function Reveal({
               <span aria-hidden>✓</span> {m.reveal_found()}
             </p>
           )}
-          <AiExplanation result={ai} lesson={lesson} played={playedLine(state, lesson)} />
-          <Explanation lesson={lesson} coachConcept={coachConcept(ai)} />
+          <LessonExplanation explanation={explanation} lesson={lesson} played={playedLine(state, lesson)} />
           <Futures lesson={lesson} played={playedLine(state, lesson)} />
           <LessonFeedback gameId={gameId} lessonId={lesson.id} />
           <div className="actions">

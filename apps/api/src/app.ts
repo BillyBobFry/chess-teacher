@@ -27,7 +27,7 @@ import {
 } from "@chess-teacher/core";
 import { baseLocale, isLocale } from "@chess-teacher/lesson-text";
 import { zValidator as validator } from "@hono/zod-validator";
-import { and, count, desc, eq, lt, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, lt, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { createMiddleware } from "hono/factory";
@@ -50,6 +50,13 @@ export interface AppDeps {
 type Vars = { Variables: { userId: string; user: { id: string; name: string; email: string } } };
 
 const PENDING_TIMEOUT_MS = 2 * 60 * 1000;
+/**
+ * Times one lesson's explanation may be written. The client tries three times on its own (a
+ * request and two retries) and the player can ask for one more round; past that the facts
+ * stand alone, so a lesson the coach keeps failing on can't keep spending.
+ */
+const MAX_ATTEMPTS = 6;
+const FAILED = ["error", "rejected"];
 
 /** Errors are codes; the client words them in the player's language. */
 const failure = (error: ApiErrorCode, extra: Omit<ApiError, "error"> = {}): ApiError => ({ error, ...extra });
@@ -289,8 +296,14 @@ export function createApp(deps: AppDeps) {
         ? { status: "ready", parts, coachedGamesRemaining: remaining(used) }
         : { status: "ready", text: row.text ?? "", coachedGamesRemaining: remaining(used) };
     }
-    return { status: row.status as ExplanationResponse["status"], coachedGamesRemaining: remaining(used) };
+    const status = row.status as ExplanationResponse["status"];
+    return FAILED.includes(status)
+      ? { status, coachedGamesRemaining: remaining(used), canRetry: canRetry(row) }
+      : { status, coachedGamesRemaining: remaining(used) };
   };
+
+  const canRetry = (row: typeof explanations.$inferSelect) =>
+    !!llm && FAILED.includes(row.status) && row.attempts < MAX_ATTEMPTS;
 
   app.get("/games/:id/lessons/:lessonId/explanation", async (c) => {
     const userId = c.get("userId");
@@ -347,7 +360,7 @@ export function createApp(deps: AppDeps) {
     const current = await existing(game.id, lesson.id);
     const stale =
       current?.status === "pending" && now().getTime() - current.updatedAt.getTime() > PENDING_TIMEOUT_MS;
-    if (current && !stale) return c.json(respond(current, used));
+    if (current && !stale && !canRetry(current)) return c.json(respond(current, used));
     // A game already coached this month has paid for the rest of its explanations.
     if (remaining(used) <= 0 && !(await coachedThisMonth(userId, game.id))) {
       return c.json<ExplanationResponse>({ status: "quota", coachedGamesRemaining: 0 });
@@ -366,19 +379,30 @@ export function createApp(deps: AppDeps) {
     }
     const factsHash = await sha256(JSON.stringify([lessonFacts, soFar]) + PROMPT_VERSION + locale);
 
-    // Claim the work: insert a pending row, or take over a stale one.
+    // Claim the work: insert a pending row, or take over a stale or failed one.
     const claimed = current
       ? await db
           .update(explanations)
-          .set({ status: "pending", locale, factsHash, updatedAt: now() })
+          .set({
+            status: "pending",
+            locale,
+            factsHash,
+            attempts: sql`${explanations.attempts} + 1`,
+            updatedAt: now(),
+          })
           .where(
             and(
               eq(explanations.id, current.id),
-              eq(explanations.status, "pending"),
-              lt(explanations.updatedAt, new Date(now().getTime() - PENDING_TIMEOUT_MS)),
+              or(
+                and(
+                  eq(explanations.status, "pending"),
+                  lt(explanations.updatedAt, new Date(now().getTime() - PENDING_TIMEOUT_MS)),
+                ),
+                and(inArray(explanations.status, FAILED), lt(explanations.attempts, MAX_ATTEMPTS)),
+              ),
             ),
           )
-          .returning({ id: explanations.id })
+          .returning({ id: explanations.id, attempts: explanations.attempts })
       : await db
           .insert(explanations)
           .values({
@@ -391,9 +415,10 @@ export function createApp(deps: AppDeps) {
             locale,
           })
           .onConflictDoNothing()
-          .returning({ id: explanations.id });
-    if (!claimed.length) return c.json(respond(await existing(game.id, lesson.id), used));
-    const rowId = claimed[0]!.id;
+          .returning({ id: explanations.id, attempts: explanations.attempts });
+    const [claim] = claimed;
+    if (!claim) return c.json(respond(await existing(game.id, lesson.id), used));
+    const rowId = claim.id;
 
     const result =
       lesson.source === "features"
@@ -428,7 +453,11 @@ export function createApp(deps: AppDeps) {
         coachedGamesRemaining: remaining(used),
       });
     }
-    return c.json<ExplanationResponse>({ status: result.status, coachedGamesRemaining: remaining(used) });
+    return c.json<ExplanationResponse>({
+      status: result.status,
+      coachedGamesRemaining: remaining(used),
+      canRetry: claim.attempts < MAX_ATTEMPTS,
+    });
   });
 
   return app;

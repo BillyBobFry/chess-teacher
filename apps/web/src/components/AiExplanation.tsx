@@ -1,102 +1,171 @@
 import type { ExplanationResponse } from "@chess-teacher/contract";
 import { isConceptId, lessonBestSan, type ConceptId, type Lesson } from "@chess-teacher/core";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState, type ReactNode } from "react";
+import { errorText } from "../api/errors.ts";
+import { ExplanationFailed, type ExplanationQuery } from "../api/queries.ts";
 import { lessonMoves } from "../lib/moves.ts";
 import { m } from "../paraglide/messages.js";
+import { Alert } from "../ui/Alert.tsx";
+import { Button } from "../ui/Button.tsx";
+import { Skeleton, SkeletonLine } from "../ui/Skeleton.tsx";
 import { orientationOf } from "./Board.tsx";
+import { Explanation } from "./Explanation.tsx";
 import { moveMarkup } from "./MoveButton.tsx";
 import { MoveText, knownMoves } from "./MoveText.tsx";
 
-/** The AI explanation as it loads: "loading", then the response (null if there is none). */
-export type AiResult = ExplanationResponse | null | "loading";
+interface Props {
+  /** The coach's explanation to load; null when the server has no coach. */
+  explanation: ExplanationQuery | null;
+  lesson: Lesson;
+  /** The real moves from the mistake on. */
+  played: string[];
+}
 
-export function useAiExplanation(
-  load: (signal: AbortSignal) => Promise<ExplanationResponse | null>,
-): AiResult {
-  const [result, setResult] = useState<AiResult>("loading");
-  useEffect(() => {
-    const controller = new AbortController();
-    load(controller.signal).then((r) => {
-      if (!controller.signal.aborted) setResult(r);
-    });
-    return () => controller.abort();
-  }, [load]);
-  return result;
+/**
+ * A lesson's explanation: the coach's, above the measured facts. While the coach writes, a
+ * skeleton holds its place and the facts wait, so the player reads the coach first. If it
+ * fails after the retries, the player can try again or read the facts without it. The facts
+ * stand alone only as a last resort: no coach on the server, the allowance used up, or a
+ * lesson the coach has failed on too often.
+ */
+export function LessonExplanation({ explanation, lesson, played }: Props) {
+  if (!explanation) return <Explanation lesson={lesson} coachConcept={null} />;
+  return <CoachedExplanation explanation={explanation} lesson={lesson} played={played} />;
+}
+
+function CoachedExplanation({ explanation, lesson, played }: Props & { explanation: ExplanationQuery }) {
+  const query = useQuery(explanation);
+  const [withoutCoach, setWithoutCoach] = useState(false);
+
+  if (query.data !== undefined) {
+    return (
+      <>
+        <AiExplanation result={query.data} lesson={lesson} played={played} />
+        <Explanation lesson={lesson} coachConcept={coachConcept(query.data)} />
+      </>
+    );
+  }
+  // Retries, automatic or asked for, show the skeleton again rather than the failure.
+  const failed = query.isError && !query.isFetching;
+  return (
+    <>
+      {failed ? (
+        <Alert className="mb-3">
+          {query.error instanceof ExplanationFailed ? m.ai_error() : errorText(query.error)}
+          <span className="mt-2 flex flex-wrap items-center gap-3">
+            <Button onPress={() => void query.refetch()}>{m.ai_retry()}</Button>
+            {!withoutCoach && (
+              <Button variant="link" onPress={() => setWithoutCoach(true)}>
+                {m.ai_show_facts()}
+              </Button>
+            )}
+          </span>
+        </Alert>
+      ) : (
+        <CoachSkeleton />
+      )}
+      {withoutCoach && <Explanation lesson={lesson} coachConcept={null} />}
+    </>
+  );
+}
+
+/** The coach's box, the shape of the explanation it's writing (UX-27). */
+function CoachSkeleton() {
+  return (
+    <CoachBox>
+      <Skeleton label={m.ai_writing()}>
+        <SkeletonLine className="mt-1 h-5 w-4/5" />
+        <SkeletonLine className="mt-2 h-3 w-1/4" />
+        <SkeletonLine className="h-4 w-full" />
+        <SkeletonLine className="h-4 w-2/3" />
+        <SkeletonLine className="mt-2 h-3 w-1/3" />
+        <SkeletonLine className="h-4 w-full" />
+        <SkeletonLine className="h-4 w-3/5" />
+        <SkeletonLine className="mt-2 h-3 w-1/2" />
+      </Skeleton>
+    </CoachBox>
+  );
+}
+
+function CoachBox({ children }: { children: ReactNode }) {
+  return (
+    <div className="mb-3 rounded-control border border-primary bg-success-subtle px-3.5 py-3">
+      <div className="text-sm font-bold text-success">{m.ai_label()}</div>
+      {children}
+    </div>
+  );
 }
 
 /** The concept the coach chose, once its explanation is ready (null otherwise). */
-export function coachConcept(result: AiResult): ConceptId | null {
-  if (result === "loading" || result?.status !== "ready") return null;
+function coachConcept(result: ExplanationResponse | null): ConceptId | null {
+  if (result?.status !== "ready") return null;
   const concept = result.parts?.concept;
   return isConceptId(concept) ? concept : null;
 }
 
+const Note = ({ children }: { children: ReactNode }) => (
+  <p className="mt-0 mb-3 text-xs text-fg-muted">{children}</p>
+);
+
 /**
- * The AI coach's explanation, shown above the measured facts when available: a headline
- * and two short paragraphs. If there isn't one, the facts-based explanation below stands
- * alone, with a note saying why (allowance used up, rejected by the guardrail, failed or
- * too slow); with no LLM on the server, without one.
+ * The coach's explanation: a headline and two short paragraphs. If there isn't one, a note says
+ * why (allowance used up, or the coach failed too often) above the facts; with no coach on the
+ * server, or for a lesson that was never revealed, nothing.
  */
-export function AiExplanation({
+function AiExplanation({
   result,
   lesson,
   played,
-}: {
-  result: AiResult;
-  lesson: Lesson;
-  /** The real moves from the mistake on. */
-  played: string[];
-}) {
+}: { result: ExplanationResponse | null } & Omit<Props, "explanation">) {
   const orientation = orientationOf(lesson.userColour);
   const { better } = lessonMoves(lesson);
   // The coach writes about the two lines it was given; the real moves may come up too.
   const known = knownMoves(lesson, [played]);
   const missedChance = lesson.kind === "missed_chance";
 
-  if (result === "loading") return <p className="ai-note muted">{m.ai_writing()}</p>;
   if (!result) return null;
-  if (result.status === "quota") {
-    return <p className="ai-note muted">{m.ai_quota()}</p>;
-  }
-  // A coach that tried and didn't manage says so, so the template below isn't mistaken for
-  // a lesson the coach never saw. A server without an LLM ("unavailable") says nothing.
-  if (result.status === "rejected") return <p className="ai-note muted">{m.ai_rejected()}</p>;
-  if (result.status === "pending") return <p className="ai-note muted">{m.ai_slow()}</p>;
+  if (result.status === "quota") return <Note>{m.ai_quota()}</Note>;
+  // A coach that tried and didn't manage says so, so the facts aren't mistaken for a lesson the
+  // coach never saw. A server without an LLM ("unavailable") says nothing.
+  if (result.status === "rejected") return <Note>{m.ai_rejected()}</Note>;
   if (result.status === "error" || (result.status === "ready" && !result.parts && !result.text))
-    return <p className="ai-note muted">{m.ai_failed()}</p>;
+    return <Note>{m.ai_failed()}</Note>;
   if (result.status !== "ready") return null;
 
   const text = (t: string) => <MoveText text={t} known={known} orientation={orientation} />;
-  const foot = <div className="ai-foot muted">{m.ai_foot({ remaining: result.coachedGamesRemaining })}</div>;
+  const foot = (
+    <div className="text-xs text-fg-muted">{m.ai_foot({ remaining: result.coachedGamesRemaining })}</div>
+  );
   if (!result.parts) {
     // Explanations stored before they were structured: one paragraph.
     return (
-      <div className="ai">
-        <div className="ai-label">{m.ai_label()}</div>
-        <p>{text(result.text ?? "")}</p>
+      <CoachBox>
+        <p className="mt-1 mb-2">{text(result.text ?? "")}</p>
         {foot}
-      </div>
+      </CoachBox>
     );
   }
   const { headline, what_it_allowed, why_better } = result.parts;
   return (
-    <div className="ai">
-      <div className="ai-label">{m.ai_label()}</div>
-      <p className="ai-headline">{text(headline)}</p>
-      <dl className="ai-parts">
-        <dt>{missedChance ? m.ai_what_missed() : m.ai_what_allowed()}</dt>
-        <dd>{text(what_it_allowed)}</dd>
-        <dt>
+    <CoachBox>
+      <p className="mt-1 mb-2 text-[1.05rem] font-bold">{text(headline)}</p>
+      <dl className="mt-0 mb-2">
+        <dt className="mt-2 text-xs font-bold text-fg-muted">
+          {missedChance ? m.ai_what_missed() : m.ai_what_allowed()}
+        </dt>
+        <dd className="m-0 mt-0.5">{text(what_it_allowed)}</dd>
+        <dt className="mt-2 text-xs font-bold text-fg-muted">
           <ParaglideMessage
             message={m.ai_why_better}
             inputs={{ move: lessonBestSan(lesson) }}
             markup={{ move: moveMarkup(better, orientation) }}
           />
         </dt>
-        <dd>{text(why_better)}</dd>
+        <dd className="m-0 mt-0.5">{text(why_better)}</dd>
       </dl>
       {foot}
-    </div>
+    </CoachBox>
   );
 }

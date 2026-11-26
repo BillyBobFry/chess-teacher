@@ -1,12 +1,11 @@
 import { lessonMove, type Lesson } from "@chess-teacher/core";
 import { lessonTitle, moveText } from "@chess-teacher/lesson-text";
-import { useCallback } from "react";
-import { api } from "../api/client.ts";
+import { useQuery } from "@tanstack/react-query";
+import { configQuery, reviewExplanationQuery } from "../api/queries.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import { Disclosure, type Key } from "../ui/Disclosure.tsx";
-import { AiExplanation, coachConcept, useAiExplanation } from "./AiExplanation.tsx";
-import { Explanation } from "./Explanation.tsx";
+import { LessonExplanation } from "./AiExplanation.tsx";
 import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
 
@@ -69,22 +68,14 @@ export function LessonRow({
 
 /** An open lesson: the coach's explanation saved at its reveal, the facts, the futures. */
 function LessonBody({ lesson, played, gameId }: { lesson: Lesson; played: string[]; gameId: string }) {
-  // Only an explanation already written at the reveal: a finished lesson never asks for a new
-  // one, which would spend the player's allowance on lessons they were never shown. So
-  // "pending" here means there is none (or not yet), not that the coach is slow.
-  const loadExplanation = useCallback(
-    () =>
-      api
-        .explanation(gameId, lesson.id)
-        .then((r) => (r.status === "pending" ? null : r))
-        .catch(() => null),
-    [gameId, lesson.id],
-  );
-  const ai = useAiExplanation(loadExplanation);
+  const coach = useQuery(configQuery).data?.llmEnabled ?? false;
   return (
     <>
-      <AiExplanation result={ai} lesson={lesson} played={played} />
-      <Explanation lesson={lesson} coachConcept={coachConcept(ai)} />
+      <LessonExplanation
+        explanation={coach ? reviewExplanationQuery(gameId, lesson.id) : null}
+        lesson={lesson}
+        played={played}
+      />
       <Futures lesson={lesson} played={played} />
       <LessonFeedback gameId={gameId} lessonId={lesson.id} />
     </>

@@ -300,7 +300,7 @@ try {
       await page.getByRole("button", { name: "Show me the answer" }).click();
     }
     await page.getByText("Your coach", { exact: true }).waitFor({ timeout: 30_000 });
-    await page.locator(".ai-headline").filter({ hasText: "(Sample)" }).waitFor();
+    await page.getByText(/^\(Sample\)/).waitFor();
     await page.getByText(/What it (allowed|missed)/).waitFor();
     await page.locator("figcaption").filter({ hasText: "What happened" }).waitFor();
     await expectTabbableBoards(page, ["main"]);
@@ -470,7 +470,7 @@ try {
       .filter({ hasText: moveText(lessonMove(lesson), "en-GB") })
       .click();
     await page.getByText("Your coach", { exact: true }).waitFor();
-    await page.locator(".ai-headline").filter({ hasText: "(Sample)" }).waitFor();
+    await page.getByText(/^\(Sample\)/).waitFor();
     await shot("6d-past-game-coach", true);
     await page.getByRole("button", { name: "Back to your games" }).click();
     await page.getByRole("heading", { name: "Your games" }).waitFor();

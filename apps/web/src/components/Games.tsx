@@ -1,6 +1,5 @@
-import type { GameSummary } from "@chess-teacher/contract";
-import { useCallback, useEffect, useState } from "react";
-import { api } from "../api/client.ts";
+import { useQuery } from "@tanstack/react-query";
+import { finishedGamesQuery } from "../api/queries.ts";
 import { outcomeText } from "../lib/result.ts";
 import { hrefOf } from "../lib/router.ts";
 import { m } from "../paraglide/messages.js";
@@ -20,27 +19,14 @@ export function Games({
   onBackToGame: (() => void) | null;
   onBack: () => void;
 }) {
-  const [games, setGames] = useState<GameSummary[] | null>(null);
-  const [error, setError] = useState(false);
+  const { data: games, isError, isFetching, refetch } = useQuery(finishedGamesQuery);
+  // A retry in flight shows as loading, not as the error it is retrying.
+  const error = isError && !isFetching;
   const locale = getLocale();
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const list = new Intl.ListFormat(locale, { style: "narrow", type: "unit" });
 
-  const fetchGames = useCallback(
-    () =>
-      api
-        .finishedGames()
-        .then(setGames)
-        .catch(() => setError(true)),
-    [],
-  );
-  useEffect(() => {
-    void fetchGames();
-  }, [fetchGames]);
-  const retry = () => {
-    setError(false);
-    void fetchGames();
-  };
+  const retry = () => void refetch();
 
   return (
     <section>

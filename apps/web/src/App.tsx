@@ -1,8 +1,10 @@
 import { OPPONENT_RATING, type ConfigResponse } from "@chess-teacher/contract";
 import { gameOf, isUserTurn } from "@chess-teacher/core";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { api, authClient } from "./api/client.ts";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { authClient } from "./api/client.ts";
+import { configQuery } from "./api/queries.ts";
 import { Board, orientationOf } from "./components/Board.tsx";
 import { GameLayout } from "./components/GameLayout.tsx";
 import { GameReview } from "./components/GameReview.tsx";
@@ -125,19 +127,15 @@ function useFocusOnNavigate(pathname: string) {
 /** Signed out → sign-in screen; signed in → the page the URL names. */
 export function App() {
   const session = authClient.useSession();
-  const [config, setConfig] = useState<ConfigResponse | null>(null);
+  const configResult = useQuery(configQuery);
+  // Without the server's answer, sign-in by email still works and the coach stays off.
+  const config: ConfigResponse | null =
+    configResult.data ?? (configResult.isError ? { googleEnabled: false, llmEnabled: false } : null);
   const pathname = usePathname();
   const known = routeOf(pathname);
   const isPage = known !== null;
   const route = known ?? PLAY;
   const signedIn = !!session.data;
-
-  useEffect(() => {
-    api
-      .config()
-      .then(setConfig)
-      .catch(() => setConfig({ googleEnabled: false, llmEnabled: false }));
-  }, []);
 
   // A path that isn't a page (a typo, an old link) shows the game, so say so in the address bar.
   useEffect(() => {
@@ -253,13 +251,6 @@ function GameApp({
     setDrawer({ panel, canMove, expanded });
   }
   const setDrawerExpanded = (expanded: boolean) => setDrawer((d) => ({ ...d, expanded }));
-
-  const revealId = saved?.reveal?.lessonId;
-  const { explanation } = g;
-  const loadExplanation = useCallback(
-    (signal: AbortSignal) => (revealId === undefined ? Promise.resolve(null) : explanation(revealId, signal)),
-    [explanation, revealId],
-  );
 
   const nav = (
     <>
@@ -497,7 +488,7 @@ function GameApp({
               lesson={revealLesson}
               reveal={saved.reveal}
               hint={g.currentHint}
-              loadExplanation={loadExplanation}
+              explanation={llmEnabled ? g.explanationQuery(saved.id, revealLesson.id) : null}
               onGuess={g.guess}
               onShowAnswer={g.showAnswer}
               onRewind={() => g.rewindTo(revealLesson.id)}
