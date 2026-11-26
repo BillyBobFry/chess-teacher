@@ -153,7 +153,7 @@
   "balance_label": "Balance of power",
   "balance_about": "About this graph",
   "balance_scrubber": "Balance of power, move by move",
-  "balance_note": "The engine's evaluation: above the line you're ahead, below it your opponent is. Not every change is a lesson: lessons are the changes we could explain.",
+  "balance_note": "The engine's evaluation after each move. The filled part is yours: past the middle line, you're ahead. Not every change is a lesson: lessons are the changes we could explain.",
   "balance_position": "{move}: {balance}",
   "balance_even": "About even",
   "balance_ahead": [
