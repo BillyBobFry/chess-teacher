@@ -2,6 +2,9 @@ node_modules/
 pnpm-lock.yaml
 tools/sim/fixtures/
 tools/sim/games/
+# Benchmark items, packets and labels, written by tools/sim/src/bench scripts
+tools/sim/bench/dev/
+tools/sim/bench/test/
 **/reports/
 apps/web/public/stockfish/
 apps/web/public/stockfish11/

@@ -8,11 +8,11 @@ import {
   type ReviewLine,
   type SessionState,
 } from "@chess-teacher/core";
-import { moveText, principleTitle } from "@chess-teacher/lesson-text";
+import { lessonTitle, moveText } from "@chess-teacher/lesson-text";
 import { useCallback, useMemo, useState } from "react";
 import { api } from "../api/client.ts";
 import type { Key } from "../ui/Disclosure.tsx";
-import { AiExplanation } from "./AiExplanation.tsx";
+import { AiExplanation, coachConcept, useAiExplanation } from "./AiExplanation.tsx";
 import { Explanation } from "./Explanation.tsx";
 import { Futures } from "./Futures.tsx";
 import { LessonFeedback } from "./LessonFeedback.tsx";
@@ -131,20 +131,13 @@ function LessonRow({
 }) {
   const locale = getLocale();
   const o = outcome(lesson);
-  const played = playedLine(state, lesson);
-  // Only an explanation already written at the reveal: the review never asks for a new one,
-  // which would spend the player's allowance on lessons they were never shown.
-  const loadExplanation = useCallback(
-    () => api.explanation(gameId, lesson.id).catch(() => null),
-    [gameId, lesson.id],
-  );
   return (
     <Disclosure
       id={lesson.id}
       summary={
         <span className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-0.5">
           <span className="row-span-2 font-semibold">{moveText(lessonMove(lesson), locale)}</span>
-          <span>{principleTitle(lesson.principle, locale)}</span>
+          <span>{lessonTitle(lesson, locale)}</span>
           <span className="text-sm text-fg-muted">
             {o.text}
             {o.tick && <span aria-hidden> ✓</span>}
@@ -152,14 +145,32 @@ function LessonRow({
         </span>
       }
     >
-      {open && (
-        <>
-          <AiExplanation load={loadExplanation} lesson={lesson} played={played} />
-          <Explanation lesson={lesson} />
-          <Futures lesson={lesson} played={played} />
-          <LessonFeedback gameId={gameId} lessonId={lesson.id} />
-        </>
-      )}
+      {open && <LessonBody lesson={lesson} state={state} gameId={gameId} />}
     </Disclosure>
+  );
+}
+
+/** An open lesson: the coach's explanation saved at its reveal, the facts, the futures. */
+function LessonBody({ lesson, state, gameId }: { lesson: Lesson; state: SessionState; gameId: string }) {
+  const played = playedLine(state, lesson);
+  // Only an explanation already written at the reveal: the review never asks for a new one,
+  // which would spend the player's allowance on lessons they were never shown. So "pending"
+  // here means there is none (or not yet), not that the coach is slow.
+  const loadExplanation = useCallback(
+    () =>
+      api
+        .explanation(gameId, lesson.id)
+        .then((r) => (r.status === "pending" ? null : r))
+        .catch(() => null),
+    [gameId, lesson.id],
+  );
+  const ai = useAiExplanation(loadExplanation);
+  return (
+    <>
+      <AiExplanation result={ai} lesson={lesson} played={played} />
+      <Explanation lesson={lesson} coachConcept={coachConcept(ai)} />
+      <Futures lesson={lesson} played={played} />
+      <LessonFeedback gameId={gameId} lessonId={lesson.id} />
+    </>
   );
 }

@@ -1,19 +1,33 @@
+import { OPPONENT_RATING } from "@chess-teacher/contract";
 import { useState } from "react";
 import type { NewGameOptions } from "../game/useGame.ts";
 import { m } from "../paraglide/messages.js";
 import { Button } from "../ui/Button.tsx";
 import { Checkbox } from "../ui/Checkbox.tsx";
 import { RadioGroup } from "../ui/RadioGroup.tsx";
+import { Slider } from "../ui/Slider.tsx";
 
-const STRENGTHS = [
-  { skill: 0, label: m.strength_gentle, note: m.strength_gentle_note },
-  { skill: 3, label: m.strength_steady, note: m.strength_steady_note },
-  { skill: 6, label: m.strength_testing, note: m.strength_testing_note },
-];
+/** What an opponent at this rating plays like, in words a new player can judge. */
+function playsLike(rating: number): string {
+  if (rating < 800) return m.new_game_rating_new();
+  if (rating < 1100) return m.new_game_rating_basics();
+  if (rating < 1400) return m.new_game_rating_regular();
+  if (rating < 1700) return m.new_game_rating_strong();
+  return m.new_game_rating_club();
+}
 
-export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => void; busy: boolean }) {
+export function NewGame({
+  onStart,
+  busy,
+  initialRating,
+}: {
+  onStart: (o: NewGameOptions) => void;
+  busy: boolean;
+  /** The rating the player chose last time (UX-18). */
+  initialRating: number;
+}) {
   const [colour, setColour] = useState<NewGameOptions["colour"]>("w");
-  const [skill, setSkill] = useState(3);
+  const [rating, setRating] = useState(initialRating);
   const [easy, setEasy] = useState(true);
 
   return (
@@ -34,13 +48,17 @@ export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => voi
         ]}
       />
 
-      <RadioGroup
+      <Slider
         className="my-6"
-        variant="cards"
-        label={m.new_game_opponent()}
-        value={String(skill)}
-        onChange={(v) => setSkill(Number(v))}
-        options={STRENGTHS.map((s) => ({ value: String(s.skill), label: s.label(), description: s.note() }))}
+        label={m.new_game_rating()}
+        value={rating}
+        onChange={setRating}
+        minValue={OPPONENT_RATING.min}
+        maxValue={OPPONENT_RATING.max}
+        step={OPPONENT_RATING.step}
+        // Ratings are written 1100, never 1,100.
+        formatOptions={{ useGrouping: false }}
+        description={playsLike(rating)}
       />
 
       <Checkbox className="mt-4 mb-7" isSelected={easy} onChange={setEasy}>
@@ -51,7 +69,7 @@ export function NewGame({ onStart, busy }: { onStart: (o: NewGameOptions) => voi
         variant="primary"
         size="large"
         isDisabled={busy}
-        onPress={() => onStart({ colour, opponentSkill: skill, easy })}
+        onPress={() => onStart({ colour, opponentRating: rating, easy })}
       >
         {busy ? m.busy_engine() : m.new_game_start()}
       </Button>

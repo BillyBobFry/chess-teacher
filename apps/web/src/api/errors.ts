@@ -1,7 +1,8 @@
-/** Errors from the server, worded in the player's language (UX-32). */
+/** Errors from the server and the engines, worded in the player's language (UX-32). */
 
 import { PASSWORD_MIN_LENGTH } from "@chess-teacher/contract";
 import { m } from "../paraglide/messages.js";
+import { OpponentLoadError } from "../engine/maia.ts";
 import { HttpError } from "./client.ts";
 
 /** What to tell the player about a failed request or step. */
@@ -27,6 +28,7 @@ export function errorText(err: unknown): string {
     }
     return m.error_generic();
   }
+  if (err instanceof OpponentLoadError) return m.error_opponent_load();
   // fetch() rejects with a TypeError when the server can't be reached.
   if (err instanceof TypeError) return m.error_network();
   return m.error_generic();

@@ -1,4 +1,6 @@
 public/stockfish/
 public/stockfish11/
+# The Maia-3 model, downloaded from a GitHub release by scripts/fetch-maia.mjs
+models/
 # Compiled from messages/ by Paraglide (vite plugin and `pnpm typecheck`)
 src/paraglide/

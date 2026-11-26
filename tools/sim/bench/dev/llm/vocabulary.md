@@ -1,0 +1,37 @@
+# Concept vocabulary
+
+- `hanging_piece` (material): Left a piece or pawn undefended where it can be taken for nothing, including by moving it or by pushing a pawn to an unprotected square.
+- `count_attackers` (material): Attackers against defenders: moving to, capturing on or pushing into a square attacked more times than it is defended, or capturing a pawn that is defended.
+- `free_material` (material): Missed a piece or pawn the opponent left loose that could simply be taken.
+- `removed_own_defender` (material): The move took away, traded off or moved away a piece that was defending something, which then falls.
+- `false_defender` (material): Something looks defended but the defender can't recapture: it is pinned, overloaded or tied to another job.
+- `greedy_grab` (material): Took material at the cost of development, king safety or coordination, and the opponent's activity outweighs it.
+- `fork` (tactics): One piece or pawn attacks two targets at once (knight, pawn, queen or other fork), whether walked into or missed.
+- `pin` (tactics): A piece can't move (or can't move safely) because something more valuable is behind it on the line.
+- `skewer` (tactics): A valuable piece is attacked on a line and, when it moves, the piece behind it falls.
+- `discovered_attack` (tactics): Moving one piece uncovers an attack (or check) by another.
+- `opened_line` (tactics): The move opened a file, rank or diagonal that lets an enemy piece reach a loose piece or the king.
+- `trapped_piece` (tactics): A piece with no safe squares that can be won, or a piece that wandered off and got trapped.
+- `in_between_move` (tactics): An in-between move, desperado or capture first before retreating: the order of moves changes what is won.
+- `remove_the_guard` (tactics): Capturing, chasing or deflecting the opponent's defender so the thing it guarded falls.
+- `missed_threat` (threats): Didn't see or answer what the opponent was threatening (other than mate), or didn't check the opponent's checks, captures and threats before moving.
+- `mate_threat` (king): Missed or allowed a mating attack or pattern on the king (not specifically the back rank).
+- `back_rank` (king): Back-rank mate or the threat of it: a king shut in behind its own pawns.
+- `king_in_centre` (king): A king left in the centre, or losing the right to castle, while lines are opening.
+- `king_shelter` (king): Weakened the pawns or pieces sheltering the king: pawn moves in front of it, or giving up a key defender of its squares.
+- `escape_square` (king): The king needs a flight square (luft) to avoid mate or endless checks.
+- `perpetual_check` (king): Allowed, or missed, a draw by perpetual check.
+- `stalemate` (king): Stalemate as a resource or a trap.
+- `attack_the_king` (king): Missed the chance to attack an exposed or weakened enemy king.
+- `tempo_attack` (tempo): Gaining time by attacking a piece (often with a pawn) so it must move, or putting a piece where it can be hit that way.
+- `lost_time` (tempo): Wasted moves: one-move threats, chasing a piece to a better square, moving the same piece again.
+- `development` (tempo): Developing pieces, or using or punishing a lead in development.
+- `pawn_break` (pawns): A pawn push that challenges or undermines the opponent's pawns and opens lines.
+- `passed_pawn` (pawns): Creating, pushing, stopping or blockading a passed pawn.
+- `pawn_weakness` (pawns): Creating or attacking weak pawns: isolated, backward, doubled or overextended.
+- `centre_control` (pawns): Occupying or controlling the centre, with pawns or pieces.
+- `rook_activity` (pieces): Rooks on open files, the seventh rank, or behind passed pawns; a rook invading.
+- `bad_placement` (pieces): A piece on a poor square: knight on the rim, blocked bishop, piece where pawns can hit it, pieces blocking each other.
+- `key_square` (pieces): Controlling or taking away an important square or outpost.
+- `trade_decisions` (trades): Whether to trade pieces: trade when ahead or defending, keep pieces when attacking, which piece to trade.
+- `endgame_knowledge` (trades): Endgame know-how: which endings are drawn or won, king activity in the endgame, the opposition.

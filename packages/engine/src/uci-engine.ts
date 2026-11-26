@@ -64,7 +64,7 @@ export class UciEngine implements Engine, ClassicalEval {
     });
   }
 
-  play(fen: string, opts: { movetimeMs: number }): Promise<string> {
+  play(fen: string, opts: { movetimeMs: number; history: readonly string[] }): Promise<string> {
     return this.serial(async () => {
       this.setMultipv(1);
       this.transport.send(`position fen ${fen}`);

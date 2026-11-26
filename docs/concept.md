@@ -75,10 +75,10 @@ be revealed eight moves later.
 
 The opponent has two modes:
 
-| Mode            | When                | How it plays                                                                                                                             |
-| --------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| **Normal**      | No pending lesson   | At the user's level, with human-like moves (target: [Maia](https://maiachess.com), a network trained on human games at specific ratings) |
-| **Levelled up** | A lesson is pending | Strong engine, **focused on exploiting that lesson**                                                                                     |
+| Mode            | When                | How it plays                                                                                                                                 |
+| --------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Normal**      | No pending lesson   | At the rating the user chose, with human-like moves from [Maia](https://maiachess.com), a network trained on human games at specific ratings |
+| **Levelled up** | A lesson is pending | Strong engine, **focused on exploiting that lesson**                                                                                         |
 
 Rules for levelling up:
 
@@ -285,7 +285,7 @@ money to run: the AI coach.
 2. **Explanation evaluation:** run the analysis over a set of real beginner games;
    generate LLM explanations from the facts; have a strong player grade them.
 3. **Web MVP:** board UI, the find-the-cause reveal, side-by-side futures, rewind.
-4. **Maia** for the normal-mode opponent and the realistic simulated lines.
+4. **Maia** for the normal-mode opponent ✓ and the realistic simulated lines.
 5. **Progress tracking** per principle and the difficulty ladder.
 
 The engineering milestones (see `architecture.md`): 1 TypeScript core ✓ · 2 playable web

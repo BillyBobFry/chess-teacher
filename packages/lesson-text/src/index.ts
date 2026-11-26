@@ -8,9 +8,13 @@
  */
 
 import type {
+  ClaimFact,
+  ConceptId,
   Detail,
   Hint,
+  Lesson,
   LessonFeature,
+  MistakeKind,
   MoveRef,
   PieceCount,
   PieceOn,
@@ -304,6 +308,21 @@ export function triggerText(t: Trigger, locale: Locale): string {
     }
     case "chance_gone":
       return m.reveal_chance_gone({}, o);
+    case "threat_played":
+      return m.trigger_threat_played({ move: moveText(t.move, locale) }, o);
+    case "piece_chased":
+      return m.trigger_piece_chased(
+        { move: moveText(t.move, locale), target: pieceOnText(t.target, locale) },
+        o,
+      );
+    case "king_checked":
+      return m.trigger_king_checked({ move: moveText(t.move, locale) }, o);
+    case "pawn_advanced":
+      return m.trigger_pawn_advanced({ move: moveText(t.move, locale) }, o);
+    case "rook_invaded":
+      return m.trigger_rook_invaded({ square: t.square }, o);
+    case "replied":
+      return m.trigger_replied({ move: moveText(t.move, locale) }, o);
     case "legacy":
       return t.text;
   }
@@ -341,3 +360,266 @@ export function undefendedText(u: Undefended, locale: Locale): string {
 
 /** Join phrases into a list for the locale ("a, b and c"). */
 export const listText = list;
+
+// --------------------------------------------------------------------------- diagnosed lessons
+
+/** A concept's name, as a lesson's title ("Watch for forks"). */
+export function conceptTitle(id: ConceptId, locale: Locale): string {
+  const o = { locale };
+  switch (id) {
+    case "hanging_piece":
+      return m.concept_hanging_piece_title({}, o);
+    case "count_attackers":
+      return m.concept_count_attackers_title({}, o);
+    case "free_material":
+      return m.concept_free_material_title({}, o);
+    case "removed_own_defender":
+      return m.concept_removed_own_defender_title({}, o);
+    case "false_defender":
+      return m.concept_false_defender_title({}, o);
+    case "greedy_grab":
+      return m.concept_greedy_grab_title({}, o);
+    case "fork":
+      return m.concept_fork_title({}, o);
+    case "pin":
+      return m.concept_pin_title({}, o);
+    case "skewer":
+      return m.concept_skewer_title({}, o);
+    case "discovered_attack":
+      return m.concept_discovered_attack_title({}, o);
+    case "opened_line":
+      return m.concept_opened_line_title({}, o);
+    case "trapped_piece":
+      return m.concept_trapped_piece_title({}, o);
+    case "in_between_move":
+      return m.concept_in_between_move_title({}, o);
+    case "remove_the_guard":
+      return m.concept_remove_the_guard_title({}, o);
+    case "missed_threat":
+      return m.concept_missed_threat_title({}, o);
+    case "mate_threat":
+      return m.concept_mate_threat_title({}, o);
+    case "back_rank":
+      return m.concept_back_rank_title({}, o);
+    case "king_in_centre":
+      return m.concept_king_in_centre_title({}, o);
+    case "king_shelter":
+      return m.concept_king_shelter_title({}, o);
+    case "escape_square":
+      return m.concept_escape_square_title({}, o);
+    case "perpetual_check":
+      return m.concept_perpetual_check_title({}, o);
+    case "stalemate":
+      return m.concept_stalemate_title({}, o);
+    case "attack_the_king":
+      return m.concept_attack_the_king_title({}, o);
+    case "tempo_attack":
+      return m.concept_tempo_attack_title({}, o);
+    case "lost_time":
+      return m.concept_lost_time_title({}, o);
+    case "development":
+      return m.concept_development_title({}, o);
+    case "pawn_break":
+      return m.concept_pawn_break_title({}, o);
+    case "passed_pawn":
+      return m.concept_passed_pawn_title({}, o);
+    case "pawn_weakness":
+      return m.concept_pawn_weakness_title({}, o);
+    case "centre_control":
+      return m.concept_centre_control_title({}, o);
+    case "rook_activity":
+      return m.concept_rook_activity_title({}, o);
+    case "bad_placement":
+      return m.concept_bad_placement_title({}, o);
+    case "key_square":
+      return m.concept_key_square_title({}, o);
+    case "trade_decisions":
+      return m.concept_trade_decisions_title({}, o);
+    case "endgame_knowledge":
+      return m.concept_endgame_knowledge_title({}, o);
+  }
+}
+
+/** What a concept means and when it applies, in a sentence or two. */
+export function conceptText(id: ConceptId, locale: Locale): string {
+  const o = { locale };
+  switch (id) {
+    case "hanging_piece":
+      return m.concept_hanging_piece_text({}, o);
+    case "count_attackers":
+      return m.concept_count_attackers_text({}, o);
+    case "free_material":
+      return m.concept_free_material_text({}, o);
+    case "removed_own_defender":
+      return m.concept_removed_own_defender_text({}, o);
+    case "false_defender":
+      return m.concept_false_defender_text({}, o);
+    case "greedy_grab":
+      return m.concept_greedy_grab_text({}, o);
+    case "fork":
+      return m.concept_fork_text({}, o);
+    case "pin":
+      return m.concept_pin_text({}, o);
+    case "skewer":
+      return m.concept_skewer_text({}, o);
+    case "discovered_attack":
+      return m.concept_discovered_attack_text({}, o);
+    case "opened_line":
+      return m.concept_opened_line_text({}, o);
+    case "trapped_piece":
+      return m.concept_trapped_piece_text({}, o);
+    case "in_between_move":
+      return m.concept_in_between_move_text({}, o);
+    case "remove_the_guard":
+      return m.concept_remove_the_guard_text({}, o);
+    case "missed_threat":
+      return m.concept_missed_threat_text({}, o);
+    case "mate_threat":
+      return m.concept_mate_threat_text({}, o);
+    case "back_rank":
+      return m.concept_back_rank_text({}, o);
+    case "king_in_centre":
+      return m.concept_king_in_centre_text({}, o);
+    case "king_shelter":
+      return m.concept_king_shelter_text({}, o);
+    case "escape_square":
+      return m.concept_escape_square_text({}, o);
+    case "perpetual_check":
+      return m.concept_perpetual_check_text({}, o);
+    case "stalemate":
+      return m.concept_stalemate_text({}, o);
+    case "attack_the_king":
+      return m.concept_attack_the_king_text({}, o);
+    case "tempo_attack":
+      return m.concept_tempo_attack_text({}, o);
+    case "lost_time":
+      return m.concept_lost_time_text({}, o);
+    case "development":
+      return m.concept_development_text({}, o);
+    case "pawn_break":
+      return m.concept_pawn_break_text({}, o);
+    case "passed_pawn":
+      return m.concept_passed_pawn_text({}, o);
+    case "pawn_weakness":
+      return m.concept_pawn_weakness_text({}, o);
+    case "centre_control":
+      return m.concept_centre_control_text({}, o);
+    case "rook_activity":
+      return m.concept_rook_activity_text({}, o);
+    case "bad_placement":
+      return m.concept_bad_placement_text({}, o);
+    case "key_square":
+      return m.concept_key_square_text({}, o);
+    case "trade_decisions":
+      return m.concept_trade_decisions_text({}, o);
+    case "endgame_knowledge":
+      return m.concept_endgame_knowledge_text({}, o);
+  }
+}
+
+/** A diagnosed lesson with no concept is titled by what kind of mistake it was. */
+export function mistakeTitle(kind: MistakeKind, locale: Locale): string {
+  const o = { locale };
+  switch (kind) {
+    case "mated":
+      return m.mistake_mated_title({}, o);
+    case "loses_material":
+      return m.mistake_loses_material_title({}, o);
+    case "misses_mate":
+      return m.mistake_misses_mate_title({}, o);
+    case "misses_material":
+      return m.mistake_misses_material_title({}, o);
+    case "positional":
+      return m.mistake_positional_title({}, o);
+  }
+}
+
+/** A lesson's title: its principle, its concept, or what kind of mistake it was. */
+export function lessonTitle(lesson: Lesson, locale: Locale): string {
+  if (lesson.source === "features") return principleTitle(lesson.principle, locale);
+  return lesson.concept ? conceptTitle(lesson.concept, locale) : mistakeTitle(lesson.mistake, locale);
+}
+
+/** One verified claim about a diagnosed lesson, as a sentence. */
+export function claimText(c: ClaimFact, locale: Locale): string {
+  const o = { locale };
+  const piece = (p: PieceOn) => pieceOnText(p, locale);
+  switch (c.kind) {
+    case "punishment":
+      if (c.mates) return m.claim_punishment_mate({ line: c.line }, o);
+      return c.wins
+        ? m.claim_punishment_wins({ line: c.line, piece: piece(c.wins) }, o)
+        : m.claim_punishment_other({ line: c.line }, o);
+    case "missed_win":
+      if (c.mates) return m.claim_missed_win_mate({ line: c.line }, o);
+      return c.wins
+        ? m.claim_missed_win_wins({ line: c.line, piece: piece(c.wins) }, o)
+        : m.claim_missed_win_other({ line: c.line }, o);
+    case "threat":
+      if (c.ignored) {
+        if (c.mates) return m.claim_threat_ignored_mate({ line: c.line }, o);
+        return c.wins
+          ? m.claim_threat_ignored_wins({ line: c.line, piece: piece(c.wins) }, o)
+          : m.claim_threat_ignored_other({ line: c.line }, o);
+      }
+      if (c.mates) return m.claim_threat_mate({ line: c.line }, o);
+      return c.wins
+        ? m.claim_threat_wins({ line: c.line, piece: piece(c.wins) }, o)
+        : m.claim_threat_other({ line: c.line }, o);
+    case "removed_defender":
+      return m.claim_removed_defender({ defender: piece(c.defender), square: c.square }, o);
+    case "opened_line":
+      return m.claim_opened_line({ from: c.from, attacker: piece(c.attacker), square: c.square }, o);
+    case "pinned_defender":
+      return m.claim_pinned_defender({ defender: piece(c.defender), square: c.square }, o);
+    case "pinned_target":
+      return m.claim_pinned_target({ target: piece(c.target), behind: piece(c.behind) }, o);
+    case "outnumbered": {
+      const counts = { attackers: c.attackers, defenders: c.defenders };
+      if (c.defenders === 0) {
+        if (!c.target) return m.claim_undefended_square({ square: c.square }, o);
+        return c.side === "yours"
+          ? m.claim_undefended_yours({ piece: piece(c.target) }, o)
+          : m.claim_undefended_theirs({ piece: piece(c.target) }, o);
+      }
+      if (!c.target) return m.claim_outnumbered_square({ square: c.square, ...counts }, o);
+      return c.side === "yours"
+        ? m.claim_outnumbered_yours({ piece: piece(c.target), ...counts }, o)
+        : m.claim_outnumbered_theirs({ piece: piece(c.target), ...counts }, o);
+    }
+    case "chased":
+      return m.claim_chased({ move: c.move, target: piece(c.target) }, o);
+    case "gains_time":
+      return m.claim_gains_time({ move: c.move, target: piece(c.target) }, o);
+    case "one_move_threat":
+      return m.claim_one_move_threat({ target: piece(c.target), reply: c.reply }, o);
+    case "king_in_centre":
+      return m.claim_king_in_centre({ king: c.king }, o);
+    case "shelter_weakened":
+      return m.claim_shelter_weakened({ pawn: c.pawn }, o);
+    case "perpetual":
+      return m.claim_perpetual({}, o);
+    case "back_rank":
+      return m.claim_back_rank({ king: c.king, square: c.square }, o);
+    case "passed_pawn":
+      return c.side === "theirs"
+        ? m.claim_passed_pawn_theirs({ from: c.from, to: c.to }, o)
+        : m.claim_passed_pawn_yours({ from: c.from, to: c.to }, o);
+    case "rook_seventh":
+      return c.side === "theirs"
+        ? m.claim_rook_seventh_theirs({ square: c.square }, o)
+        : m.claim_rook_seventh_yours({ square: c.square }, o);
+    case "pawn_break":
+      return m.claim_pawn_break({ move: c.move, target: c.target }, o);
+    case "free_capture":
+      return m.claim_free_capture({ move: c.move, took: piece(c.took) }, o);
+    case "gave_up_king_defender":
+      return m.claim_gave_up_king_defender({ piece: piece(c.piece) }, o);
+    case "double_attack":
+      return m.claim_double_attack({ move: c.move, targets: list(c.targets.map(piece), locale) }, o);
+    case "pawn_grab":
+      return m.claim_pawn_grab({ square: c.square }, o);
+    case "neglected_development":
+      return m.claim_neglected_development({ pawn: c.pawn, count: c.undeveloped }, o);
+  }
+}

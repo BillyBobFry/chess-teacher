@@ -1,0 +1,14 @@
+{"id":"b1700-5aef80","main":"greedy_grab","also":["count_attackers","missed_threat"],"why":"Grabbing the g5 pawn with a once-defended square ignored the gxh4 threat and cost the knight."}
+{"id":"b1700-77ff89","main":"free_material","also":["missed_threat"],"why":"The e4 knight could be won with Ne7 and the queen lift, but Bd7 missed it and allowed Ne5."}
+{"id":"b1700-a0b25f","main":"lost_time","also":["development","bad_placement"],"why":"The queen was chased by the bishop and moved again to a square that blocks the c8 bishop, instead of retreating to d8 and developing."}
+{"id":"b1700-f12f91","main":"missed_threat","also":["free_material","remove_the_guard"],"why":"Bxh5 and Bxc5 were threatened, and Nxe4 won a pawn, but Nf6 left the c5 knight to be deflected."}
+{"id":"b1700-05e13d","main":"passed_pawn","also":["endgame_knowledge","missed_threat"],"why":"In a pawn race g4 creates the fastest passed pawn, while Kf2 let Black push the b-pawn."}
+{"id":"b1700-1a1a84","main":"free_material","also":["missed_threat"],"why":"The e4 pawn was loose and Qxe4 simply won it, but Bg3 let Black keep it."}
+{"id":"b1700-4aafc5","main":"king_shelter","also":["missed_threat","count_attackers"],"why":"Recapturing with the f-pawn weakened the king shelter, while Bxe5 recaptured with a piece."}
+{"id":"b1700-4f1c94","main":"king_in_centre","also":["development","lost_time"],"why":"Castling queenside was the useful move, while Bc5 left the king in the centre and the bishop was traded off."}
+{"id":"b1700-5eed49","main":"trade_decisions","also":["bad_placement","missed_threat"],"why":"Trading the h6 bishop for the g7 bishop was right, and Qg5 left it hanging to Bxh6."}
+{"id":"b1700-6e8d91","main":"king_in_centre","also":["free_material","missed_threat"],"why":"The king on f2 faces checks and the e6 pawn was loose, but Rg5 ignored both."}
+{"id":"b1700-d16fc6","main":"missed_threat","also":["free_material","lost_time"],"why":"The check Rae1+ ignored Black's threat and Bg6+ would have won the g3 pawn."}
+{"id":"b1700-0d8a1d","main":"removed_own_defender","also":["missed_threat","count_attackers"],"why":"Be7 took away the e6 defender of d5 so the pawn fell."}
+{"id":"b1700-a64aa0","main":"tempo_attack","also":["bad_placement","centre_control"],"why":"The knight on g4 was chased by h3 and ended on the rim, while Nd5 centralised it."}
+{"id":"b1700-bcc335","main":"fork","also":["missed_threat","hanging_piece"],"why":"d6 allowed Nb6 forking a8 and c8, which also won the loose f6 pawn."}

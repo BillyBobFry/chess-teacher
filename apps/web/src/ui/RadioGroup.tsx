@@ -5,7 +5,15 @@ const focusRing =
   "outline-none data-focus-visible:relative data-focus-visible:z-10 data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-solid data-focus-visible:outline-primary";
 
 const styles = tv({
-  slots: { options: "", option: ["group cursor-pointer bg-surface text-fg", focusRing] },
+  slots: {
+    options: "",
+    option: [
+      "group cursor-pointer bg-surface text-fg",
+      // UX-36: a ruled-out option is struck through as well as muted.
+      "data-disabled:cursor-default data-disabled:text-fg-muted data-disabled:line-through",
+      focusRing,
+    ],
+  },
   variants: {
     variant: {
       // UX-56: 2 to 4 short options.
@@ -45,7 +53,8 @@ export function RadioGroup<T extends string>({
   label: string;
   value: T;
   onChange: (value: T) => void;
-  options: readonly { value: T; label: string; description?: string }[];
+  /** `isDisabled` rules an option out, e.g. a wrong guess. */
+  options: readonly { value: T; label: string; description?: string; isDisabled?: boolean }[];
   variant: "segmented" | "cards";
   /** Placement only. */
   className?: string;
@@ -63,7 +72,7 @@ export function RadioGroup<T extends string>({
       <Label className="mb-2 block font-semibold">{label}</Label>
       <div className={s.options()}>
         {options.map((o) => (
-          <Radio key={o.value} value={o.value} className={s.option()}>
+          <Radio key={o.value} value={o.value} isDisabled={o.isDisabled} className={s.option()}>
             <span className={variant === "cards" ? "font-semibold" : undefined}>{o.label}</span>
             {o.description && (
               // UX-47: on the selected fill, the fill's own text colour.

@@ -1,0 +1,15 @@
+{"id":"b1100-3b2e71","main":"hanging_piece","also":["missed_threat","development"],"why":"Pushing e5 put an undefended pawn where the Nf3 attacks it, instead of removing the pinning bishop's partner first with Bxf3."}
+{"id":"b1100-2925f3","main":"mate_threat","also":["missed_threat","king_shelter"],"why":"With the king on h1 and black queen on h3, the Nf3 idea threatens mate, and f5 ignored it instead of f3."}
+{"id":"b1100-b6a4d7","main":"missed_threat","also":["king_shelter","discovered_attack"],"why":"Rg1+ with Bg7+ discoveries was coming, and b5 did nothing about it while Kh8 stopped it."}
+{"id":"b1100-6e0af6","main":"missed_threat","also":["mate_threat","greedy_grab"],"why":"Taking the pawn on d6 ignored the Nf3 and Qh3 threats against the king and left the pawn attacked three times."}
+{"id":"b1100-061ea1","main":"missed_threat","also":["discovered_attack","hanging_piece"],"why":"Be3 stepped off the line and let a discovered attack win the queen on d6, instead of Qb3 dealing with the black queen."}
+{"id":"b1100-1ad259","main":"trade_decisions","also":["development"],"why":"Recapturing with the bishop (Bxc4) trades the right piece and develops it, whereas Nxc4 gave up the knight."}
+{"id":"b1100-2d1b2f","main":"tempo_attack","also":["missed_threat","centre_control"],"why":"Ng4 would have gained time by attacking the bishop, while castling allowed Bb2 and Ndb5 with tempo."}
+{"id":"b1100-898f32","main":"pawn_weakness","also":["centre_control","rook_activity"],"why":"Recapturing fxg3 damaged the pawn structure and the centre, where hxg3 kept the pawns intact and opened the rook."}
+{"id":"b1100-a4f07e","main":"tempo_attack","also":["missed_threat","bad_placement"],"why":"11...h6 hits the queen with a pawn and wins the knight, whereas Bb4 wasted the move and left d5 loose."}
+{"id":"b1100-a8040c","main":"centre_control","also":["pawn_break","development"],"why":"d4 challenges the centre and attacks c5 and e5, which Bc3 left to Black."}
+{"id":"b1100-2b9912","main":"trade_decisions","also":["centre_control"],"why":"Recapturing with the pawn (bxc6) keeps the bishop pair and solid structure, while Bxc6 allowed Nxe5."}
+{"id":"b1100-b04c64","main":"fork","also":["hanging_piece","missed_threat"],"why":"The knight on f7 forks queen and rook, and Qe7 lost the rook on h8 instead of taking Bxf2+ first."}
+{"id":"b1100-ba67ec","main":"tempo_attack","also":["pawn_weakness","pawn_break"],"why":"c6 attacks the rook on d5 with a pawn and gains time, where bxa5 let White's pawns and rook dominate."}
+{"id":"b1100-ce0c20","main":"bad_placement","also":["tempo_attack","lost_time"],"why":"The knight on g5 can be hit by h6, and Qf3 neglected that and lost time before a4 or retreating."}
+{"id":"b1100-ebbf1f","main":"trade_decisions","also":["development","centre_control"],"why":"Recapturing with the knight keeps the better bishop and piece structure, whereas Bxd5 traded poorly."}

@@ -89,7 +89,7 @@ export const games = pgTable(
       .references(() => user.id, { onDelete: "cascade" }),
     state: jsonb("state").notNull(),
     stateVersion: integer("state_version").notNull().default(1),
-    opponentSkill: integer("opponent_skill").notNull(),
+    opponentRating: integer("opponent_rating").notNull(),
     reveal: jsonb("reveal"),
     finished: boolean("finished").notNull().default(false),
     createdAt: timestamp("created_at").notNull().defaultNow(),

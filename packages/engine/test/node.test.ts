@@ -26,7 +26,7 @@ describe.skipIf(!available && !process.env.CI)("NodeUciEngine", () => {
       const [best] = await engine.analyse(mateIn1, { depth: 6, multipv: 1 });
       expect(best).toMatchObject({ move: "d1d8", score: 9999 });
 
-      expect(await engine.play(START, { movetimeMs: 20 })).toMatch(/^[a-h][1-8][a-h][1-8]/);
+      expect(await engine.play(START, { movetimeMs: 20, history: [] })).toMatch(/^[a-h][1-8][a-h][1-8]/);
     } finally {
       await engine.close();
     }

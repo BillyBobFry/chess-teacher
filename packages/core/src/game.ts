@@ -80,6 +80,11 @@ export class Game {
     return this.keys.filter((k) => k === current).length >= 5;
   }
 
+  /** The positions (FENs) before the current one, oldest first. */
+  previousFens(): string[] {
+    return this.chess.history({ verbose: true }).map((m) => m.before);
+  }
+
   /** History of moves in UCI, for display or saving. */
   history(): string[] {
     return this.chess.history({ verbose: true }).map((m) => m.lan);

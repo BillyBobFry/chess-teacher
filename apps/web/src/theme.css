@@ -86,3 +86,11 @@
     }
   }
 }
+
+@layer base {
+  /* After an in-app navigation, focus moves to the new page's heading (App.tsx) so reading
+     starts there. A heading isn't a control, so it shows no focus ring (UX-58). */
+  :is(main, main h1)[tabindex="-1"]:focus-visible {
+    outline: none;
+  }
+}

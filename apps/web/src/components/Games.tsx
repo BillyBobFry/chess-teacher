@@ -1,6 +1,7 @@
 import type { GameOutcome, GameSummary } from "@chess-teacher/contract";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../api/client.ts";
+import { hrefOf } from "../lib/router.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import { ActionList, ActionListItem } from "../ui/ActionList.tsx";
@@ -15,15 +16,7 @@ const OUTCOME: Record<GameOutcome, () => string> = {
 };
 
 /** The player's finished games, newest first; each opens its review. */
-export function Games({
-  onOpen,
-  onNewGame,
-  onBack,
-}: {
-  onOpen: (id: string) => void;
-  onNewGame: () => void;
-  onBack: () => void;
-}) {
+export function Games({ onNewGame, onBack }: { onNewGame: () => void; onBack: () => void }) {
   const [games, setGames] = useState<GameSummary[] | null>(null);
   const [error, setError] = useState(false);
   const locale = getLocale();
@@ -67,7 +60,7 @@ export function Games({
         </>
       )}
       {games && games.length > 0 && (
-        <ActionList label={m.games_list()} className="mb-4" onAction={(id) => onOpen(String(id))}>
+        <ActionList label={m.games_list()} className="mb-4">
           {games.map((g) => {
             const when = date.format(new Date(g.updatedAt));
             const facts = [
@@ -76,7 +69,12 @@ export function Games({
               m.games_lessons({ count: g.lessons }),
             ].filter((f) => f !== null);
             return (
-              <ActionListItem key={g.id} id={g.id} textValue={list.format([when, ...facts])}>
+              <ActionListItem
+                key={g.id}
+                id={g.id}
+                href={hrefOf({ page: "pastGame", id: g.id })}
+                textValue={list.format([when, ...facts])}
+              >
                 <span className="block font-semibold">{when}</span>
                 <span className="block text-sm text-fg-muted">{facts.join(" · ")}</span>
               </ActionListItem>

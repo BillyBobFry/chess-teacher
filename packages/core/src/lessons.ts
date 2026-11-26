@@ -12,6 +12,8 @@ import {
   type Measurements,
 } from "./features.ts";
 import { Game, cleanLine, fullmoveOf, plyOf, sanOf, uciParts } from "./game.ts";
+import type { Claim } from "./claims.ts";
+import type { ConceptId, MistakeKind } from "./concepts.ts";
 import type { PrincipleId } from "./principles.ts";
 import type { Detail, MoveRef, PieceCount, Trigger } from "./text.ts";
 
@@ -92,8 +94,8 @@ export const DEFAULT_CONFIG: TeachingConfig = {
   verifyStrategic: true,
 };
 
-/** A lesson is plain data, so a game in progress can be saved and resumed anywhere. */
-export interface Lesson {
+/** What every lesson has, however it was diagnosed. Plain data, so a game in progress can be saved and resumed anywhere. */
+interface LessonCommon {
   id: number;
   /**
    * The line of play the mistake was made on: the game's current line (`SessionState.line`)
@@ -108,26 +110,11 @@ export interface Lesson {
   bestMove: string;
   bestScore: number;
   userScore: number;
-  feature: LessonFeature;
-  principle: PrincipleId;
   kind: LessonKind;
-  baseline: number;
-  /** Feature value at the end of the user's line. */
-  predicted: number;
-  /** Feature value at the end of the best line. */
-  bestValue: number;
-  /** A consequence lands when the real value is <= this. */
-  triggerAt: number;
+  /** The move, then the engine's predicted reply and continuation. */
   userLine: string[];
+  /** The better move and its continuation. */
   bestLine: string[];
-  userValues: number[];
-  bestValues: number[];
-  divergence: number;
-  baselineDetail: Detail;
-  userDetail: Detail;
-  bestDetail: Detail;
-  /** User pieces left hanging after the move (squares, h8 → a1 order). */
-  hangingAfter: string[];
   status: LessonStatus;
   resolvedPly: number | null;
   /** What happened when the lesson was triggered (null until then). */
@@ -136,9 +123,69 @@ export interface Lesson {
   deferred: boolean;
   foundCause: boolean | null;
   chanceMove: string | null;
+}
+
+/** A lesson from comparing measured features along two lines: games saved before diagnosis. */
+export interface FeatureLesson extends LessonCommon {
+  source: "features";
+  feature: LessonFeature;
+  principle: PrincipleId;
+  baseline: number;
+  /** Feature value at the end of the user's line. */
+  predicted: number;
+  /** Feature value at the end of the best line. */
+  bestValue: number;
+  /** A consequence lands when the real value is <= this. */
+  triggerAt: number;
+  userValues: number[];
+  bestValues: number[];
+  divergence: number;
+  baselineDetail: Detail;
+  userDetail: Detail;
+  bestDetail: Detail;
+  /** User pieces left hanging after the move (squares, h8 → a1 order). */
+  hangingAfter: string[];
   /** Why the classical evaluation agreed with this strategic lesson (if it was checked). */
   verification?: string;
 }
+
+/**
+ * The event a diagnosed lesson waits for before it is revealed: what the opponent does that
+ * shows the mistake. The teaching opponent steers towards it.
+ */
+export type Awaited =
+  | { kind: "mate" }
+  /** The user's material, once exchanges settle, falls to this balance (pawns) or below. */
+  | { kind: "material"; balance: number }
+  /** The opponent plays the threat the user's move left unanswered. */
+  | { kind: "move"; move: string; why: "threat" }
+  /** The opponent plays the move that attacks the user's piece on `target`. */
+  | { kind: "move"; move: string; why: "chase"; target: string }
+  /** The opponent checks the user's king. */
+  | { kind: "check" }
+  /** The opponent's passed pawn on this square moves on. */
+  | { kind: "pawn_moves"; from: string }
+  /** The opponent's rook stands on this square. */
+  | { kind: "rook_on"; square: string }
+  /** Nothing to wait for: the opponent's reply is the moment to look. */
+  | { kind: "reply" }
+  /** A missed chance: revealed once the chance has gone. */
+  | { kind: "chance" };
+
+/** A lesson from `diagnose`: verified claims, the concepts they support, and the event it awaits. */
+export interface DiagnosedLesson extends LessonCommon {
+  source: "diagnosis";
+  mistake: MistakeKind;
+  claims: Claim[];
+  concept: ConceptId | null;
+  secondary: ConceptId | null;
+  awaits: Awaited;
+  /** Winning chances (%) for the user with the better move and after the move. */
+  winBefore: number;
+  winAfter: number;
+}
+
+export type Lesson = FeatureLesson | DiagnosedLesson;
 
 export const lessonGap = (l: Lesson): number => l.bestScore - l.userScore;
 export const lessonMoveNumber = (l: Lesson): number => fullmoveOf(l.fenBefore);
@@ -186,7 +233,7 @@ export function detectMistake(
   candsBefore: Candidate[],
   after: Candidate[],
   cfg: TeachingConfig,
-): Lesson | null {
+): FeatureLesson | null {
   const best = candsBefore[0];
   if (!best) return null;
   const userColour = new Position(fenBefore).turn;
@@ -209,6 +256,7 @@ export function detectMistake(
   const baseline = measureAll(new Position(fenBefore), userColour);
 
   const base = {
+    source: "features" as const,
     id: lessonId,
     line,
     ply: plyOf(fenBefore),
@@ -356,38 +404,45 @@ export function detectMistake(
 
 // --------------------------------------------------------------------------- triggers
 
-export function consequenceLanded(lesson: Lesson, game: Game): boolean {
+export function consequenceLanded(lesson: FeatureLesson, game: Game): boolean {
   if (lesson.feature === MATE_FEATURE) return game.isCheckmate() && game.turn === lesson.userColour;
   const [value] = FEATURES_BY_NAME[lesson.feature].measure(new Position(game.fen), lesson.userColour);
   return value <= lesson.triggerAt;
 }
 
-export function describeConsequence(lesson: Lesson, game: Game): Trigger {
+/**
+ * The material lost since `fenBefore`: pieces lost and taken, the net loss, and whether more
+ * will fall (the settled balance is below `settledBefore` by more than the net loss so far).
+ */
+export function lostMaterial(fenBefore: string, c: Colour, game: Game, settledBefore: number): Trigger {
+  const now = new Position(game.fen);
+  const before = new Position(fenBefore);
+  const changes = (color: Colour): PieceCount[] => {
+    const out: PieceCount[] = [];
+    for (const piece of ["q", "r", "b", "n", "p"] as PieceType[]) {
+      const count = before.pieces(piece, color).length - now.pieces(piece, color).length;
+      if (count > 0) out.push({ piece, count });
+    }
+    return out;
+  };
+  const balance = (p: Position) => material(p, c) - material(p, opposite(c));
+  const net = balance(before) - balance(now);
+  if (net <= 0) return { kind: "losing_material" };
+  const [settled] = FEATURES_BY_NAME.material.measure(now, c);
+  return {
+    kind: "lost_material",
+    lost: changes(c),
+    taken: changes(opposite(c)),
+    net,
+    more: settledBefore - settled > net,
+  };
+}
+
+export function describeConsequence(lesson: FeatureLesson, game: Game): Trigger {
   const c = lesson.userColour;
   if (lesson.feature === MATE_FEATURE) return { kind: "checkmated" };
   const now = new Position(game.fen);
-  if (lesson.feature === "material") {
-    const before = new Position(lesson.fenBefore);
-    const changes = (color: Colour): PieceCount[] => {
-      const out: PieceCount[] = [];
-      for (const piece of ["q", "r", "b", "n", "p"] as PieceType[]) {
-        const count = before.pieces(piece, color).length - now.pieces(piece, color).length;
-        if (count > 0) out.push({ piece, count });
-      }
-      return out;
-    };
-    const balance = (p: Position) => material(p, c) - material(p, opposite(c));
-    const net = balance(before) - balance(now);
-    if (net <= 0) return { kind: "losing_material" };
-    const [settled] = FEATURES_BY_NAME.material.measure(now, c);
-    return {
-      kind: "lost_material",
-      lost: changes(c),
-      taken: changes(opposite(c)),
-      net,
-      more: lesson.baseline - settled > net,
-    };
-  }
+  if (lesson.feature === "material") return lostMaterial(lesson.fenBefore, c, game, lesson.baseline);
   const [, detail] = FEATURES_BY_NAME[lesson.feature].measure(now, c);
   return { kind: "feature", feature: lesson.feature, detail };
 }

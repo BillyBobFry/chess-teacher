@@ -38,6 +38,7 @@ the measurements behind several decisions are in [`benchmarks.md`](benchmarks.md
 | D13 | **Coached games as the unit, with a server-side ledger**                                   | A user-facing unit that's easy to understand. A game becomes "coached" when its first AI explanation is generated, and that's when one is consumed (free monthly allowance first, then purchased). AI explanations per game are capped. Balances live in one ledger on the server so Stripe purchases (web) and in-app purchases (mobile) share it.                                                                                                                                                                                                                                                                                                                                   |
 | D14 | **Strategic lessons need a second opinion**                                                | Our features say _what_ differs between the two lines; Stockfish 11's classical evaluation says which of its terms account for the difference. A strategic lesson is only taught when its feature's term is a main reason. Stockfish 11 runs as a third, lazily loaded worker (3.7 MB, ~175 ms to start); when absent, lessons aren't checked.                                                                                                                                                                                                                                                                                                                                        |
 | D15 | **Web controls come from React Aria Components, styled with Tailwind and semantic tokens** | Keyboard, focus, screen-reader, touch and right-to-left behaviour come from a maintained library instead of being rebuilt for each control, and its built-in strings are already translated. Each control is wrapped once in `apps/web/src/ui/` and used from there, so a control looks and behaves the same everywhere. Tailwind's theme holds only semantic tokens (`primary`, `critical`, `warning`...), so there is no raw colour to reach for and dark mode is a change of token values. Consistency matters more than using native elements: where React Aria renders its own dialog or popover, we use it. Covers the web app only; the native app's UI toolkit is open (§15). |
+| D16 | **Maia-3 plays the opponent's normal moves, in the browser**                               | It plays the move a person of the chosen rating would play, mistakes included, where weakened Stockfish plays near-perfect moves broken by random blunders. The 5M model, with 8-bit weights, is 6.8 MB and takes about 15 ms a move with ONNX Runtime's WebAssembly build in a Web Worker, so it stays on the device (D2). It isn't in git: it's published as a GitHub release, and the build downloads it and checks its SHA-256 (`apps/web/scripts/fetch-maia.mjs`), so changing or growing the model is a new release, not a change to the history. Stockfish still analyses every move, and plays the opponent's moves while it punishes a mistake.                              |
 
 ## 3. Overview
 
@@ -154,11 +155,15 @@ Porting notes from the Python prototype:
   the COOP/COEP headers that multi-threaded WASM needs, and it was fast enough in the
   benchmarks. Revisit if phones prove too slow.
 - **Where it runs:** a Web Worker, so analysis never blocks the UI.
-- **Two engine instances:** one for analysis at full strength, one weakened (Skill Level)
-  for the opponent's normal moves, matching the prototype.
+- **Engines:** Stockfish at full strength for analysis, and for the opponent's moves while it
+  punishes a mistake; Maia-3 (D16) for the opponent's normal moves, at the game's rating;
+  Stockfish 11 for its classical evaluation (D14), loaded on first use.
 - **Depth:** 12 by default; drop to 10 on slow devices (measured at start-up with a short
   benchmark). To be validated on real phones in MS2.
-- **Maia** (human-like opponent) is a later swap behind the same `Engine` interface.
+- **Maia:** ONNX Runtime Web (WebAssembly, single-threaded) in its own Web Worker, behind the
+  same `Engine` interface. The model and the runtime are hashed assets, cached for good: about
+  9 MB to download the first time (5.3 MB model and 3.9 MB runtime, compressed), started as
+  the app opens so it's usually ready by the time a game starts. Not yet measured on phones.
 
 ## 7. The server
 
@@ -216,6 +221,9 @@ example.com/app/...   the SPA: sign-in screen, games, progress
 example.com/api/...   the Hono API
 ```
 
+Each page of the app has its own URL (`/app/`, `/app/games`, `/app/games/:id`,
+`/app/progress`, `/app/licences`; `apps/web/src/lib/router.ts`), so a refresh stays put and
+the browser's back and forward work; the build rewrites every `/app/*` path to the SPA.
 Visiting `/app` signed out redirects to `/app/sign-in`; the marketing pages' "Sign in" and
 "Start learning" buttons link there. Mobile apps call the same API with token-based
 sessions. If marketing grows (blog, SEO content), an Astro site can take over `/` through

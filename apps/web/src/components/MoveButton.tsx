@@ -10,7 +10,7 @@ import { Button } from "../ui/Button.tsx";
 import { Popover, PopoverTrigger } from "../ui/Popover.tsx";
 
 // SVG attributes, so a literal colour rather than a CSS variable.
-const MOVE_ARROW = "#3f6fb0";
+export const MOVE_ARROW = "#3f6fb0";
 
 /** "12. Nf3", "12… Nf6": through the one move formatter (UX-106). */
 export const moveTitle = (move: Move): string =>

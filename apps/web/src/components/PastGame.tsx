@@ -2,6 +2,7 @@ import { gameOf } from "@chess-teacher/core";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { loadGame, type SavedGame } from "../game/storage.ts";
 import { resultText } from "../lib/result.ts";
+import { goBackTo } from "../lib/router.ts";
 import { m } from "../paraglide/messages.js";
 import { Alert } from "../ui/Alert.tsx";
 import { Button } from "../ui/Button.tsx";
@@ -11,16 +12,15 @@ import { Review } from "./Review.tsx";
 /** A finished game from the player's account: its final position and its review. */
 export function PastGame({
   id,
-  onBack,
   onNewGame,
   onProgress,
 }: {
   id: string;
-  onBack: () => void;
   onNewGame: () => void;
   onProgress: () => void;
 }) {
   const [game, setGame] = useState<SavedGame | null>(null);
+  const backToGames = () => goBackTo({ page: "games" });
   const [error, setError] = useState(false);
 
   const fetchGame = useCallback(
@@ -61,7 +61,7 @@ export function PastGame({
         ) : (
           <p className="muted">{m.loading()}</p>
         )}
-        <Button onPress={onBack}>{m.games_back()}</Button>
+        <Button onPress={backToGames}>{m.games_back()}</Button>
       </main>
     );
   }
@@ -78,7 +78,7 @@ export function PastGame({
         />
       </div>
       <aside className="panel">
-        <Button variant="link" className="mb-3" onPress={onBack}>
+        <Button variant="link" className="mb-3" onPress={backToGames}>
           {m.games_back()}
         </Button>
         <Review

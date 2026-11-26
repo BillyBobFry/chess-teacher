@@ -1,4 +1,7 @@
 export * from "./board.ts";
+export * from "./claims.ts";
+export * from "./concepts.ts";
+export * from "./diagnose.ts";
 export * from "./engine.ts";
 export * from "./explain.ts";
 export * from "./features.ts";
@@ -6,6 +9,7 @@ export * from "./game.ts";
 export * from "./lessons.ts";
 export * from "./opponent.ts";
 export * from "./principles.ts";
+export * from "./reveals.ts";
 export * from "./session.ts";
 export * from "./validate.ts";
 export * from "./text.ts";

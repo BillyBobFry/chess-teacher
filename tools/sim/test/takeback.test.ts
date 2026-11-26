@@ -2,9 +2,12 @@
 
 import { describe, expect, it } from "vitest";
 import {
+  DEFAULT_CONFIG,
   canTakeBack,
+  detectMistake,
   gameOf,
   isUserTurn,
+  newSession,
   playedLine,
   plyOf,
   takeBack,
@@ -83,21 +86,31 @@ describe("takeBack", () => {
     }
   });
 
-  it("makes a lesson pending again when the taken-back move had fixed it", async () => {
-    let checked = 0;
-    for (const { name } of loadGames()) {
-      const { points } = await replay(name);
-      for (const p of points) {
-        for (const { kind, lessonId } of p.events) {
-          if (kind !== "fixed" || !p.afterReply) continue;
-          const lesson = lessonIn(defined(takeBack(p.afterReply), "a takeback"), lessonId);
-          expect(lesson.status).toBe("pending");
-          expect(lesson.resolvedPly).toBeNull();
-          checked++;
-        }
-      }
-    }
-    expect(checked).toBeGreaterThan(0);
+  it("makes a lesson pending again when the taken-back move had fixed it", () => {
+    // 1. e4 e5 2. Ba6 left the bishop to the knight; 3. Bc4, after 2...d6, saved it.
+    const moves = ["e2e4", "e7e5", "f1a6", "d7d6", "a6c4", "g8f6"];
+    const lesson = defined(
+      detectMistake(
+        1,
+        0,
+        gameOf({ ...newSession({ userColour: "w" }), moves: moves.slice(0, 2) }).fen,
+        "f1a6",
+        gameOf({ ...newSession({ userColour: "w" }), moves: moves.slice(0, 3) }),
+        [{ move: "g1f3", score: 40, pv: ["g1f3", "b8c6", "f1c4"] }],
+        [{ move: "b8a6", score: 320, pv: ["b8a6", "g1f3", "d7d6"] }],
+        DEFAULT_CONFIG,
+      ),
+      "a lesson for 2. Ba6",
+    );
+    // Resolved as of the position after 3. Bc4, as the session records it.
+    const state: SessionState = {
+      ...newSession({ userColour: "w" }),
+      moves,
+      lessons: [{ ...lesson, status: "fixed", resolvedPly: 5 }],
+    };
+    const back = defined(takeBack(state), "a takeback");
+    expect(back.moves).toEqual(moves.slice(0, 4));
+    expect(lessonIn(back, lesson.id)).toMatchObject({ status: "pending", resolvedPly: null });
   });
 
   it("keeps the line as a branch when it undoes the moves of a lesson the player was shown, and only then", async () => {

@@ -1,0 +1,15 @@
+{"id":"b1700-0c38b4","main":"missed_threat","also":["tempo_attack","free_material"],"why":"Retreating the knight ignored fxg4 and let Bg5 hit the queen; Rxd4 was available."}
+{"id":"b1700-14fa76","main":"free_material","also":["missed_threat"],"why":"The knight on g7 was simply capturable with Rxg7 instead of dodging."}
+{"id":"b1700-176a48","main":"fork","also":["hanging_piece"],"why":"Kg2 walks into Ne1+ forking king and the undefended bishop on c2."}
+{"id":"b1700-1c734d","main":"missed_threat","also":["free_material","pin"],"why":"Nxg5 won a piece; f6 left the pinned bishop on a3 to fall."}
+{"id":"b1700-1cce46","main":"pawn_break","also":["pawn_weakness"],"why":"c6 challenges the d5 pawn and the centre; Qe8 was passive."}
+{"id":"b1700-1d3a03","main":"king_in_centre","also":["missed_threat"],"why":"The king on f7 gets checked repeatedly; Be7 did nothing to deal with it."}
+{"id":"b1700-67e0d8","main":"mate_threat","also":["missed_threat","escape_square"],"why":"Qh7# was threatened and Qc5 ignored it; Nf5 covered h6 and h7."}
+{"id":"b1700-dcb648","main":"mate_threat","also":["king_in_centre","hanging_piece"],"why":"Qxg6# was threatened and Nb8 ignored it with the king stuck in the centre."}
+{"id":"b1700-693036","main":"endgame_knowledge","also":["passed_pawn","opened_line"],"why":"Kc6 left b7 and let the queen reach c8; the king must stay to shepherd the pawn, Ka7."}
+{"id":"b1700-4a447c","main":"pin","also":["count_attackers","false_defender"],"why":"Bxe5+ puts the bishop on a square where it is pinned to the king by Re8 and then lost."}
+{"id":"b1700-6da361","main":"tempo_attack","also":["centre_control","free_material"],"why":"Ng3 lets f4 gain time on the knight; exf5 simply took the pawn."}
+{"id":"b1700-6ef3cb","main":"in_between_move","also":["missed_threat"],"why":"Nxe2+ capturing with check first was needed before recapturing on c4."}
+{"id":"b1700-a2d971","main":"free_material","also":["missed_threat"],"why":"Qxd5 took a free knight; Be4 missed it."}
+{"id":"b1700-b36202","main":"lost_time","also":["development","tempo_attack"],"why":"Early Qh4+ gets chased by g3 and costs time; dxe5 was better."}
+{"id":"b1700-b4d137","main":"lost_time","also":["attack_the_king","free_material"],"why":"A slow a5 missed Ng4 hitting h2 with a strong attack on the king."}

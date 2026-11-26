@@ -1,11 +1,14 @@
 /**
- * Stockfish in the browser: the WASM "lite, single-threaded" build, each instance in its
- * own Web Worker so analysis never blocks the UI. Two instances: one at full strength
- * for analysis, one weakened for the opponent's normal moves.
+ * The engines a game runs on, all in Web Workers so they never block the UI:
+ * - Stockfish at full strength for analysis, and for the opponent's moves while it punishes
+ *   a mistake (the WASM "lite, single-threaded" build).
+ * - Maia-3 for the opponent's normal moves, at the game's rating (maia.ts).
+ * - Stockfish 11's classical evaluation, the second opinion on strategic lessons.
  */
 
 import type { ClassicalEval, Engines } from "@chess-teacher/core";
-import { UciEngine, type UciTransport } from "@chess-teacher/engine";
+import { MaiaEngine, UciEngine, type MaiaNetwork, type UciTransport } from "@chess-teacher/engine";
+import { startMaiaNetwork } from "./maia.ts";
 
 const SCRIPT = `${import.meta.env.BASE_URL}stockfish/stockfish-19-lite-single.js`;
 const SCRIPT_11 = `${import.meta.env.BASE_URL}stockfish11/stockfish.js`;
@@ -27,7 +30,7 @@ function workerTransport(script = SCRIPT): UciTransport {
 const BENCH_FEN = "r1bq1rk1/pp2bppp/2n1pn2/3p4/2PP4/2N1PN2/PP3PPP/R2QKB1R w KQ - 0 9";
 
 let analyst: Promise<{ engine: UciEngine; depth: number }> | null = null;
-let weak: { skill: number; engine: Promise<UciEngine> } | null = null;
+let maia: Promise<MaiaNetwork> | null = null;
 
 /**
  * Analysis depth for this device: 12 normally, 10 if a depth-12 analysis is slow
@@ -53,16 +56,32 @@ const classical: ClassicalEval = {
   },
 };
 
-export async function getEngines(opponentSkill: number): Promise<{ engines: Engines; depth: number }> {
+function started(): { analyst: Promise<{ engine: UciEngine; depth: number }>; maia: Promise<MaiaNetwork> } {
   analyst ??= startAnalyst();
-  if (!weak || weak.skill !== opponentSkill) {
-    const previous = weak;
-    weak = {
-      skill: opponentSkill,
-      engine: UciEngine.start(workerTransport(), { skill: opponentSkill, hashMb: 8 }),
-    };
-    if (previous) void previous.engine.then((e) => e.close());
+  if (!maia) {
+    const network = startMaiaNetwork();
+    maia = network;
+    // A failed download is reported when a game needs the opponent, and tried again then.
+    network.catch(() => {
+      if (maia === network) maia = null;
+    });
   }
-  const [{ engine, depth }, weakEngine] = await Promise.all([analyst, weak.engine]);
-  return { engines: { analyst: engine, weak: weakEngine, classical }, depth };
+  return { analyst, maia };
+}
+
+/**
+ * Start the engines without waiting for them, so they're ready by the time the player has
+ * chosen their game: the opponent's network is a 9 MB download the first time.
+ */
+export function startEngines(): void {
+  started();
+}
+
+export async function getEngines(opponentRating: number): Promise<{ engines: Engines; depth: number }> {
+  const engines = started();
+  const [{ engine, depth }, network] = await Promise.all([engines.analyst, engines.maia]);
+  // Temperature 1: Maia samples its move as it was trained to, so it errs like a player of
+  // that rating. It assumes the player is rated the same.
+  const weak = new MaiaEngine(network, opponentRating, 1);
+  return { engines: { analyst: engine, weak, classical }, depth };
 }

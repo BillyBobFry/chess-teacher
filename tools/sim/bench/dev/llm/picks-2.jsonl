@@ -1,0 +1,15 @@
+{"id":"b1400-33f9de","main":"free_material","also":["count_attackers"],"why":"The pawn on d4 was attacked and undefended, and Bxd4 simply won it."}
+{"id":"b1400-38a4a2","main":"fork","also":["missed_threat","count_attackers"],"why":"Castling ignored the knight fork on e2 and the Qxe4+ threat; Nc3 covered both."}
+{"id":"b1400-1a4666","main":"removed_own_defender","also":["mate_threat","greedy_grab"],"why":"Taking the g5 pawn with the knight removed the e6 defender of g7 and allowed Bxg7 mate."}
+{"id":"b1400-026910","main":"greedy_grab","also":["tempo_attack","centre_control"],"why":"Grabbing on d4 let White gain time with e5 hitting the bishop while Nxe4 was the better move."}
+{"id":"b1400-3630a6","main":"free_material","also":["greedy_grab","rook_activity"],"why":"Qxa5 won the loose queen, but the player took a pawn on d7 and left the rook to take over."}
+{"id":"b1400-2372fb","main":"fork","also":["king_in_centre","missed_threat"],"why":"Nh3 allowed Nd4 and Nxc2+ forking king and rook while the king sat uncastled in the centre."}
+{"id":"b1400-2db1e6","main":"hanging_piece","also":["missed_threat"],"why":"Recapturing on d4 left the e4 pawn undefended; e5 kept it safe and attacked d6."}
+{"id":"b1400-49b94f","main":"missed_threat","also":["false_defender","free_material"],"why":"The Bxf7+ threat was ignored, and the pinned f7 pawn could not be held while Rxe3 won a pawn."}
+{"id":"b1400-4a45bd","main":"king_in_centre","also":["king_shelter","missed_threat"],"why":"f5 opened lines against the uncastled king and allowed Qh5+; Qc8 would have defended."}
+{"id":"b1400-63f6b9","main":"missed_threat","also":["rook_activity"],"why":"Taking on b6 ignored the Rxa2 threat that puts a rook on the seventh; a3 stopped it."}
+{"id":"b1400-7b92fd","main":"missed_threat","also":["escape_square","perpetual_check"],"why":"a5 ignored the Bh2+ and knight checks; g3 gave the king luft and avoided the perpetual."}
+{"id":"b1700-01def9","main":"pin","also":["count_attackers","free_material"],"why":"The queen on g7 was pinned along the g-file and attacked twice; Qxe5 simply won a pawn safely."}
+{"id":"b1700-0b76dd","main":"opened_line","also":["hanging_piece","free_material"],"why":"Moving the b-pawn opened the d6-a3 diagonal and left the knight on a3 hanging; Nxb5 was available."}
+{"id":"b1700-138f78","main":"count_attackers","also":["greedy_grab","missed_threat"],"why":"Capturing on d5 with the queen met a defender and lost it; Ra6 was the safe answer to the Qxb7 threat."}
+{"id":"b1700-15365f","main":"tempo_attack","also":["escape_square","development"],"why":"h3 attacks the bishop on g4 and gains time; d3 let Nd4 hit the queen with tempo."}

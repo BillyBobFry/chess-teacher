@@ -31,7 +31,7 @@ import {
 import { hintText, moveText } from "@chess-teacher/lesson-text";
 import { api } from "../api/client.ts";
 import { errorText } from "../api/errors.ts";
-import { getEngines } from "../engine/engines.ts";
+import { getEngines, startEngines } from "../engine/engines.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { ToastMessage } from "../ui/Toast.tsx";
@@ -41,7 +41,7 @@ export type Busy = null | "loading" | "engine" | "preparing" | "checking" | "opp
 
 export interface NewGameOptions {
   colour: Colour | "random";
-  opponentSkill: number;
+  opponentRating: number;
   easy: boolean;
 }
 
@@ -148,9 +148,9 @@ export function useGame(opts: { llmEnabled: boolean }) {
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 6000);
   }, []);
 
-  const engines = useCallback(async (skill: number) => {
+  const engines = useCallback(async (opponentRating: number) => {
     if (!enginesReady.current) setBusy("engine");
-    const result = await getEngines(skill);
+    const result = await getEngines(opponentRating);
     enginesReady.current = true;
     return result;
   }, []);
@@ -163,8 +163,8 @@ export function useGame(opts: { llmEnabled: boolean }) {
         const lesson = g.state.lessons.find((l) => l.id === e.lessonId);
         if (!lesson) continue;
         if ((e.kind === "triggered" || e.kind === "chanceGone") && !lesson.deferred && !reveal) {
-          // Asking "which move caused it?" is pointless when it was obviously the last one.
-          const obvious = e.kind === "chanceGone" && userMovesAgo(g.state, lesson) === 1;
+          // Asking "which move caused it?" is pointless when it was the player's last move.
+          const obvious = userMovesAgo(g.state, lesson) === 1;
           reveal = { lessonId: e.lessonId, step: obvious ? "explain" : "find", attempts: 0, wrong: [] };
           // Written now, not when the lesson was created, so it can say what really happened;
           // usually ready by the time the player has found the cause.
@@ -199,7 +199,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
           commit({ ...g, state: finish(g.state), finished: true });
           break;
         }
-        const { engines: e } = await engines(g.opponentSkill);
+        const { engines: e } = await engines(g.opponentRating);
         if (isUserTurn(g.state)) {
           if (g.state.analysis?.fen === gameOf(g.state).fen) break; // ready for the user's move
           setBusy("preparing");
@@ -221,9 +221,10 @@ export function useGame(opts: { llmEnabled: boolean }) {
     }
   }, [commit, engines, handle]);
 
-  // Load the user's game in progress, if any.
+  // Load the user's game in progress, if any, while the engines start.
   useEffect(() => {
     let cancelled = false;
+    startEngines();
     refreshMe();
     loadActiveGame()
       .then((g) => {
@@ -259,7 +260,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
       setBusy("checking");
       void (async () => {
         try {
-          const { engines: e } = await engines(g.opponentSkill);
+          const { engines: e } = await engines(g.opponentRating);
           const r = await userMove(g.state, uci, e);
           if (gameRef.current?.id === g.id && gameRef.current.state === g.state) {
             commit(handle({ ...gameRef.current, state: r.state }, r.events));
@@ -288,11 +289,11 @@ export function useGame(opts: { llmEnabled: boolean }) {
         commit({ ...old, state: resignGame(old.state), reveal: null, finished: true });
         await saver.current?.flush();
       }
-      const { depth } = await engines(o.opponentSkill);
+      const { depth } = await engines(o.opponentRating);
       setBusy(null);
       const created = await createGame({
         state: newSession({ userColour: colour, config: { analysisDepth: depth, easy: o.easy } }),
-        opponentSkill: o.opponentSkill,
+        opponentRating: o.opponentRating,
         reveal: null,
         finished: false,
       });

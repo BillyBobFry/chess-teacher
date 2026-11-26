@@ -42,9 +42,15 @@ export const RevealSchema = z.object({
 });
 export type RevealState = z.infer<typeof RevealSchema>;
 
+/**
+ * The opponent's strength: the rating (as on Lichess, whose games Maia learned from) it plays
+ * its normal moves at. The range the new-game slider offers, and all the server accepts.
+ */
+export const OPPONENT_RATING = { min: 600, max: 1800, step: 100, default: 1000 } as const;
+
 const gameFields = {
   state: SessionStateSchema,
-  opponentSkill: z.number().int().min(0).max(20),
+  opponentRating: z.number().int().min(OPPONENT_RATING.min).max(OPPONENT_RATING.max),
   reveal: RevealSchema.nullable(),
   finished: z.boolean(),
 };
@@ -60,7 +66,7 @@ export interface GameRecord {
   id: string;
   state: z.infer<typeof SessionStateSchema>;
   stateVersion: number;
-  opponentSkill: number;
+  opponentRating: number;
   reveal: RevealState | null;
   finished: boolean;
   createdAt: string;
@@ -104,6 +110,8 @@ export interface ExplanationParts {
   headline: string;
   what_it_allowed: string;
   why_better: string;
+  /** The concept the coach chose for a diagnosed lesson (a core `ConceptId`). */
+  concept?: string;
 }
 
 export interface ExplanationResponse {
@@ -159,7 +167,9 @@ export const FeedbackBody = z.object({
 export type FeedbackBody = z.infer<typeof FeedbackBody>;
 
 export interface PrincipleProgress {
-  /** A principle id from the core's curriculum; the client shows its title in the player's locale. */
+  /** What `id` names: a principle (older lessons) or a concept (diagnosed lessons). */
+  kind: "principle" | "concept";
+  /** A principle or concept id from the core; the client shows its title in the player's locale. */
   id: string;
   /** Lessons about this principle across the recent games. */
   lessons: number;
