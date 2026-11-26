@@ -13,10 +13,13 @@ import { Review } from "./Review.tsx";
 export function PastGame({
   id,
   onNewGame,
+  onBackToGame,
   onProgress,
 }: {
   id: string;
   onNewGame: () => void;
+  /** Returns to the game in progress; null when there isn't one. */
+  onBackToGame: (() => void) | null;
   onProgress: () => void;
 }) {
   const [game, setGame] = useState<SavedGame | null>(null);
@@ -86,6 +89,7 @@ export function PastGame({
           state={game.state}
           result={resultText(board.game, game.state)}
           onNewGame={onNewGame}
+          onBackToGame={onBackToGame}
           onProgress={onProgress}
         />
       </aside>

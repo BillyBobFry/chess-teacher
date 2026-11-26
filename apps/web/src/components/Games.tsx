@@ -16,7 +16,16 @@ const OUTCOME: Record<GameOutcome, () => string> = {
 };
 
 /** The player's finished games, newest first; each opens its review. */
-export function Games({ onNewGame, onBack }: { onNewGame: () => void; onBack: () => void }) {
+export function Games({
+  onNewGame,
+  onBackToGame,
+  onBack,
+}: {
+  onNewGame: () => void;
+  /** Returns to the game in progress; null when there isn't one. */
+  onBackToGame: (() => void) | null;
+  onBack: () => void;
+}) {
   const [games, setGames] = useState<GameSummary[] | null>(null);
   const [error, setError] = useState(false);
   const locale = getLocale();
@@ -54,8 +63,9 @@ export function Games({ onNewGame, onBack }: { onNewGame: () => void; onBack: ()
       {games?.length === 0 && (
         <>
           <p className="max-w-[65ch]">{m.games_empty()}</p>
-          <Button variant="primary" className="mb-4" onPress={onNewGame}>
-            {m.nav_new_game()}
+          {/* Finishing the game in progress is what fills this list (UX-17). */}
+          <Button variant="primary" className="mb-4" onPress={onBackToGame ?? onNewGame}>
+            {onBackToGame ? m.game_back_to_current() : m.nav_new_game()}
           </Button>
         </>
       )}

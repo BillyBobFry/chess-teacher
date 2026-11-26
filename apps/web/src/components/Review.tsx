@@ -45,12 +45,18 @@ export function Review({
   state,
   result,
   onNewGame,
+  onBackToGame,
   onProgress,
 }: {
   gameId: string;
   state: SessionState;
   result: string;
   onNewGame: () => void;
+  /**
+   * Returns to a game still in progress, when this review is of an earlier game. Null when
+   * there isn't one; then the next step is a new game.
+   */
+  onBackToGame: (() => void) | null;
   onProgress?: () => void;
 }) {
   const lessons = reviewLessons(state);
@@ -74,8 +80,9 @@ export function Review({
         </>
       )}
       <div className="actions">
-        <Button variant="primary" onPress={onNewGame}>
-          {m.nav_new_game()}
+        {/* With a game in progress, a new game would resign it; the way on is back to that game. */}
+        <Button variant="primary" onPress={onBackToGame ?? onNewGame}>
+          {onBackToGame ? m.game_back_to_current() : m.nav_new_game()}
         </Button>
         {onProgress && <Button onPress={onProgress}>{m.account_progress()}</Button>}
       </div>
