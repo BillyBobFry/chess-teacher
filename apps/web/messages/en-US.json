@@ -67,6 +67,7 @@
   "status_paused": "Game paused",
   "status_your_move": "Your move",
   "panel_moves": "Moves",
+  "panel_lesson": "Lesson",
   "panel_play_hint": "Play normally. If a mistake comes back to bite you, the game will pause so you can find out why.",
   "moves_empty": "No moves yet.",
   "moves_undo": "Undo",
