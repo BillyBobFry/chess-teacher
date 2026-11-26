@@ -8,9 +8,7 @@ import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import { Alert } from "../ui/Alert.tsx";
 import { Button } from "../ui/Button.tsx";
-import { Board, orientationOf } from "./Board.tsx";
-import { GameLayout } from "./GameLayout.tsx";
-import { Review } from "./Review.tsx";
+import { GameReview } from "./GameReview.tsx";
 
 /**
  * Where a past game's Back button leads: the principle page it was opened from, or else the
@@ -24,7 +22,7 @@ function useBack(): { route: Route; label: string } {
     : { route: { page: "games" }, label: m.games_back() };
 }
 
-/** A finished game from the player's account: its final position and its review. */
+/** A finished game from the player's account: its replay and its review. */
 export function PastGame({
   id,
   openLesson,
@@ -62,15 +60,7 @@ export function PastGame({
     void fetchGame();
   };
 
-  const board = useMemo(() => {
-    if (!game) return null;
-    const replay = gameOf(game.state);
-    return {
-      game: replay,
-      fen: replay.fen,
-      lastMove: replay.chess.history({ verbose: true }).at(-1) ?? null,
-    };
-  }, [game]);
+  const board = useMemo(() => (game ? { game: gameOf(game.state) } : null), [game]);
 
   if (!game || !board) {
     return (
@@ -91,36 +81,25 @@ export function PastGame({
   }
 
   return (
-    <GameLayout
+    <GameReview
+      key={game.id}
+      gameId={game.id}
+      state={game.state}
+      result={resultText(board.game, game.state)}
+      boardId="past"
+      openLesson={openLesson}
       expanded={expanded}
       onExpandedChange={setExpanded}
-      panelLabel={m.review_title()}
-      board={
-        <Board
-          id="past"
-          label={m.board_game()}
-          fen={board.fen}
-          orientation={orientationOf(game.state.userColour)}
-          focusable={false}
-          lastMove={board.lastMove}
-        />
+      aboveBoard={null}
+      belowBoard={null}
+      aboveReview={
+        <Button variant="link" className="mb-3 self-start" onPress={goBack}>
+          {back.label}
+        </Button>
       }
-      panel={
-        <>
-          <Button variant="link" className="mb-3 self-start" onPress={goBack}>
-            {back.label}
-          </Button>
-          <Review
-            gameId={game.id}
-            state={game.state}
-            result={resultText(board.game, game.state)}
-            openLesson={openLesson}
-            onNewGame={onNewGame}
-            onBackToGame={onBackToGame}
-            onProgress={onProgress}
-          />
-        </>
-      }
+      onNewGame={onNewGame}
+      onBackToGame={onBackToGame}
+      onProgress={onProgress}
     />
   );
 }

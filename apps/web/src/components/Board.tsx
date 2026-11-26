@@ -10,6 +10,9 @@ export type Orientation = "white" | "black";
 /** The board as the player sees it: their own pieces at the bottom. */
 export const orientationOf = (colour: Color): Orientation => (colour === "w" ? "white" : "black");
 
+/** Arrow colours, as literals: they're SVG attributes, so a CSS variable won't do. */
+export const ARROW = { yours: "#c2552b", better: "#2f8f5f" } as const;
+
 export interface BoardArrow {
   from: string;
   to: string;
@@ -35,6 +38,8 @@ interface Props {
   /** Extra square highlights, e.g. the pieces a lesson is about. */
   marked?: string[];
   showNotation?: boolean;
+  /** Pieces slide to a new position. Off for a jump of several moves, which reads as noise. */
+  animate?: boolean;
 }
 
 type Mark = "last" | "lesson" | "selected" | "target" | "capture";
@@ -80,6 +85,7 @@ export function Board({
   arrows,
   marked,
   showNotation = true,
+  animate = true,
 }: Props) {
   const chess = useMemo(() => new Chess(fen), [fen]);
   const interactive = !!onMove;
@@ -237,7 +243,7 @@ export function Board({
             allowDrawingArrows: false,
             showNotation,
             animationDurationInMs: 180,
-            showAnimations: !matchMedia("(prefers-reduced-motion: reduce)").matches, // UX-26
+            showAnimations: animate && !matchMedia("(prefers-reduced-motion: reduce)").matches, // UX-26
             arrows: (arrows ?? []).map((a) => ({ startSquare: a.from, endSquare: a.to, color: a.color })),
             darkSquareStyle: { backgroundColor: "var(--sq-dark)" },
             lightSquareStyle: { backgroundColor: "var(--sq-light)" },

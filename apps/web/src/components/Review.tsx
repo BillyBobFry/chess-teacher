@@ -1,5 +1,6 @@
 import {
   gameOutcome,
+  movesOfLine,
   playedLine,
   reviewLessons,
   reviewTree,
@@ -7,25 +8,31 @@ import {
   type SessionState,
 } from "@chess-teacher/core";
 import { moveText } from "@chess-teacher/lesson-text";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
+import type { Replay } from "../game/useReplay.ts";
 import type { Key } from "../ui/Disclosure.tsx";
+import { orientationOf } from "./Board.tsx";
 import { LessonRow } from "./LessonRow.tsx";
+import { MoveList } from "./MoveList.tsx";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import { Button } from "../ui/Button.tsx";
 import { DisclosureGroup } from "../ui/Disclosure.tsx";
 
-const rowId = (lessonId: number) => `review-lesson-${lessonId}`;
+/** A lesson's row in the review, so it can be scrolled to (from a link, or the replay). */
+export const lessonRowId = (lessonId: Key) => `review-lesson-${lessonId}`;
 
 /**
  * Post-game review: every lesson, with its explanations and futures on demand. Where the player
  * went back and played on differently, what they played first hangs off the move they went
- * back to, indented, with its own lessons: a tree of the lines they played.
+ * back to, indented, with its own lessons: a tree of the lines they played. Then the moves of
+ * the line on the replay's board, each of which puts the board there.
  */
 export function Review({
   gameId,
   state,
   result,
+  replay,
   openLesson,
   onNewGame,
   onBackToGame,
@@ -34,6 +41,8 @@ export function Review({
   gameId: string;
   state: SessionState;
   result: string;
+  /** The game on the board: which lesson is open, and the line whose moves are listed. */
+  replay: Replay;
   /** A lesson to start open and scrolled to (a link from a principle's page), or null. */
   openLesson: number | null;
   onNewGame: () => void;
@@ -49,11 +58,17 @@ export function Review({
   const branched = tree.items.some((i) => i.kind === "line");
   // Praise for a clean game is only earned by finishing it without losing (UX-30).
   const earned = ["won", "drawn"].includes(gameOutcome(state));
-  const [open, setOpen] = useState<Key | null>(openLesson);
+  const { open, openLesson: setOpen } = replay;
+  const lineMoves = useMemo(() => movesOfLine(state, replay.line), [state, replay.line]);
+  const lessonAt = useMemo(
+    () => new Map(replay.lessons.map(({ lesson, at }) => [at, lesson.kind])),
+    [replay.lessons],
+  );
   useEffect(() => {
     // Instant, so nothing moves under reduced motion (UX-26). Only on arrival: the player
     // scrolls from there.
-    if (openLesson !== null) document.getElementById(rowId(openLesson))?.scrollIntoView({ block: "start" });
+    if (openLesson !== null)
+      document.getElementById(lessonRowId(openLesson))?.scrollIntoView({ block: "start" });
   }, [openLesson]);
   return (
     <section className="review">
@@ -69,6 +84,13 @@ export function Review({
           </DisclosureGroup>
         </>
       )}
+      <h3 className="mt-0 mb-2 text-base">{m.panel_moves()}</h3>
+      <MoveList
+        startFen={state.startFen}
+        moves={lineMoves}
+        orientation={orientationOf(state.userColour)}
+        replay={{ step: replay.step, onStep: replay.go, lessons: lessonAt }}
+      />
       <div className="actions">
         {/* With a game in progress, a new game would resign it; the way on is back to that game. */}
         <Button variant="primary" onPress={onBackToGame ?? onNewGame}>
@@ -99,7 +121,7 @@ function Line({
         item.kind === "lesson" ? (
           // The margin keeps what's just above it in view when it's scrolled to, such as the
           // earlier try it's in.
-          <li key={`lesson-${item.lesson.id}`} id={rowId(item.lesson.id)} className="scroll-mt-12">
+          <li key={`lesson-${item.lesson.id}`} id={lessonRowId(item.lesson.id)} className="scroll-mt-12">
             <LessonRow
               id={item.lesson.id}
               lesson={item.lesson}

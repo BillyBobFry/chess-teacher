@@ -6,6 +6,7 @@
  *   the new-game dialog → reload and resume →
  *   a recorded game at a reveal (wrong guess → hint → answer → AI explanation → futures →
  *   rewind) → resign and see the earlier try in the review → resign a game and review it →
+ *   replay it, step by step and from a lesson →
  *   a principle's lessons from the progress page, and on into a game's review →
  *   past games, with the coach's explanation kept → a past game's URL survives a reload, and
  *   back and forward move between pages → sign out and back in → licences → phone layout.
@@ -20,6 +21,8 @@ import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+  Game,
+  fullmoveOf,
   lessonMove,
   newSession,
   opponentMove,
@@ -327,6 +330,17 @@ try {
     await page.getByRole("heading", { name: "Game review" }).waitFor();
     await page.getByText(/^Your earlier try from /).waitFor();
     await shot("4b-review-branch", true);
+    // Its lesson puts the board on that earlier try, until the player goes back to the game.
+    // The board's side of the game layout: the first of <main>'s two parts, the panel second.
+    const boardSide = page.locator("main > div").first();
+    await page
+      .locator(".review")
+      .getByRole("button")
+      .filter({ hasText: moveText(lessonMove(lesson), "en-GB") })
+      .click();
+    await boardSide.getByText(/^Your earlier try from /).waitFor();
+    await boardSide.getByRole("button", { name: "Back to the game" }).click();
+    await boardSide.getByText(/^Your earlier try from /).waitFor({ state: "detached" });
   });
 
   await step("resign a game with no lessons: no praise (UX-30)", async () => {
@@ -348,6 +362,43 @@ try {
     await page.locator(".review").getByRole("button", { expanded: false }).first().click();
     await shot("5-review", true);
   });
+
+  await step(
+    "replay the reviewed game: step through it, and see a lesson's mistake on the board",
+    async () => {
+      const replay = page.getByRole("group", { name: "Step through the game" });
+      // The board's side of the game layout: the first of <main>'s two parts, the panel second.
+      const boardSide = page.locator("main > div").first();
+      const mistake = moveText(lessonMove(lesson), "en-GB");
+      const played = new Game(end.startFen, end.moves).chess.history({ verbose: true });
+      const last = played.at(-1)!;
+      const finalMove = moveText(
+        { moveNumber: fullmoveOf(last.before), colour: last.color, san: last.san },
+        "en-GB",
+      );
+      await replay.getByRole("button", { name: "Start" }).click();
+      await replay.getByText("Start", { exact: true }).waitFor();
+      // Focus is on the stepper, not the board or a field, so the keys step the replay.
+      await page.keyboard.press("ArrowRight");
+      await replay.getByText(`1. ${played[0]!.san}`, { exact: true }).waitFor();
+      await page.keyboard.press("End");
+      await replay.getByText(finalMove, { exact: true }).waitFor();
+      // Opening a lesson puts the board just before its mistake, and says so under it.
+      const row = page.locator(".review").getByRole("button").filter({ hasText: mistake });
+      if ((await row.getAttribute("aria-expanded")) === "true") await row.click();
+      await row.click();
+      await boardSide.getByText(mistake, { exact: true }).waitFor();
+      await shot("5b-replay", true);
+      // With the lesson closed, the note under the board opens it again.
+      await row.click();
+      await boardSide.getByRole("button", { name: "Show lesson" }).click();
+      await page
+        .locator(".review")
+        .getByRole("button", { expanded: true })
+        .filter({ hasText: mistake })
+        .waitFor();
+    },
+  );
 
   await step("account menu shows the AI allowance", async () => {
     await page.getByRole("button", { name: "Account" }).click();

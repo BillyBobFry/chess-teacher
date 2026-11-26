@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { api, authClient } from "./api/client.ts";
 import { Board, orientationOf } from "./components/Board.tsx";
 import { GameLayout } from "./components/GameLayout.tsx";
+import { GameReview } from "./components/GameReview.tsx";
 import { Games } from "./components/Games.tsx";
 import { Licences } from "./components/Licences.tsx";
 import { MoveList } from "./components/MoveList.tsx";
@@ -20,7 +21,6 @@ import { Kbd } from "./ui/Kbd.tsx";
 import { Link } from "./ui/Link.tsx";
 import { Menu, MenuItem, MenuSection, MenuTrigger } from "./ui/Menu.tsx";
 import { Toasts } from "./ui/Toast.tsx";
-import { Review } from "./components/Review.tsx";
 import { SignIn } from "./components/SignIn.tsx";
 import { useGame, type Busy } from "./game/useGame.ts";
 import { resultText } from "./lib/result.ts";
@@ -425,54 +425,72 @@ function GameApp({
           ? m.status_your_move()
           : "…";
 
+  const statusLine = (
+    <div
+      className={`min-h-[1.5em] font-semibold ${canMove ? "text-primary" : ""}`}
+      role="status"
+      aria-live="polite"
+    >
+      {status}
+    </div>
+  );
+  const error = g.error && (
+    <Alert>
+      {g.error}{" "}
+      <Button variant="link" onPress={g.dismissError}>
+        {m.dismiss()}
+      </Button>
+    </Alert>
+  );
+
+  if (saved.finished) {
+    return (
+      <Shell nav={nav} layout="game">
+        <GameReview
+          key={saved.id}
+          gameId={saved.id}
+          state={state}
+          result={resultText(board.game, state)}
+          boardId="main"
+          openLesson={null}
+          expanded={drawer.expanded}
+          onExpandedChange={setDrawerExpanded}
+          aboveBoard={statusLine}
+          belowBoard={error}
+          aboveReview={null}
+          onNewGame={() => setChoosing(true)}
+          onBackToGame={null}
+          onProgress={() => navigate({ page: "progress" })}
+        />
+        <Toasts toasts={g.toasts} />
+      </Shell>
+    );
+  }
+
   return (
     <Shell nav={nav} layout="game">
       <GameLayout
         expanded={drawer.expanded}
         onExpandedChange={setDrawerExpanded}
-        panelLabel={
-          panel === "review" ? m.review_title() : panel === "lesson" ? m.panel_lesson() : m.panel_moves()
-        }
+        panelLabel={panel === "lesson" ? m.panel_lesson() : m.panel_moves()}
+        under="0rem"
         board={
           <>
-            <div
-              className={`min-h-[1.5em] font-semibold ${canMove ? "text-primary" : ""}`}
-              role="status"
-              aria-live="polite"
-            >
-              {status}
-            </div>
+            {statusLine}
             <Board
               id="main"
               label={m.board_game()}
               fen={board.fen}
               orientation={orientation}
-              focusable={!saved.finished}
+              focusable
               lastMove={board.lastMove}
               onMove={canMove ? g.move : undefined}
             />
-            {g.error && (
-              <Alert>
-                {g.error}{" "}
-                <Button variant="link" onPress={g.dismissError}>
-                  {m.dismiss()}
-                </Button>
-              </Alert>
-            )}
+            {error}
           </>
         }
         panel={
-          saved.finished ? (
-            <Review
-              gameId={saved.id}
-              state={state}
-              result={resultText(board.game, state)}
-              openLesson={null}
-              onNewGame={() => setChoosing(true)}
-              onBackToGame={null}
-              onProgress={() => navigate({ page: "progress" })}
-            />
-          ) : revealLesson && saved.reveal ? (
+          revealLesson && saved.reveal ? (
             <Reveal
               gameId={saved.id}
               state={state}
@@ -504,7 +522,12 @@ function GameApp({
                 </Button>
               </div>
               <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                <MoveList startFen={state.startFen} moves={state.moves} orientation={orientation} />
+                <MoveList
+                  startFen={state.startFen}
+                  moves={state.moves}
+                  orientation={orientation}
+                  replay={null}
+                />
                 <p className="muted small">{m.panel_play_hint()}</p>
                 <p className="muted small">
                   <ParaglideMessage
