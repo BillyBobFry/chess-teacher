@@ -1,65 +1,20 @@
 import type { ExplanationResponse } from "@chess-teacher/contract";
-import { lessonBestSan, type Lesson } from "@chess-teacher/core";
+import { isConceptId, lessonBestSan, type ConceptId, type Lesson } from "@chess-teacher/core";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
-import type { Move } from "chess.js";
-import { Fragment, useEffect, useState, type ReactNode } from "react";
-import { findMove, lessonMoves, lineMoves, splitMoves } from "../lib/moves.ts";
+import { useEffect, useState } from "react";
+import { lessonMoves } from "../lib/moves.ts";
 import { m } from "../paraglide/messages.js";
-import { orientationOf, type Orientation } from "./Board.tsx";
-import { MoveButton, moveMarkup } from "./MoveButton.tsx";
+import { orientationOf } from "./Board.tsx";
+import { moveMarkup } from "./MoveButton.tsx";
+import { MoveText, knownMoves } from "./MoveText.tsx";
 
-interface Known {
-  /** Every move in the lines the coach could mention. */
-  lines: Move[];
-  /** The mistake and the better move. */
-  named: Move[];
-}
+/** The AI explanation as it loads: "loading", then the response (null if there is none). */
+export type AiResult = ExplanationResponse | null | "loading";
 
-/**
- * Text with chess moves picked out so they're easy to spot. A move that is surely one of
- * `known` previews its board; one we can't place stays text, rather than show a wrong board.
- */
-function withMoves(text: string, known: Known, orientation: Orientation): ReactNode[] {
-  return splitMoves(text).map((seg, i) => {
-    if (!seg.move) return <Fragment key={i}>{seg.text}</Fragment>;
-    const move = findMove(seg.text, known.lines, known.named);
-    return move ? (
-      <MoveButton key={i} move={move} orientation={orientation}>
-        {seg.text}
-      </MoveButton>
-    ) : (
-      <span key={i} className="move">
-        {seg.text}
-      </span>
-    );
-  });
-}
-
-/**
- * The AI coach's explanation, shown above the measured facts when available: a headline
- * and two short paragraphs. If there isn't one (no API key, allowance used up, still being
- * written, or rejected by the guardrail), the facts-based explanation below stands alone.
- */
-export function AiExplanation({
-  load,
-  lesson,
-  played,
-}: {
-  load: (signal: AbortSignal) => Promise<ExplanationResponse | null>;
-  lesson: Lesson;
-  /** The real moves from the mistake on. */
-  played: string[];
-}) {
-  const [result, setResult] = useState<ExplanationResponse | null | "loading">("loading");
-  const orientation = orientationOf(lesson.userColour);
-  const { yours, better } = lessonMoves(lesson);
-  // The coach writes about the two lines it was given; the real moves may come up too.
-  const known: Known = {
-    lines: [lesson.userLine, lesson.bestLine, played].flatMap((line) => lineMoves(lesson.fenBefore, line)),
-    named: [yours, better].filter((mv) => mv !== undefined),
-  };
-  const missedChance = lesson.kind === "missed_chance";
-
+export function useAiExplanation(
+  load: (signal: AbortSignal) => Promise<ExplanationResponse | null>,
+): AiResult {
+  const [result, setResult] = useState<AiResult>("loading");
   useEffect(() => {
     const controller = new AbortController();
     load(controller.signal).then((r) => {
@@ -67,21 +22,59 @@ export function AiExplanation({
     });
     return () => controller.abort();
   }, [load]);
+  return result;
+}
+
+/** The concept the coach chose, once its explanation is ready (null otherwise). */
+export function coachConcept(result: AiResult): ConceptId | null {
+  if (result === "loading" || result?.status !== "ready") return null;
+  const concept = result.parts?.concept;
+  return isConceptId(concept) ? concept : null;
+}
+
+/**
+ * The AI coach's explanation, shown above the measured facts when available: a headline
+ * and two short paragraphs. If there isn't one, the facts-based explanation below stands
+ * alone, with a note saying why (allowance used up, rejected by the guardrail, failed or
+ * too slow); with no LLM on the server, without one.
+ */
+export function AiExplanation({
+  result,
+  lesson,
+  played,
+}: {
+  result: AiResult;
+  lesson: Lesson;
+  /** The real moves from the mistake on. */
+  played: string[];
+}) {
+  const orientation = orientationOf(lesson.userColour);
+  const { better } = lessonMoves(lesson);
+  // The coach writes about the two lines it was given; the real moves may come up too.
+  const known = knownMoves(lesson, [played]);
+  const missedChance = lesson.kind === "missed_chance";
 
   if (result === "loading") return <p className="ai-note muted">{m.ai_writing()}</p>;
   if (!result) return null;
   if (result.status === "quota") {
     return <p className="ai-note muted">{m.ai_quota()}</p>;
   }
-  if (result.status !== "ready" || (!result.parts && !result.text)) return null;
+  // A coach that tried and didn't manage says so, so the template below isn't mistaken for
+  // a lesson the coach never saw. A server without an LLM ("unavailable") says nothing.
+  if (result.status === "rejected") return <p className="ai-note muted">{m.ai_rejected()}</p>;
+  if (result.status === "pending") return <p className="ai-note muted">{m.ai_slow()}</p>;
+  if (result.status === "error" || (result.status === "ready" && !result.parts && !result.text))
+    return <p className="ai-note muted">{m.ai_failed()}</p>;
+  if (result.status !== "ready") return null;
 
+  const text = (t: string) => <MoveText text={t} known={known} orientation={orientation} />;
   const foot = <div className="ai-foot muted">{m.ai_foot({ remaining: result.remaining })}</div>;
   if (!result.parts) {
     // Explanations stored before they were structured: one paragraph.
     return (
       <div className="ai">
         <div className="ai-label">{m.ai_label()}</div>
-        <p>{withMoves(result.text!, known, orientation)}</p>
+        <p>{text(result.text ?? "")}</p>
         {foot}
       </div>
     );
@@ -90,10 +83,10 @@ export function AiExplanation({
   return (
     <div className="ai">
       <div className="ai-label">{m.ai_label()}</div>
-      <p className="ai-headline">{withMoves(headline, known, orientation)}</p>
+      <p className="ai-headline">{text(headline)}</p>
       <dl className="ai-parts">
         <dt>{missedChance ? m.ai_what_missed() : m.ai_what_allowed()}</dt>
-        <dd>{withMoves(what_it_allowed, known, orientation)}</dd>
+        <dd>{text(what_it_allowed)}</dd>
         <dt>
           <ParaglideMessage
             message={m.ai_why_better}
@@ -101,7 +94,7 @@ export function AiExplanation({
             markup={{ move: moveMarkup(better, orientation) }}
           />
         </dt>
-        <dd>{withMoves(why_better, known, orientation)}</dd>
+        <dd>{text(why_better)}</dd>
       </dl>
       {foot}
     </div>

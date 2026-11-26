@@ -14,8 +14,12 @@ export interface Candidate {
 export interface Engine {
   /** Analyse a position. Returns up to `multipv` candidates, best first. */
   analyse(fen: string, opts: { depth: number; multipv: number }): Promise<Candidate[]>;
-  /** Pick a move to play (respecting any strength limit the engine was created with). */
-  play(fen: string, opts: { movetimeMs: number }): Promise<string>;
+  /**
+   * Pick a move to play (respecting any strength limit the engine was created with).
+   * `history` is the game's positions before `fen`, oldest first: a human-like engine (Maia)
+   * reads the last few to see how the position came about; Stockfish ignores it.
+   */
+  play(fen: string, opts: { movetimeMs: number; history: readonly string[] }): Promise<string>;
 }
 
 /** The engines a game needs: full-strength analysis, and a weakened opponent. */

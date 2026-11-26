@@ -1,0 +1,303 @@
+{
+  "about": "The lesson benchmark's concept vocabulary: what a coach would name as the idea behind a move. Built from the dev annotators' free-text concepts, grouped into families. A concept that fits none is mapped to \"other\".",
+  "families": {
+    "material": "Loose pieces and counting: what can be taken, and whether it's really defended",
+    "tactics": "Named tactical patterns",
+    "threats": "Seeing what the opponent wants",
+    "king": "King safety and mating patterns",
+    "tempo": "Time: development and moves that gain or lose it",
+    "pawns": "Pawn structure and pawn play",
+    "pieces": "Where pieces stand and which squares and lines they use",
+    "trades": "Exchanges and endgames"
+  },
+  "concepts": [
+    {
+      "id": "hanging_piece",
+      "family": "material",
+      "means": "Left a piece or pawn undefended where it can be taken for nothing, including by moving it or by pushing a pawn to an unprotected square.",
+      "examples": [
+        "pushed pawn left undefended",
+        "left e4 pawn hanging",
+        "loose bishop on f2",
+        "pawn grab left a2 hanging"
+      ]
+    },
+    {
+      "id": "count_attackers",
+      "family": "material",
+      "means": "Attackers against defenders: moving to, capturing on or pushing into a square attacked more times than it is defended, or capturing a pawn that is defended.",
+      "examples": [
+        "pushed into an outnumbered square",
+        "count attackers and defenders",
+        "capturing a defended pawn with the queen",
+        "e3 pawn attacked twice, defended once"
+      ]
+    },
+    {
+      "id": "free_material",
+      "family": "material",
+      "means": "Missed a piece or pawn the opponent left loose that could simply be taken.",
+      "examples": ["missed a free pawn on d4", "missed the loose e4 pawn", "take the offered centre pawn"]
+    },
+    {
+      "id": "removed_own_defender",
+      "family": "material",
+      "means": "The move took away, traded off or moved away a piece that was defending something, which then falls.",
+      "examples": [
+        "queen trade removed d6's defender",
+        "recapture removed e5's defender",
+        "removed the defender of g7",
+        "pawn was shielding a3"
+      ]
+    },
+    {
+      "id": "false_defender",
+      "family": "material",
+      "means": "Something looks defended but the defender can't recapture: it is pinned, overloaded or tied to another job.",
+      "examples": [
+        "d4 pawn defended by a pinned pawn",
+        "the e3 pawn couldn't recapture",
+        "pawn defender tied to the rook",
+        "overloaded defender"
+      ]
+    },
+    {
+      "id": "greedy_grab",
+      "family": "material",
+      "means": "Took material at the cost of development, king safety or coordination, and the opponent's activity outweighs it.",
+      "examples": ["greedy pawn grab, loose bishop", "pawn grab with back rank weak"]
+    },
+
+    {
+      "id": "fork",
+      "family": "tactics",
+      "means": "One piece or pawn attacks two targets at once (knight, pawn, queen or other fork), whether walked into or missed.",
+      "examples": ["castled into a knight fork", "pawn fork with e5", "queen fork on d4"]
+    },
+    {
+      "id": "pin",
+      "family": "tactics",
+      "means": "A piece can't move (or can't move safely) because something more valuable is behind it on the line.",
+      "examples": ["checked into a pin", "knight pinned on f3", "pin on the f-file"]
+    },
+    {
+      "id": "skewer",
+      "family": "tactics",
+      "means": "A valuable piece is attacked on a line and, when it moves, the piece behind it falls.",
+      "examples": ["king left on the skewer file"]
+    },
+    {
+      "id": "discovered_attack",
+      "family": "tactics",
+      "means": "Moving one piece uncovers an attack (or check) by another.",
+      "examples": ["discovered check on the h-file"]
+    },
+    {
+      "id": "opened_line",
+      "family": "tactics",
+      "means": "The move opened a file, rank or diagonal that lets an enemy piece reach a loose piece or the king.",
+      "examples": [
+        "pawn capture opened a line to your knight",
+        "opened a diagonal to the king",
+        "queen trade opened the d-file"
+      ]
+    },
+    {
+      "id": "trapped_piece",
+      "family": "tactics",
+      "means": "A piece with no safe squares that can be won, or a piece that wandered off and got trapped.",
+      "examples": ["trap the stranded queen", "stranded bishop"]
+    },
+    {
+      "id": "in_between_move",
+      "family": "tactics",
+      "means": "An in-between move, desperado or capture first before retreating: the order of moves changes what is won.",
+      "examples": [
+        "exchange on f6, don't retreat",
+        "capture before retreating",
+        "remove a defender before recapturing"
+      ]
+    },
+    {
+      "id": "remove_the_guard",
+      "family": "tactics",
+      "means": "Capturing, chasing or deflecting the opponent's defender so the thing it guarded falls.",
+      "examples": [
+        "trade off an attacker first",
+        "remove a defender first",
+        "attack the exposed king's defender"
+      ]
+    },
+
+    {
+      "id": "missed_threat",
+      "family": "threats",
+      "means": "Didn't see or answer what the opponent was threatening (other than mate), or didn't check the opponent's checks, captures and threats before moving.",
+      "examples": [
+        "ignored the threat of Nd4",
+        "missed the threat against f2",
+        "check every enemy check before moving",
+        "respond to the opponent's threat first"
+      ]
+    },
+
+    {
+      "id": "mate_threat",
+      "family": "king",
+      "means": "Missed or allowed a mating attack or pattern on the king (not specifically the back rank).",
+      "examples": ["missed mate threat on h7", "mate on the long diagonal", "king walks into mating net"]
+    },
+    {
+      "id": "back_rank",
+      "family": "king",
+      "means": "Back-rank mate or the threat of it: a king shut in behind its own pawns.",
+      "examples": ["back-rank mate threat", "back-rank weakness"]
+    },
+    {
+      "id": "king_in_centre",
+      "family": "king",
+      "means": "A king left in the centre, or losing the right to castle, while lines are opening.",
+      "examples": ["king stuck in the centre", "lost the right to castle"]
+    },
+    {
+      "id": "king_shelter",
+      "family": "king",
+      "means": "Weakened the pawns or pieces sheltering the king: pawn moves in front of it, or giving up a key defender of its squares.",
+      "examples": [
+        "f-pawn move exposes uncastled king",
+        "gave up the light-squared defender",
+        "broken king shelter"
+      ]
+    },
+    {
+      "id": "escape_square",
+      "family": "king",
+      "means": "The king needs a flight square (luft) to avoid mate or endless checks.",
+      "examples": ["give the king an escape square"]
+    },
+    {
+      "id": "perpetual_check",
+      "family": "king",
+      "means": "Allowed, or missed, a draw by perpetual check.",
+      "examples": ["allowed perpetual check"]
+    },
+    {
+      "id": "stalemate",
+      "family": "king",
+      "means": "Stalemate as a resource or a trap.",
+      "examples": ["stalemate trick in the corner"]
+    },
+    {
+      "id": "attack_the_king",
+      "family": "king",
+      "means": "Missed the chance to attack an exposed or weakened enemy king.",
+      "examples": [
+        "hit the exposed king first",
+        "attack the broken king",
+        "open lines while king is in centre"
+      ]
+    },
+
+    {
+      "id": "tempo_attack",
+      "family": "tempo",
+      "means": "Gaining time by attacking a piece (often with a pawn) so it must move, or putting a piece where it can be hit that way.",
+      "examples": [
+        "bishop kicked by a pawn with tempo",
+        "knight chased by ...d4",
+        "retreat the queen with a threat",
+        "e5 push gains time",
+        "develop with a threat"
+      ]
+    },
+    {
+      "id": "lost_time",
+      "family": "tempo",
+      "means": "Wasted moves: one-move threats, chasing a piece to a better square, moving the same piece again.",
+      "examples": [
+        "lost time with a one-move threat",
+        "chasing a piece to a better square",
+        "don't chase, restrict"
+      ]
+    },
+    {
+      "id": "development",
+      "family": "tempo",
+      "means": "Developing pieces, or using or punishing a lead in development.",
+      "examples": [
+        "use your lead in development",
+        "punish lagging development",
+        "develop pieces before pawn moves",
+        "undeveloped queenside"
+      ]
+    },
+
+    {
+      "id": "pawn_break",
+      "family": "pawns",
+      "means": "A pawn push that challenges or undermines the opponent's pawns and opens lines.",
+      "examples": ["a5 lever against b4", "undermine the b4 pawn with a5"]
+    },
+    {
+      "id": "passed_pawn",
+      "family": "pawns",
+      "means": "Creating, pushing, stopping or blockading a passed pawn.",
+      "examples": ["stop the passed h-pawn", "passed e-pawn", "outside passed pawn"]
+    },
+    {
+      "id": "pawn_weakness",
+      "family": "pawns",
+      "means": "Creating or attacking weak pawns: isolated, backward, doubled or overextended.",
+      "examples": ["weak d6 and c5 pawns", "attack the overextended b4 pawn"]
+    },
+    {
+      "id": "centre_control",
+      "family": "pawns",
+      "means": "Occupying or controlling the centre, with pawns or pieces.",
+      "examples": ["control the centre", "challenge the centre with ...d5"]
+    },
+
+    {
+      "id": "rook_activity",
+      "family": "pieces",
+      "means": "Rooks on open files, the seventh rank, or behind passed pawns; a rook invading.",
+      "examples": ["rook to the seventh rank", "rook invades your second rank", "contest the open f-file"]
+    },
+    {
+      "id": "bad_placement",
+      "family": "pieces",
+      "means": "A piece on a poor square: knight on the rim, blocked bishop, piece where pawns can hit it, pieces blocking each other.",
+      "examples": ["knight on the rim", "rook blocks own bishop", "don't put pieces where pawns can hit them"]
+    },
+    {
+      "id": "key_square",
+      "family": "pieces",
+      "means": "Controlling or taking away an important square or outpost.",
+      "examples": ["control the d4 square", "take d4 away from the knight"]
+    },
+
+    {
+      "id": "trade_decisions",
+      "family": "trades",
+      "means": "Whether to trade pieces: trade when ahead or defending, keep pieces when attacking, which piece to trade.",
+      "examples": [
+        "trade queens when defending",
+        "trade queens when ahead",
+        "trade queens to reach rook ending"
+      ]
+    },
+    {
+      "id": "endgame_knowledge",
+      "family": "trades",
+      "means": "Endgame know-how: which endings are drawn or won, king activity in the endgame, the opposition.",
+      "examples": ["rook endings are drawish", "activate your king in the endgame"]
+    },
+
+    {
+      "id": "other",
+      "family": "other",
+      "means": "None of the above fits. Keep the annotator's words as the text.",
+      "examples": []
+    }
+  ]
+}

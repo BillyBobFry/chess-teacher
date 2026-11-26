@@ -28,6 +28,7 @@ import {
 } from "@chess-teacher/core";
 import type { RecordedCall } from "@chess-teacher/engine";
 import { NodeUciEngine, findStockfish } from "@chess-teacher/engine/node";
+import { lessonFeatureLabel } from "./prototype-text.ts";
 import type { RecordedGame, RecordedStep } from "./recorded-game.ts";
 
 const { values: args } = parseArgs({
@@ -52,9 +53,9 @@ class RecordingEngine implements Engine {
     return result;
   }
 
-  async play(fen: string, opts: { movetimeMs: number }): Promise<string> {
+  async play(fen: string, opts: { movetimeMs: number; history: readonly string[] }): Promise<string> {
     const result = await this.engine.play(fen, opts);
-    this.calls.push({ op: "play", fen, ...opts, result });
+    this.calls.push({ op: "play", fen, movetimeMs: opts.movetimeMs, result });
     return result;
   }
 }
@@ -73,7 +74,7 @@ async function recordGame(n: number, analystEngine: Engine, weakEngine: Engine, 
     if (game.turn === userColour) {
       state = (await startUserTurn(state, engines)).state;
       steps.push({ type: "startUserTurn" });
-      const move = await student.play(game.fen, { movetimeMs: 10 });
+      const move = await student.play(game.fen, { movetimeMs: 10, history: game.previousFens() });
       state = (await userMove(state, move, engines)).state;
       steps.push({ type: "userMove", move });
     } else {
@@ -101,7 +102,7 @@ async function main() {
     const { recorded, lessons } = await recordGame(g, analyst, weak, student);
     const name = `game-${String(g + 1).padStart(2, "0")}.json`;
     writeFileSync(join(args.out, name), JSON.stringify(recorded) + "\n");
-    const summary = lessons.map((l) => `${l.feature}/${l.kind}/${l.status}`).join(", ");
+    const summary = lessons.map((l) => `${lessonFeatureLabel(l)}/${l.kind}/${l.status}`).join(", ");
     console.log(`${name}: ${recorded.steps.length} steps; lessons: ${summary || "none"}`);
   }
   await Promise.all([analyst.close(), weak.close(), student.close()]);

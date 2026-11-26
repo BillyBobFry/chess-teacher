@@ -7,6 +7,7 @@
  */
 
 import { Position, opposite, type Colour } from "./board.ts";
+import { DIAGNOSE_CONFIG, diagnose } from "./diagnose.ts";
 import type { Candidate, Engines } from "./engine.ts";
 import { FEATURES_BY_NAME, material, settledBalance, type Measurement } from "./features.ts";
 import { Game, STANDARD_START, fullmoveOf, isLegal, plyOf, sanOf, turnOf } from "./game.ts";
@@ -17,24 +18,26 @@ import {
   MISSED_CHANCE,
   consequenceLanded,
   describeConsequence,
-  detectMistake,
   lessonGap,
   scoreAfter,
+  type FeatureLesson,
   type Lesson,
   type LessonKind,
   type LessonStatus,
   type TeachingConfig,
 } from "./lessons.ts";
 import { chooseOpponentMove, type OpponentMode } from "./opponent.ts";
+import { awaitedHappened, chanceStillThere, describeAwaited, lessonFromDossier } from "./reveals.ts";
 import type { Detail, MoveRef } from "./text.ts";
-import { verifyLesson } from "./validate.ts";
 
 /**
  * 2: lessons hold their details and trigger as data, not English text.
  * 3: the evaluation after each move (`scores`), and whether the player resigned.
  * 4: lines of play left behind by going back past a revealed lesson (`line`, `branches`).
+ * 5: lessons from `diagnose` (claims, concepts and the event they await) beside the older
+ *    feature lessons, which say so in `source`.
  */
-export const SESSION_STATE_VERSION = 4;
+export const SESSION_STATE_VERSION = 5;
 
 /**
  * A line of play the game left behind: the player went back to before a lesson they had been
@@ -185,38 +188,52 @@ async function analysis(s: SessionState, game: Game, engines: Engines): Promise<
 
 // ------------------------------------------------------------------ turn flow
 
+/** Whether the player can still take a missed chance, judged from the engine's best line now. */
+function chanceStillOpen(lesson: Lesson, now: Candidate, fen: string, s: SessionState): boolean {
+  if (lesson.source === "diagnosis") return chanceStillThere(lesson, now.score);
+  // A missed mate has no feature to measure; startUserTurn leaves those to expire.
+  if (lesson.feature === MATE_FEATURE) return true;
+  const feat = FEATURES_BY_NAME[lesson.feature];
+  const line = new Game(fen);
+  for (const m of now.pv.slice(0, s.config.linePlies)) {
+    if (!isLegal(line.chess, m)) break;
+    line.push(m);
+  }
+  const nowBest = feat.measure(new Position(line.fen), s.userColour)[0];
+  return (
+    (nowBest - lesson.predicted) / feat.unit >= 0.5 * ((lesson.bestValue - lesson.predicted) / feat.unit)
+  );
+}
+
 /** Call when it's the user's turn. Checks whether missed chances have gone. */
 export async function startUserTurn(state: SessionState, engines: Engines): Promise<StepResult> {
   const s = clone(state);
   const game = gameOf(s);
   const events: GameEvent[] = [];
   const cands = await analysis(s, game, engines);
+  // One lesson at a time: a chance that went on the same move as another lesson was revealed
+  // (the opponent's reply often does both), or along with another chance, goes to the review.
+  let shown = s.lessons.some(
+    (l) => l.line === s.line && l.status === "triggered" && !l.deferred && l.resolvedPly === game.ply,
+  );
   for (const lesson of pending(s, MISSED_CHANCE)) {
     if (game.ply - lesson.ply > 2 * s.config.expiryMoves) {
       resolve(lesson, "expired", game);
       events.push(event("expired", lesson));
       continue;
     }
-    if (lesson.feature === "mate") continue;
-    const feat = FEATURES_BY_NAME[lesson.feature];
-    let stillThere = false;
-    if (cands.length) {
-      const line = new Game(game.fen);
-      for (const m of cands[0]!.pv.slice(0, s.config.linePlies)) {
-        if (!isLegal(line.chess, m)) break;
-        line.push(m);
-      }
-      const nowBest = feat.measure(new Position(line.fen), s.userColour)[0];
-      stillThere =
-        (nowBest - lesson.predicted) / feat.unit >= 0.5 * ((lesson.bestValue - lesson.predicted) / feat.unit);
+    if (lesson.source === "features" && lesson.feature === MATE_FEATURE) continue;
+    const now = cands[0];
+    if (now && chanceStillOpen(lesson, now, game.fen, s)) {
+      lesson.chanceMove = now.move;
+      continue;
     }
-    if (stillThere) {
-      lesson.chanceMove = cands[0]!.move;
-    } else {
-      resolve(lesson, "triggered", game);
-      lesson.trigger = { kind: "chance_gone" };
-      events.push(event("chanceGone", lesson));
-    }
+    resolve(lesson, "triggered", game);
+    lesson.trigger = { kind: "chance_gone" };
+    lesson.deferred = shown;
+    events.push(event("chanceGone", lesson));
+    if (!shown) sendWaitingToReview(s, game, events);
+    shown = true;
   }
   return { state: s, events };
 }
@@ -261,27 +278,33 @@ export async function userMove(state: SessionState, move: string, engines: Engin
     settledBalance(game.fen, s.userColour) < onBoard - 0.5
   ) {
     for (const older of pending(s, CONSEQUENCE)) {
-      if (older.feature === "material") resolve(older, "superseded", game);
+      if (older.source === "features" ? older.feature === "material" : older.awaits.kind === "material")
+        resolve(older, "superseded", game);
     }
   }
 
-  let lesson = detectMistake(s.lessons.length + 1, s.line, fenBefore, move, game, cands, after, s.config);
-  if (lesson && engines.classical && s.config.verifyStrategic !== false) {
-    const verdict = await verifyLesson(lesson, engines.classical);
-    if (verdict.reason !== "not a strategic feature") {
-      if (verdict.agrees) lesson.verification = verdict.reason;
-      else {
-        s.unverified = (s.unverified ?? 0) + 1;
-        lesson = null;
-      }
+  // The opponent's move before this one: taking back a piece they just took isn't a win.
+  const lastOpp = s.moves.length >= 2 ? s.moves[s.moves.length - 2] : undefined;
+  const previous =
+    lastOpp === undefined ? null : { fen: new Game(s.startFen, s.moves.slice(0, -2)).fen, move: lastOpp };
+  const dossier = await diagnose(engines.analyst, fenBefore, move, previous, DIAGNOSE_CONFIG, {
+    before: cands,
+    after,
+  });
+  if (dossier) {
+    const lesson = lessonFromDossier(
+      s.lessons.length + 1,
+      s.line,
+      dossier,
+      { best: cands[0]?.score ?? userScore, user: userScore },
+      s.config,
+    );
+    // Credit assignment: once a newer mistake waits for the same kind of event, we can no
+    // longer tell which move caused what, so the older lesson goes to the review.
+    for (const older of pending(s)) {
+      if (older.source === "diagnosis" && older.awaits.kind === lesson.awaits.kind)
+        resolve(older, "superseded", game);
     }
-  }
-  // Below the normal threshold, a strategic lesson is only trusted once the classical check agrees.
-  if (lesson && lesson.verification === undefined && lessonGap(lesson) < s.config.threshold) lesson = null;
-  if (lesson) {
-    // Credit assignment: once a newer mistake affects the same factor, we can no longer
-    // tell which move caused what, so the older lesson goes to the review.
-    for (const older of pending(s)) if (older.feature === lesson.feature) resolve(older, "superseded", game);
     s.lessons.push(lesson);
     events.push(event("created", lesson));
     if (s.config.easy && lesson.kind === CONSEQUENCE && s.config.levelUp) {
@@ -301,23 +324,28 @@ export async function opponentMove(
   if (game.turn === s.userColour) throw new Error("It is the user's turn.");
   const active = s.config.levelUp ? activeLesson(s) : null;
   const { move, mode } = await chooseOpponentMove(game, active, engines, s.config);
+  const fenBeforeReply = game.fen;
   game.push(move);
   s.moves.push(move);
   s.opponentModes.push(mode);
   // A game over needs no engine to score; otherwise the user's next turn analyses it.
   if (game.isGameOver()) recordScore(s, scoreAfter(game, [], s.userColour));
   s.analysis = null;
-  return { state: s, events: checkConsequences(s, game), move, mode };
+  return { state: s, events: checkConsequences(s, game, move, fenBeforeReply), move, mode };
 }
 
-function checkConsequences(s: SessionState, game: Game): GameEvent[] {
+const hasLanded = (lesson: Lesson, game: Game, last: string): boolean =>
+  lesson.source === "features" ? consequenceLanded(lesson, game) : awaitedHappened(lesson, game, last);
+
+/** Revealed after the opponent's `last` move (played from `fenBefore`). */
+function checkConsequences(s: SessionState, game: Game, last: string, fenBefore: string): GameEvent[] {
   const events: GameEvent[] = [];
   const landed: Lesson[] = [];
   const byRecency = [...pending(s, CONSEQUENCE)].sort((a, b) => b.ply - a.ply);
   for (const lesson of byRecency) {
     const since = game.ply - lesson.ply;
     if (since < 2) continue; // need at least the opponent's reply
-    if (consequenceLanded(lesson, game)) {
+    if (hasLanded(lesson, game, last)) {
       landed.push(lesson);
     } else if (since > 2 * s.config.expiryMoves) {
       resolve(lesson, "expired", game);
@@ -328,11 +356,27 @@ function checkConsequences(s: SessionState, game: Game): GameEvent[] {
   landed.sort((a, b) => lessonGap(b) - lessonGap(a));
   landed.forEach((lesson, i) => {
     resolve(lesson, "triggered", game);
-    lesson.trigger = describeConsequence(lesson, game);
+    lesson.trigger =
+      lesson.source === "features"
+        ? describeConsequence(lesson, game)
+        : describeAwaited(lesson, game, last, fenBefore);
     lesson.deferred = i > 0;
     events.push(event("triggered", lesson));
   });
+  if (landed.length) sendWaitingToReview(s, game, events);
   return events;
+}
+
+/**
+ * One lesson at a time (concept §4): once a lesson is shown, the opponent stops pursuing the
+ * mistakes still waiting to be punished, so the next lesson doesn't land straight after it.
+ * They go to the review as ones the player got away with.
+ */
+function sendWaitingToReview(s: SessionState, game: Game, events: GameEvent[]): void {
+  for (const lesson of pending(s, CONSEQUENCE)) {
+    resolve(lesson, "expired", game);
+    events.push(event("expired", lesson));
+  }
 }
 
 /** Game over: anything still pending becomes "you got away with it". */
@@ -488,23 +532,26 @@ export function playedLine(s: SessionState, lesson: Lesson, maxPlies = 16): stri
 
 // ------------------------------------------------------------------ saved games
 
+/**
+ * A lesson as versions 2 to 4 saved it: a feature lesson that didn't say so, and before
+ * version 4 had no line, because there was only one.
+ */
+type LessonV4 = Omit<FeatureLesson, "source" | "line"> & { line?: number };
+
 /** A lesson as version 1 saved it: details and trigger as English text. */
-type LessonV1 = Omit<Lesson, "baselineDetail" | "userDetail" | "bestDetail" | "trigger" | "line"> & {
+type LessonV1 = Omit<LessonV4, "baselineDetail" | "userDetail" | "bestDetail" | "trigger"> & {
   baselineDetail: string;
   userDetail: string;
   bestDetail: string;
   triggerText: string;
 };
 
-/** A lesson as version 3 and earlier saved it: no line, because there was only one. */
-type LessonV3 = Omit<Lesson, "line"> & { line?: number };
-
 /** A session as any version saved it. */
 export type SavedSessionState = Omit<
   SessionState,
   "lessons" | "scores" | "resigned" | "line" | "branches"
 > & {
-  lessons: (LessonV3 | LessonV1)[];
+  lessons: (Lesson | LessonV4 | LessonV1)[];
   scores?: (number | null)[];
   resigned?: boolean;
   line?: number;
@@ -517,12 +564,18 @@ export type SavedSessionState = Omit<
  * consequence's trigger can't always be rebuilt (the game may have been rewound past it),
  * so it keeps its saved text. Version 2 and earlier recorded no evaluations or resignations.
  * Version 3 and earlier kept no lines left behind: every lesson is on the one line there is.
+ * Version 4 and earlier had only feature lessons, which didn't say so.
  */
 export function upgradeSession(saved: SavedSessionState): SessionState {
   const line = saved.line ?? 0;
   const lessons = (
-    saved.version >= 2 ? (saved.lessons as LessonV3[]) : (saved.lessons as LessonV1[]).map(upgradedLesson)
-  ).map((l) => ({ ...l, line: l.line ?? line }));
+    saved.version >= 2
+      ? (saved.lessons as (Lesson | LessonV4)[])
+      : (saved.lessons as LessonV1[]).map(upgradedLesson)
+  ).map((l): Lesson => {
+    const lined = { ...l, line: l.line ?? line };
+    return "source" in lined ? lined : { ...lined, source: "features" };
+  });
   return {
     ...saved,
     version: SESSION_STATE_VERSION,
@@ -535,7 +588,7 @@ export function upgradeSession(saved: SavedSessionState): SessionState {
   };
 }
 
-function upgradedLesson(old: LessonV1): LessonV3 {
+function upgradedLesson(old: LessonV1): LessonV4 {
   const { triggerText, ...rest } = old;
   return {
     ...rest,
@@ -549,7 +602,7 @@ function upgradedLesson(old: LessonV1): LessonV3 {
   };
 }
 
-function upgradedDetails(l: LessonV1): Pick<Lesson, "baselineDetail" | "userDetail" | "bestDetail"> {
+function upgradedDetails(l: LessonV1): Pick<FeatureLesson, "baselineDetail" | "userDetail" | "bestDetail"> {
   if (l.feature === MATE_FEATURE) {
     return {
       baselineDetail: { kind: "none" },

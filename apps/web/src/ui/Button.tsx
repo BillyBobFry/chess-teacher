@@ -18,7 +18,8 @@ export const secondaryLook = [
   "data-hovered:border-fg-muted data-pressed:border-fg-muted data-pressed:bg-surface-muted",
 ];
 
-const button = tv({
+/** Shared with `Link`, which can look like a button. */
+export const button = tv({
   base: ["inline-flex items-center justify-center gap-2 text-center", ...pressable],
   variants: {
     // UX-46: every hover has a pressed state. React Aria reports no hover from touch (UX-23).

@@ -1,0 +1,17 @@
+{
+  "hanging": ["hanging_piece"],
+  "free_material": ["free_material"],
+  "forcing_moves": ["family:tactics"],
+  "develop": ["development"],
+  "king_safety": ["family:king"],
+  "centre": ["centre_control"],
+  "activity": ["family:pieces"],
+  "pawn_weaknesses": ["pawn_weakness"],
+  "target_weaknesses": ["pawn_weakness"],
+  "passed_pawns": ["passed_pawn"],
+  "outposts": ["key_square"],
+  "open_files": ["rook_activity"],
+  "king_activity": ["endgame_knowledge"],
+  "feature:mate": ["mate_threat"],
+  "feature:material": ["family:material"]
+}

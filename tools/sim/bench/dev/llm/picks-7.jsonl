@@ -1,0 +1,15 @@
+{"id":"b1400-4b1e4b","main":"free_material","also":["pawn_break"],"why":"Quietly preparing with d3 and a4 won a pawn on d5, whereas d4 opened the centre and allowed trades that threw the advantage away."}
+{"id":"b1400-7d2c94","main":"development","also":["pin","king_shelter"],"why":"Pushing f6 with all minor pieces at home weakened e6, where the pawn was pinned, instead of developing with Bf5."}
+{"id":"b1400-ad45a6","main":"missed_threat","also":["free_material","rook_activity"],"why":"Rxf7 grabbed the pawn with tempo, while Bxf7 ignored Black's Nf6 and Be2 plan that wins material."}
+{"id":"b1400-c92670","main":"greedy_grab","also":["missed_threat"],"why":"Taking the a2 pawn pulled the bishop away and ignored White's Re2 and Ne4+ threats."}
+{"id":"b1400-d94fa9","main":"tempo_attack","also":["lost_time"],"why":"b4 would hit the c5 bishop and gain time, whereas the queen check just wasted a move."}
+{"id":"b1400-091f0a","main":"development","also":["king_shelter","centre_control"],"why":"Ng6 develops a piece, but g6 pushed a kingside pawn with two knights and bishops still at home."}
+{"id":"b1400-2cbd42","main":"missed_threat","also":["free_material"],"why":"Nxf6+ was coming, and Qxf3 both dodged it and won a pawn, whereas Qg6 walked into Rg1."}
+{"id":"b1400-424b4a","main":"missed_threat","also":["king_in_centre"],"why":"White threatened Ngxf6+ and Nh5, and Nxd5 removed the dangerous knight, but Nb4 ignored it."}
+{"id":"b1400-801147","main":"free_material","also":["missed_threat"],"why":"The undefended c5 pawn could be won with Na3 and Nb5, and the check lost that chance while ignoring g5 ideas."}
+{"id":"b1400-8f2a58","main":"endgame_knowledge","also":["passed_pawn"],"why":"The king should go to h5 to hit the h6 knight and keep the passed pawns going, since the king is a strong active piece in the endgame."}
+{"id":"b1400-906d83","main":"tempo_attack","also":["development"],"why":"Bb4 put the bishop where a3 hits it with tempo, whereas Nc6 develops a piece and sidesteps the queen threat."}
+{"id":"b1400-a578a8","main":"missed_threat","also":["key_square"],"why":"Nxb6 and Qxb6 was threatened, while Nd4 attacked the queen and dealt with it."}
+{"id":"b1700-03f837","main":"missed_threat","also":["king_in_centre","development"],"why":"Bxf7+ followed by Ng5+ was threatened, and b5 ignored it, whereas Nf6 developed and covered f7."}
+{"id":"b1700-04555f","main":"removed_own_defender","also":["missed_threat","king_shelter"],"why":"The f7 pawn was defending the rook on e6, and f5 took it away so the rook was lost."}
+{"id":"b1700-095394","main":"fork","also":["king_in_centre","missed_threat"],"why":"Nc7+ forked king and rook on a8, so the rook needed to be moved or protected with Rb8 rather than Kd8."}

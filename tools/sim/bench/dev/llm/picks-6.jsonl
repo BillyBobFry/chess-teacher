@@ -1,0 +1,15 @@
+{"id":"b1400-20de77","main":"missed_threat","also":["opened_line","king_in_centre"],"why":"Black's Qb4+ and Qxe4 threat was ignored, and c4 opened the b1-e4 line against a pinned, undefended e4 pawn."}
+{"id":"b1400-2115e5","main":"removed_own_defender","also":["hanging_piece"],"why":"Bd3 took the bishop off f1, which was the only guard of g2, so the queen takes it."}
+{"id":"b1400-2905cf","main":"missed_threat","also":["count_attackers"],"why":"White's f4xe5 and Bxe6 threat was ignored; Bxb3 first removes the attacker."}
+{"id":"b1400-290c4a","main":"pawn_break","also":["king_in_centre","development"],"why":"d5 challenged the centre before the king was safe or pieces developed, letting exd5 open lines."}
+{"id":"b1400-7ed0ee","main":"mate_threat","also":["king_shelter","pin"],"why":"Qxg2# was threatened and h4 weakened the shelter instead of g3 covering g2."}
+{"id":"b1400-2edfa6","main":"mate_threat","also":["king_in_centre","pin"],"why":"The centre king faced Qb4+ with a mating net; cxd5 ignored it where Qd4+ forced a draw."}
+{"id":"b1400-b1850b","main":"mate_threat","also":["missed_threat"],"why":"Nf7# was threatened and a5 did nothing about it; Qh5 captures the attacking knight's support."}
+{"id":"b1400-11e19c","main":"greedy_grab","also":["missed_threat","pawn_break"],"why":"Grabbing c7 cost time and ignored the c4 break that attacks d5 and the black kingside play."}
+{"id":"b1400-1d756e","main":"endgame_knowledge","also":["passed_pawn","rook_activity"],"why":"In this rook ending the king went to g4 where it is checked, instead of staying behind the pawns to stop the passed pawns."}
+{"id":"b1400-22bbac","main":"free_material","also":["missed_threat"],"why":"Nxc7 simply won an undefended pawn while the knight on b5 was also under threat, but Qb3+ lost the tempo."}
+{"id":"b1400-4d1bfe","main":"missed_threat","also":["remove_the_guard","back_rank"],"why":"Black's Nxc3 would remove the defender of e5; Bxe4 first prevents it, and castling left a back-rank weakness."}
+{"id":"b1400-63d121","main":"missed_threat","also":["count_attackers"],"why":"Black's Nxc4 trade left e5 weak; Bb3 first keeps the bishop and wins e5."}
+{"id":"b1400-8831be","main":"missed_threat","also":["development","king_in_centre"],"why":"Bxa8 was threatened and Bb7 allowed a trade; Rd8 develops and brings the king toward safety."}
+{"id":"b1400-0d3f77","main":"bad_placement","also":["key_square","endgame_knowledge","passed_pawn"],"why":"Nh6+ put the knight on the rim, while Ne5+ keeps it central and blocks the b-pawn."}
+{"id":"b1400-3427bf","main":"bad_placement","also":["tempo_attack","rook_activity"],"why":"Qc7 puts the queen where a rook hits it with tempo; Bd4 keeps pieces coordinated."}

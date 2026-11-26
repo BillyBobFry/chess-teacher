@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "stockfish": "node scripts/copy-stockfish.mjs",
-    "dev": "node scripts/copy-stockfish.mjs && vite",
-    "build": "node scripts/copy-stockfish.mjs && vite build",
+    "dev": "node scripts/copy-stockfish.mjs && node scripts/fetch-maia.mjs && vite",
+    "build": "node scripts/copy-stockfish.mjs && node scripts/fetch-maia.mjs && vite build",
     "preview": "vite preview",
     "typecheck": "pnpm i18n && tsc --noEmit",
     "smoke": "tsx scripts/smoke.ts",
@@ -20,6 +20,7 @@
     "@inlang/paraglide-js-react": "1.0.4",
     "better-auth": "1.7.27",
     "chess.js": "1.4.0",
+    "onnxruntime-web": "1.31.1",
     "react": "19.3.1",
     "react-aria-components": "1.22.1",
     "react-chessboard": "5.12.4",

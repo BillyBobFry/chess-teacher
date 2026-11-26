@@ -1,0 +1,15 @@
+{"id":"b1100-01a78b","main":"missed_threat","also":["pin","false_defender"],"why":"Kf5 ignored Rf3+ and left the bishop on f2 pinned and attacked twice."}
+{"id":"b1100-032f52","main":"removed_own_defender","also":["missed_threat","trade_decisions"],"why":"Qc6 offered a queen trade that removed the d7 queen, the only defender of d6."}
+{"id":"b1100-0400cd","main":"missed_threat","also":["pin","free_material"],"why":"Bd6 ignored Bxf6, which exploits the pinned defender of e4, and missed taking on d5."}
+{"id":"b1100-06b857","main":"count_attackers","also":["tempo_attack","pawn_weakness"],"why":"c5 pushed a pawn to a square attacked twice and defended once, and h6 gains time against Bg5."}
+{"id":"b1100-22f939","main":"back_rank","also":["missed_threat","greedy_grab"],"why":"Grabbing b2 ignored Qh7+ and Qh8# against a king with no flight square."}
+{"id":"b1100-005868","main":"removed_own_defender","also":["count_attackers"],"why":"Qxd7 pulled the queen off e7, leaving the knight on e5 attacked twice and defended once; Kxd7 kept it."}
+{"id":"b1100-361561","main":"hanging_piece","also":["missed_threat","development"],"why":"Bc5 ignored that e5 was undefended against Nxe5; Nc6 defends it while developing."}
+{"id":"b1100-0db440","main":"trade_decisions","also":["bad_placement"],"why":"Bxf3 gave up the bishop pair and doubled nothing for it; retreating to h5 kept the bishop."}
+{"id":"b1100-4d9838","main":"tempo_attack","also":["bad_placement","lost_time"],"why":"Rf4 put the rook where Bg3 hits it with gain of tempo, instead of a calm useful move like b6."}
+{"id":"b1100-57feb9","main":"removed_own_defender","also":["tempo_attack","missed_threat"],"why":"Qf2 walked into Ng4 with tempo and left b2 undefended after the bishop on c1 was tied up."}
+{"id":"b1100-9a716b","main":"king_in_centre","also":["development","missed_threat"],"why":"Bb5 left the king in the centre with lines opening, allowing checks that win the rook; Nc3 develops."}
+{"id":"b1100-a49ac3","main":"missed_threat","also":["bad_placement","pawn_break"],"why":"Na5 ignored the b5 break; a5 stops it and keeps the knight off the rim."}
+{"id":"b1100-c79b64","main":"centre_control","also":["missed_threat","key_square"],"why":"Castling ignored the d5 push; Nd4 controls the centre and hits the bishop on f5."}
+{"id":"b1400-1b593d","main":"trade_decisions","also":["missed_threat"],"why":"Bf4 avoided the right trade; Bxf6 removes the attacker and the fxg5 threat."}
+{"id":"b1400-29522c","main":"count_attackers","also":["centre_control","development"],"why":"d4 pushed a pawn to a square attacked three times and defended twice; d3 supports the centre safely."}

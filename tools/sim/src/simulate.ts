@@ -23,12 +23,20 @@ import {
   startUserTurn,
   userMove,
   type Engines,
-  type PrincipleId,
+  isPrincipleId,
   type SessionState,
 } from "@chess-teacher/core";
 import { NodeUciEngine, findStockfish } from "@chess-teacher/engine/node";
 import { createRequire } from "node:module";
-import { PRINCIPLES, factsText, moveLabel, templateExplanation, triggerText } from "./prototype-text.ts";
+import {
+  PRINCIPLES,
+  factsText,
+  lessonFeatureLabel,
+  lessonIdeaLabel,
+  moveLabel,
+  templateExplanation,
+  triggerText,
+} from "./prototype-text.ts";
 
 const { values: args } = parseArgs({
   options: {
@@ -51,7 +59,8 @@ interface LessonRow {
   colour: string;
   kind: string;
   feature: string;
-  principle: PrincipleId;
+  /** A principle id, or a diagnosed lesson's concept. */
+  principle: string;
   status: string;
   deferred: boolean;
   gapCp: number;
@@ -89,7 +98,10 @@ async function playGame(
     if (game.turn === userColour) {
       const t = performance.now();
       state = (await startUserTurn(state, engines)).state;
-      const move = await student.play(game.fen, { movetimeMs: Number(args["student-movetime"]) });
+      const move = await student.play(game.fen, {
+        movetimeMs: Number(args["student-movetime"]),
+        history: game.previousFens(),
+      });
       const t2 = performance.now();
       state = (await userMove(state, move, engines)).state;
       userTime += t2 - t + (performance.now() - t2);
@@ -111,8 +123,8 @@ async function playGame(
       move: moveLabel(lessonMove(l)),
       colour: userColour === "w" ? "white" : "black",
       kind: l.kind,
-      feature: l.feature,
-      principle: l.principle,
+      feature: lessonFeatureLabel(l),
+      principle: lessonIdeaLabel(l),
       status: l.status,
       deferred: l.deferred,
       gapCp: lessonGap(l),
@@ -150,7 +162,9 @@ function summarise(games: GameRow[]) {
     consequenceStatus: count(cons.map((l) => l.status)),
     missedStatus: count(lessons.filter((l) => l.kind === MISSED_CHANCE).map((l) => l.status)),
     features: count(lessons.map((l) => l.feature)),
-    principles: count(lessons.map((l) => PRINCIPLES[l.principle].title)),
+    principles: count(
+      lessons.map((l) => (isPrincipleId(l.principle) ? PRINCIPLES[l.principle].title : l.principle)),
+    ),
   };
 }
 

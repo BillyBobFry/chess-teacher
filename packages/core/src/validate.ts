@@ -9,7 +9,7 @@
 import { Position, VALUES, type Colour } from "./board.ts";
 import type { ClassicalEval, EvalTrace } from "./engine.ts";
 import { Game } from "./game.ts";
-import type { Lesson, LessonFeature } from "./lessons.ts";
+import type { FeatureLesson, LessonFeature } from "./lessons.ts";
 
 /** Which classical-evaluation terms correspond to each strategic feature. */
 export const FEATURE_TERMS: Partial<Record<LessonFeature, string[]>> = {
@@ -148,7 +148,7 @@ export function lineEndFen(fenBefore: string, line: readonly string[]): string {
 /** Ask the classical engine whether a strategic lesson's feature really explains the gap.
  * Material and checkmate lessons need no second opinion. */
 export async function verifyLesson(
-  lesson: Lesson,
+  lesson: FeatureLesson,
   classical: ClassicalEval,
   opts: VerdictOptions = DEFAULT_VERDICT_OPTIONS,
 ): Promise<ClassicalVerdict> {

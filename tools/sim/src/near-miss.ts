@@ -40,11 +40,11 @@ import {
   verifyLesson,
   type ClassicalVerdict,
   type Engines,
-  type Lesson,
+  type FeatureLesson,
   type SessionState,
 } from "@chess-teacher/core";
 import { NodeUciEngine, findStockfish } from "@chess-teacher/engine/node";
-import { detailText, moveLabel, templateExplanation } from "./prototype-text.ts";
+import { detailText, lessonFeatureLabel, moveLabel, templateExplanation } from "./prototype-text.ts";
 
 const { values: args } = parseArgs({
   options: {
@@ -62,7 +62,7 @@ const LOW = Number(args.low);
 
 interface NearMiss {
   game: number;
-  lesson: Lesson;
+  lesson: FeatureLesson;
   verdict: ClassicalVerdict;
   /** What the app actually taught for the same move, if anything. */
   taughtInstead: string | null;
@@ -73,12 +73,12 @@ type TaughtCategory =
 
 interface Taught {
   game: number;
-  lesson: Lesson;
+  lesson: FeatureLesson;
   category: TaughtCategory;
 }
 
 /** Material lessons: did the user lose their own material, leave a free capture, or miss a tactic? */
-function categorise(l: Lesson): TaughtCategory {
+function categorise(l: FeatureLesson): TaughtCategory {
   if (l.feature !== "material" && l.feature !== "mate") return "strategy";
   if (l.feature === "mate") return "tactics: blunder";
   const pos = new Position(l.fenBefore);
@@ -137,7 +137,7 @@ async function main() {
       state = (await startUserTurn(state, engines)).state;
       const fenBefore = game.fen;
       const cands = state.analysis?.fen === fenBefore ? state.analysis.candidates : [];
-      const move = await student.play(fenBefore, { movetimeMs: 10 });
+      const move = await student.play(fenBefore, { movetimeMs: 10, history: game.previousFens() });
       const before = state.lessons.length;
       state = (await userMove(state, move, engines)).state;
       userMoves += 1;
@@ -164,13 +164,15 @@ async function main() {
           game: g + 1,
           lesson: probe,
           verdict,
-          taughtInstead: instead ? `${instead.feature} (${instead.kind})` : null,
+          taughtInstead: instead ? `${lessonFeatureLabel(instead)} (${instead.kind})` : null,
         });
       }
     }
     state = finish(state);
     strictUnverified += state.unverified ?? 0;
-    for (const lesson of state.lessons) taught.push({ game: g + 1, lesson, category: categorise(lesson) });
+    // This report is about the feature lessons; diagnosed lessons are measured by the benchmark.
+    for (const lesson of state.lessons)
+      if (lesson.source === "features") taught.push({ game: g + 1, lesson, category: categorise(lesson) });
     console.log(
       `game ${g + 1}/${args.games}: ${state.lessons.length} lessons taught, ` +
         `${nearMisses.filter((n) => n.game === g + 1).length} near misses`,

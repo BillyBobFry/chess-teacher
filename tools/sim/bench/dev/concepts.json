@@ -1,0 +1,1811 @@
+{
+ "b1100-01a78b": {
+  "agreed": [
+   "count_attackers",
+   "skewer"
+  ],
+  "families": [
+   "tactics",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-032f52": {
+  "agreed": [
+   "opened_line",
+   "pawn_weakness"
+  ],
+  "families": [
+   "tactics",
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-0400cd": {
+  "agreed": [
+   "free_material"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-06b857": {
+  "agreed": [
+   "hanging_piece",
+   "development"
+  ],
+  "families": [
+   "material",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-22f939": {
+  "agreed": [
+   "mate_threat"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-005868": {
+  "agreed": [
+   "removed_own_defender",
+   "count_attackers"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-361561": {
+  "agreed": [
+   "hanging_piece",
+   "missed_threat"
+  ],
+  "families": [
+   "material",
+   "threats"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-0db440": {
+  "agreed": [
+   "king_shelter",
+   "king_in_centre"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-4d9838": {
+  "agreed": [
+   "lost_time",
+   "passed_pawn"
+  ],
+  "families": [
+   "tempo",
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-57feb9": {
+  "agreed": [
+   "tempo_attack",
+   "fork"
+  ],
+  "families": [
+   "tempo",
+   "tactics"
+  ],
+  "teachable_votes": 2
+ },
+ "b1100-9a716b": {
+  "agreed": [
+   "missed_threat"
+  ],
+  "families": [
+   "threats",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-a49ac3": {
+  "agreed": [
+   "trapped_piece",
+   "bad_placement",
+   "lost_time"
+  ],
+  "families": [
+   "tactics",
+   "pieces",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-00cfda": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-0771e0": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-0aaf3d": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-0c96e8": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-0e0230": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-0e597e": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-c79b64": {
+  "agreed": [
+   "fork",
+   "attack_the_king"
+  ],
+  "families": [
+   "tactics",
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-1b593d": {
+  "agreed": [
+   "pin",
+   "in_between_move"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-0e1e36": {
+  "agreed": [
+   "bad_placement"
+  ],
+  "families": [
+   "pieces"
+  ],
+  "teachable_votes": 0
+ },
+ "b1700-14cb28": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-4d2d05": {
+  "agreed": [
+   "tempo_attack"
+  ],
+  "families": [
+   "tempo"
+  ],
+  "teachable_votes": 0
+ },
+ "b1700-a6e0a7": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-ae8f01": {
+  "agreed": [
+   "pawn_break"
+  ],
+  "families": [
+   "pawns"
+  ],
+  "teachable_votes": 0
+ },
+ "b1700-d16fc6": {
+  "agreed": [
+   "attack_the_king"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 0
+ },
+ "b1700-f9c83e": {
+  "agreed": [
+   "development"
+  ],
+  "families": [
+   "tempo"
+  ],
+  "teachable_votes": 0
+ },
+ "b1700-057a91": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-0aad3f": {
+  "agreed": [
+   "pawn_break"
+  ],
+  "families": [
+   "pawns"
+  ],
+  "teachable_votes": 0
+ },
+ "b1700-0d8a1d": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-18920d": {
+  "agreed": [
+   "tempo_attack"
+  ],
+  "families": [
+   "tempo"
+  ],
+  "teachable_votes": 0
+ },
+ "b1700-20cacc": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-2a9b48": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-a64aa0": {
+  "agreed": [
+   "bad_placement",
+   "key_square",
+   "lost_time"
+  ],
+  "families": [
+   "pieces",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-bcc335": {
+  "agreed": [
+   "opened_line"
+  ],
+  "families": [
+   "tactics",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-29522c": {
+  "agreed": [
+   "count_attackers"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-33f9de": {
+  "agreed": [
+   "free_material",
+   "false_defender"
+  ],
+  "families": [
+   "material",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-38a4a2": {
+  "agreed": [
+   "fork",
+   "missed_threat"
+  ],
+  "families": [
+   "tactics",
+   "threats"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-1a4666": {
+  "agreed": [
+   "removed_own_defender",
+   "mate_threat"
+  ],
+  "families": [
+   "material",
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-026910": {
+  "agreed": [
+   "free_material",
+   "fork"
+  ],
+  "families": [
+   "material",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-3630a6": {
+  "agreed": [
+   "trade_decisions",
+   "endgame_knowledge",
+   "passed_pawn"
+  ],
+  "families": [
+   "trades",
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-2372fb": {
+  "agreed": [
+   "missed_threat",
+   "bad_placement",
+   "key_square"
+  ],
+  "families": [
+   "threats",
+   "pieces"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-2db1e6": {
+  "agreed": [
+   "fork",
+   "hanging_piece",
+   "tempo_attack"
+  ],
+  "families": [
+   "tactics",
+   "material",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-49b94f": {
+  "agreed": [
+   "free_material",
+   "count_attackers"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-4a45bd": {
+  "agreed": [
+   "opened_line",
+   "king_in_centre"
+  ],
+  "families": [
+   "tactics",
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-63f6b9": {
+  "agreed": [
+   "rook_activity",
+   "hanging_piece"
+  ],
+  "families": [
+   "pieces",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-04064d": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-057209": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-0e1ce0": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-0f9a34": {
+  "agreed": [
+   "false_defender",
+   "hanging_piece"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 0
+ },
+ "b1400-1097db": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-145e78": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-7b92fd": {
+  "agreed": [
+   "perpetual_check",
+   "escape_square"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-01def9": {
+  "agreed": [
+   "pin",
+   "free_material"
+  ],
+  "families": [
+   "tactics",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-0b76dd": {
+  "agreed": [
+   "opened_line",
+   "hanging_piece"
+  ],
+  "families": [
+   "tactics",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-138f78": {
+  "agreed": [
+   "count_attackers"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-15365f": {
+  "agreed": [
+   "pin",
+   "key_square"
+  ],
+  "families": [
+   "tactics",
+   "pieces"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-4fc47a": {
+  "agreed": [
+   "stalemate",
+   "endgame_knowledge"
+  ],
+  "families": [
+   "king",
+   "trades"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-0bb611": {
+  "agreed": [
+   "tempo_attack"
+  ],
+  "families": [
+   "tempo"
+  ],
+  "teachable_votes": 1
+ },
+ "b1700-0c6c6d": {
+  "agreed": [
+   "tempo_attack",
+   "free_material"
+  ],
+  "families": [
+   "tempo",
+   "material"
+  ],
+  "teachable_votes": 2
+ },
+ "b1700-03dccc": {
+  "agreed": [
+   "greedy_grab"
+  ],
+  "families": [
+   "material",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-07c844": {
+  "agreed": [
+   "pawn_break",
+   "development"
+  ],
+  "families": [
+   "pawns",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-0eccf8": {
+  "agreed": [
+   "count_attackers",
+   "remove_the_guard"
+  ],
+  "families": [
+   "material",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-2ae5dd": {
+  "agreed": [
+   "passed_pawn"
+  ],
+  "families": [
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-4a71c7": {
+  "agreed": [
+   "rook_activity",
+   "lost_time"
+  ],
+  "families": [
+   "pieces",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-118d96": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-1419d3": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-14682b": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-1a8a40": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-1a9f48": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-24cea3": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1700-4dd027": {
+  "agreed": [
+   "back_rank",
+   "passed_pawn"
+  ],
+  "families": [
+   "king",
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-0d8ebe": {
+  "agreed": [
+   "free_material",
+   "king_in_centre"
+  ],
+  "families": [
+   "material",
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-104406": {
+  "agreed": [
+   "opened_line"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-18efe6": {
+  "agreed": [
+   "removed_own_defender",
+   "pin"
+  ],
+  "families": [
+   "material",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-1a6e6f": {
+  "agreed": [
+   "tempo_attack",
+   "back_rank",
+   "passed_pawn"
+  ],
+  "families": [
+   "tempo",
+   "king",
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-1ae735": {
+  "agreed": [
+   "false_defender",
+   "remove_the_guard"
+  ],
+  "families": [
+   "material",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-1b93b5": {
+  "agreed": [
+   "rook_activity"
+  ],
+  "families": [
+   "pieces"
+  ],
+  "teachable_votes": 2
+ },
+ "b1100-31dd85": {
+  "agreed": [
+   "fork",
+   "trapped_piece"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-3ab80c": {
+  "agreed": [
+   "missed_threat",
+   "removed_own_defender"
+  ],
+  "families": [
+   "threats",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-3b2e71": {
+  "agreed": [
+   "pin",
+   "hanging_piece"
+  ],
+  "families": [
+   "tactics",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-2925f3": {
+  "agreed": [
+   "missed_threat",
+   "escape_square",
+   "mate_threat"
+  ],
+  "families": [
+   "threats",
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-b6a4d7": {
+  "agreed": [
+   "opened_line",
+   "mate_threat",
+   "missed_threat"
+  ],
+  "families": [
+   "tactics",
+   "king",
+   "threats"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-6e0af6": {
+  "agreed": [
+   "remove_the_guard",
+   "mate_threat"
+  ],
+  "families": [
+   "tactics",
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-061ea1": {
+  "agreed": [
+   "tempo_attack"
+  ],
+  "families": [
+   "tempo",
+   "king"
+  ],
+  "teachable_votes": 0
+ },
+ "b1100-1ad259": {
+  "agreed": [
+   "trade_decisions"
+  ],
+  "families": [
+   "trades"
+  ],
+  "teachable_votes": 2
+ },
+ "b1100-2d1b2f": {
+  "agreed": [
+   "bad_placement",
+   "development"
+  ],
+  "families": [
+   "pieces",
+   "tempo",
+   "tactics"
+  ],
+  "teachable_votes": 2
+ },
+ "b1100-898f32": {
+  "agreed": [
+   "rook_activity",
+   "count_attackers"
+  ],
+  "families": [
+   "pieces",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-a4f07e": {
+  "agreed": [
+   "tempo_attack"
+  ],
+  "families": [
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-a8040c": {
+  "agreed": [
+   "centre_control",
+   "tempo_attack"
+  ],
+  "families": [
+   "pawns",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-2b9912": {
+  "agreed": [
+   "opened_line",
+   "attack_the_king",
+   "pin",
+   "key_square"
+  ],
+  "families": [
+   "tactics",
+   "king",
+   "pieces"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-b04c64": {
+  "agreed": [
+   "king_in_centre",
+   "attack_the_king"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-ba67ec": {
+  "agreed": [
+   "opened_line",
+   "tempo_attack",
+   "rook_activity"
+  ],
+  "families": [
+   "tactics",
+   "tempo",
+   "pieces"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-ce0c20": {
+  "agreed": [
+   "lost_time",
+   "bad_placement"
+  ],
+  "families": [
+   "tempo",
+   "pieces"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-ebbf1f": {
+  "agreed": [
+   "tempo_attack",
+   "king_in_centre",
+   "trade_decisions"
+  ],
+  "families": [
+   "tempo",
+   "king",
+   "trades"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-029cbf": {
+  "agreed": [
+   "development",
+   "trade_decisions"
+  ],
+  "families": [
+   "pieces",
+   "tempo",
+   "trades"
+  ],
+  "teachable_votes": 1
+ },
+ "b1100-04cdfa": {
+  "agreed": [
+   "in_between_move",
+   "free_material"
+  ],
+  "families": [
+   "tactics",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-0d88a4": {
+  "agreed": [
+   "removed_own_defender"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-0e3f06": {
+  "agreed": [
+   "development",
+   "free_material",
+   "king_shelter"
+  ],
+  "families": [
+   "tempo",
+   "material",
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-1c9697": {
+  "agreed": [
+   "centre_control",
+   "remove_the_guard"
+  ],
+  "families": [
+   "pawns",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-1fa23b": {
+  "agreed": [
+   "hanging_piece"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-367c40": {
+  "agreed": [
+   "bad_placement",
+   "key_square",
+   "pawn_weakness"
+  ],
+  "families": [
+   "pieces",
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-0b03f8": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-2247fd": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-36ab1e": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-6cf9f3": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-aaf187": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-0366bd": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-078353": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-0dc851": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-0e26b3": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-12ca8d": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-1bc26f": {
+  "agreed": [
+   "trade_decisions"
+  ],
+  "families": [
+   "trades"
+  ],
+  "teachable_votes": 0
+ },
+ "b1100-26d003": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1100-37cab7": {
+  "agreed": [
+   "hanging_piece",
+   "pin"
+  ],
+  "families": [
+   "material",
+   "tactics"
+  ],
+  "teachable_votes": 0
+ },
+ "b1100-57c420": {
+  "agreed": [
+   "trapped_piece",
+   "trade_decisions"
+  ],
+  "families": [
+   "tactics",
+   "trades"
+  ],
+  "teachable_votes": 3
+ },
+ "b1100-79c328": {
+  "agreed": [
+   "endgame_knowledge"
+  ],
+  "families": [
+   "trades"
+  ],
+  "teachable_votes": 2
+ },
+ "b1400-0375f8": {
+  "agreed": [
+   "hanging_piece"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-05dfa9": {
+  "agreed": [
+   "mate_threat",
+   "escape_square"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-0a8d92": {
+  "agreed": [
+   "missed_threat"
+  ],
+  "families": [
+   "threats"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-0fef81": {
+  "agreed": [
+   "count_attackers",
+   "missed_threat"
+  ],
+  "families": [
+   "material",
+   "threats"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-174281": {
+  "agreed": [
+   "pin",
+   "opened_line"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-20de77": {
+  "agreed": [
+   "king_in_centre",
+   "hanging_piece"
+  ],
+  "families": [
+   "king",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-2115e5": {
+  "agreed": [
+   "removed_own_defender"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-2905cf": {
+  "agreed": [
+   "missed_threat"
+  ],
+  "families": [
+   "threats"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-290c4a": {
+  "agreed": [
+   "king_in_centre",
+   "missed_threat",
+   "development"
+  ],
+  "families": [
+   "king",
+   "threats",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-7ed0ee": {
+  "agreed": [
+   "mate_threat"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-2edfa6": {
+  "agreed": [
+   "discovered_attack",
+   "king_in_centre"
+  ],
+  "families": [
+   "tactics",
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-b1850b": {
+  "agreed": [
+   "mate_threat"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-11e19c": {
+  "agreed": [
+   "tempo_attack",
+   "in_between_move"
+  ],
+  "families": [
+   "tempo",
+   "tactics"
+  ],
+  "teachable_votes": 2
+ },
+ "b1400-1d756e": {
+  "agreed": [
+   "endgame_knowledge",
+   "tempo_attack"
+  ],
+  "families": [
+   "trades",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-22bbac": {
+  "agreed": [
+   "fork"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-4d1bfe": {
+  "agreed": [
+   "remove_the_guard",
+   "free_material"
+  ],
+  "families": [
+   "tactics",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-63d121": {
+  "agreed": [
+   "missed_threat"
+  ],
+  "families": [
+   "threats"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-8831be": {
+  "agreed": [
+   "pin",
+   "rook_activity"
+  ],
+  "families": [
+   "tactics",
+   "pieces"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-0d3f77": {
+  "agreed": [
+   "fork",
+   "bad_placement",
+   "hanging_piece"
+  ],
+  "families": [
+   "tactics",
+   "pieces",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-3427bf": {
+  "agreed": [
+   "trapped_piece",
+   "lost_time"
+  ],
+  "families": [
+   "tactics",
+   "tempo"
+  ],
+  "teachable_votes": 2
+ },
+ "b1400-4b1e4b": {
+  "agreed": [
+   "trapped_piece",
+   "bad_placement",
+   "tempo_attack",
+   "pawn_weakness"
+  ],
+  "families": [
+   "tactics",
+   "pieces",
+   "tempo",
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-7d2c94": {
+  "agreed": [
+   "king_shelter",
+   "development"
+  ],
+  "families": [
+   "king",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-ad45a6": {
+  "agreed": [
+   "rook_activity",
+   "trade_decisions"
+  ],
+  "families": [
+   "pieces",
+   "trades"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-c92670": {
+  "agreed": [
+   "trapped_piece",
+   "pin",
+   "greedy_grab"
+  ],
+  "families": [
+   "tactics",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-d94fa9": {
+  "agreed": [
+   "lost_time",
+   "tempo_attack"
+  ],
+  "families": [
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-091f0a": {
+  "agreed": [
+   "king_shelter",
+   "pin",
+   "development"
+  ],
+  "families": [
+   "king",
+   "tactics",
+   "tempo"
+  ],
+  "teachable_votes": 1
+ },
+ "b1400-2cbd42": {
+  "agreed": [
+   "trade_decisions",
+   "count_attackers"
+  ],
+  "families": [
+   "material",
+   "trades"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-424b4a": {
+  "agreed": [
+   "missed_threat",
+   "king_in_centre",
+   "count_attackers"
+  ],
+  "families": [
+   "threats",
+   "king",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-801147": {
+  "agreed": [
+   "bad_placement",
+   "missed_threat"
+  ],
+  "families": [
+   "pieces",
+   "threats"
+  ],
+  "teachable_votes": 2
+ },
+ "b1400-8f2a58": {
+  "agreed": [
+   "fork"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-011892": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-0dc107": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-108673": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-1cef87": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-319500": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-4f692f": {
+  "agreed": [
+   "pin"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 0
+ },
+ "b1400-07d456": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-0dd09b": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-10c4b9": {
+  "agreed": [
+   "in_between_move"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 0
+ },
+ "b1400-111d49": {
+  "agreed": [
+   "bad_placement",
+   "development"
+  ],
+  "families": [
+   "pieces",
+   "tempo"
+  ],
+  "teachable_votes": 0
+ },
+ "b1400-14dc9c": {
+  "agreed": [],
+  "families": [],
+  "teachable_votes": 0
+ },
+ "b1400-1b61d0": {
+  "agreed": [
+   "king_in_centre"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 0
+ },
+ "b1400-1ebf52": {
+  "agreed": [
+   "rook_activity"
+  ],
+  "families": [
+   "pieces"
+  ],
+  "teachable_votes": 0
+ },
+ "b1400-906d83": {
+  "agreed": [
+   "development",
+   "lost_time"
+  ],
+  "families": [
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1400-a578a8": {
+  "agreed": [
+   "tempo_attack"
+  ],
+  "families": [
+   "tempo",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-03f837": {
+  "agreed": [
+   "missed_threat",
+   "hanging_piece",
+   "discovered_attack"
+  ],
+  "families": [
+   "threats",
+   "material",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-04555f": {
+  "agreed": [
+   "removed_own_defender",
+   "pin"
+  ],
+  "families": [
+   "material",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-095394": {
+  "agreed": [
+   "fork",
+   "king_in_centre"
+  ],
+  "families": [
+   "tactics",
+   "king"
+  ],
+  "teachable_votes": 2
+ },
+ "b1700-0c38b4": {
+  "agreed": [
+   "pin",
+   "in_between_move",
+   "opened_line"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-14fa76": {
+  "agreed": [
+   "false_defender",
+   "back_rank",
+   "free_material"
+  ],
+  "families": [
+   "material",
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-176a48": {
+  "agreed": [
+   "fork",
+   "missed_threat"
+  ],
+  "families": [
+   "tactics",
+   "threats"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-1c734d": {
+  "agreed": [
+   "pin",
+   "king_shelter"
+  ],
+  "families": [
+   "tactics",
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-1cce46": {
+  "agreed": [
+   "pawn_break",
+   "centre_control",
+   "attack_the_king"
+  ],
+  "families": [
+   "pawns",
+   "king"
+  ],
+  "teachable_votes": 2
+ },
+ "b1700-1d3a03": {
+  "agreed": [
+   "endgame_knowledge",
+   "hanging_piece"
+  ],
+  "families": [
+   "trades",
+   "material"
+  ],
+  "teachable_votes": 0
+ },
+ "b1700-67e0d8": {
+  "agreed": [
+   "mate_threat"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-dcb648": {
+  "agreed": [
+   "mate_threat",
+   "king_shelter"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-693036": {
+  "agreed": [
+   "stalemate",
+   "endgame_knowledge",
+   "passed_pawn"
+  ],
+  "families": [
+   "king",
+   "trades",
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-4a447c": {
+  "agreed": [
+   "pin",
+   "development"
+  ],
+  "families": [
+   "tactics",
+   "tempo"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-6da361": {
+  "agreed": [
+   "tempo_attack",
+   "pawn_break"
+  ],
+  "families": [
+   "tempo",
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-6ef3cb": {
+  "agreed": [
+   "hanging_piece",
+   "in_between_move"
+  ],
+  "families": [
+   "material",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-a2d971": {
+  "agreed": [
+   "free_material",
+   "fork",
+   "in_between_move"
+  ],
+  "families": [
+   "material",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-b36202": {
+  "agreed": [
+   "lost_time",
+   "fork"
+  ],
+  "families": [
+   "tempo",
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-b4d137": {
+  "agreed": [
+   "attack_the_king",
+   "king_shelter",
+   "mate_threat"
+  ],
+  "families": [
+   "king"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-0d26dd": {
+  "agreed": [
+   "king_in_centre",
+   "trapped_piece"
+  ],
+  "families": [
+   "king",
+   "tactics"
+  ],
+  "teachable_votes": 2
+ },
+ "b1700-5aef80": {
+  "agreed": [
+   "in_between_move"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-77ff89": {
+  "agreed": [
+   "key_square"
+  ],
+  "families": [
+   "pieces"
+  ],
+  "teachable_votes": 1
+ },
+ "b1700-a0b25f": {
+  "agreed": [
+   "bad_placement",
+   "hanging_piece"
+  ],
+  "families": [
+   "pieces",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-f12f91": {
+  "agreed": [
+   "discovered_attack",
+   "fork",
+   "in_between_move"
+  ],
+  "families": [
+   "tactics"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-05e13d": {
+  "agreed": [
+   "passed_pawn"
+  ],
+  "families": [
+   "pawns"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-1a1a84": {
+  "agreed": [
+   "free_material"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-3cb1de": {
+  "agreed": [
+   "rook_activity",
+   "free_material"
+  ],
+  "families": [
+   "pieces",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-4aafc5": {
+  "agreed": [
+   "fork",
+   "free_material"
+  ],
+  "families": [
+   "tactics",
+   "material"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-4f1c94": {
+  "agreed": [
+   "hanging_piece",
+   "missed_threat",
+   "rook_activity"
+  ],
+  "families": [
+   "material",
+   "threats",
+   "pieces"
+  ],
+  "teachable_votes": 3
+ },
+ "b1700-5eed49": {
+  "agreed": [
+   "trade_decisions",
+   "lost_time"
+  ],
+  "families": [
+   "trades",
+   "tempo"
+  ],
+  "teachable_votes": 2
+ },
+ "b1700-6e8d91": {
+  "agreed": [
+   "false_defender",
+   "hanging_piece"
+  ],
+  "families": [
+   "material"
+  ],
+  "teachable_votes": 3
+ }
+}

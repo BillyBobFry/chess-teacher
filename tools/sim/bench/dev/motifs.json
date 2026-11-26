@@ -1,0 +1,153 @@
+{
+ "b1100-032f52": [
+  "capturingDefender"
+ ],
+ "b1100-22f939": [
+  "mateIn2",
+  "mate",
+  "kingsideAttack"
+ ],
+ "b1400-38a4a2": [
+  "fork"
+ ],
+ "b1400-1a4666": [
+  "mateIn1",
+  "mate",
+  "kingsideAttack"
+ ],
+ "b1400-026910": [
+  "intermezzo"
+ ],
+ "b1400-3630a6": [
+  "discoveredAttack"
+ ],
+ "b1700-01def9": [
+  "pin"
+ ],
+ "b1700-0b76dd": [
+  "hangingPiece"
+ ],
+ "b1700-138f78": [
+  "hangingPiece"
+ ],
+ "b1700-4fc47a": [
+  "mateIn2",
+  "mate",
+  "queenEndgame"
+ ],
+ "b1100-0d8ebe": [
+  "intermezzo"
+ ],
+ "b1100-104406": [
+  "interference"
+ ],
+ "b1100-18efe6": [
+  "hangingPiece"
+ ],
+ "b1100-1a6e6f": [
+  "pin"
+ ],
+ "b1100-1b93b5": [
+  "rookEndgame"
+ ],
+ "b1100-2925f3": [
+  "mateIn5",
+  "mate",
+  "advancedPawn",
+  "doubleCheck",
+  "exposedKing",
+  "promotion"
+ ],
+ "b1100-b6a4d7": [
+  "mateIn5",
+  "mate",
+  "attraction",
+  "sacrifice",
+  "discoveredAttack",
+  "kingsideAttack"
+ ],
+ "b1100-6e0af6": [
+  "mateIn5",
+  "mate",
+  "advancedPawn",
+  "doubleCheck",
+  "sacrifice",
+  "exposedKing",
+  "promotion"
+ ],
+ "b1100-898f32": [
+  "discoveredAttack"
+ ],
+ "b1400-0375f8": [
+  "hangingPiece"
+ ],
+ "b1400-05dfa9": [
+  "discoveredAttack"
+ ],
+ "b1400-0a8d92": [
+  "hangingPiece"
+ ],
+ "b1400-174281": [
+  "pin"
+ ],
+ "b1400-20de77": [
+  "fork",
+  "pin"
+ ],
+ "b1400-7ed0ee": [
+  "mateIn1",
+  "mate",
+  "kingsideAttack"
+ ],
+ "b1400-2edfa6": [
+  "mateIn4",
+  "mate",
+  "dovetailMate",
+  "discoveredAttack"
+ ],
+ "b1400-b1850b": [
+  "mateIn1",
+  "mate"
+ ],
+ "b1400-1d756e": [
+  "rookEndgame"
+ ],
+ "b1400-4d1bfe": [
+  "intermezzo"
+ ],
+ "b1700-03f837": [
+  "attraction",
+  "sacrifice",
+  "discoveredAttack",
+  "attackingF2F7"
+ ],
+ "b1700-095394": [
+  "clearance",
+  "castling"
+ ],
+ "b1700-176a48": [
+  "fork"
+ ],
+ "b1700-67e0d8": [
+  "mateIn1",
+  "mate"
+ ],
+ "b1700-dcb648": [
+  "mateIn5",
+  "mate",
+  "fork",
+  "discoveredAttack",
+  "exposedKing"
+ ],
+ "b1700-693036": [
+  "queenEndgame"
+ ],
+ "b1700-6ef3cb": [
+  "kingsideAttack"
+ ],
+ "b1700-b4d137": [
+  "attraction",
+  "sacrifice",
+  "pin"
+ ]
+}

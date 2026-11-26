@@ -12,6 +12,7 @@
 import {
   CONSEQUENCE,
   MATE_FEATURE,
+  diagnosisFacts,
   facts,
   hints,
   lessonBestSan,
@@ -236,10 +237,30 @@ export function triggerText(t: Trigger | null): string {
       return `${TRIGGER_OPENERS[t.feature] ?? "Something went wrong"} (${detailText(t.detail)}).`;
     case "chance_gone":
       return "The chance has gone.";
+    case "threat_played":
+      return `They played ${moveLabel(t.move)}, the threat your move left open.`;
+    case "piece_chased":
+      return `${moveLabel(t.move)} attacks your ${PIECE_NAMES[t.target.piece]} on ${t.target.square}.`;
+    case "king_checked":
+      return `${moveLabel(t.move)} checks your king while it's still in the centre.`;
+    case "pawn_advanced":
+      return `Their passed pawn moved on with ${moveLabel(t.move)}.`;
+    case "rook_invaded":
+      return `Their rook has reached your second rank on ${t.square}.`;
+    case "replied":
+      return `Their reply, ${moveLabel(t.move)}, shows what your move allowed.`;
     case "legacy":
       return t.text;
   }
 }
+
+/** What a lesson is about, for reports: its feature, or for a diagnosed lesson its kind of mistake. */
+export const lessonFeatureLabel = (l: Lesson): string =>
+  l.source === "features" ? l.feature : `diagnosis:${l.mistake}`;
+
+/** What a lesson teaches, for reports: its principle, or for a diagnosed lesson its concept. */
+export const lessonIdeaLabel = (l: Lesson): string =>
+  l.source === "features" ? l.principle : (l.concept ?? "none");
 
 /** The text the prototype put on each event. */
 export function eventText(e: GameEvent, lessons: Lesson[]): string {
@@ -264,8 +285,9 @@ const hintText = (h: Hint): string => {
 
 export const hintTexts = (l: Lesson): string[] => hints(l).map(hintText);
 
-/** The lesson's facts, with English values. */
+/** The lesson's facts, with English values (diagnosed lessons keep their claims as data). */
 export function factsText(l: Lesson) {
+  if (l.source === "diagnosis") return diagnosisFacts(l);
   const f = facts(l);
   const p = PRINCIPLES[f.principle];
   return {
@@ -288,6 +310,13 @@ export function factsText(l: Lesson) {
 
 /** The prototype's template explanation, used in the simulation reports. */
 export function templateExplanation(l: Lesson): string {
+  if (l.source === "diagnosis") {
+    return [
+      `On move ${lessonMoveNumber(l)} you played ${lessonUserSan(l)}. ${lessonBestSan(l)} was better.`,
+      `Mistake: ${l.mistake}. Concept: ${l.concept ?? "none"}${l.secondary ? ` (+ ${l.secondary})` : ""}.`,
+      `Claims: ${l.claims.map((c) => c.kind).join(", ")}.`,
+    ].join("\n");
+  }
   const p = PRINCIPLES[l.principle];
   const f = FEATURE_LABELS[l.feature] ?? l.feature;
   const userSan = lessonUserSan(l);
@@ -311,7 +340,9 @@ export function templateExplanation(l: Lesson): string {
     lines.push(`Your move wasn't a disaster, but ${bestSan} would have improved ${f}.`);
     lines.push(`After the better line: ${best}. After yours: ${user}.`);
   }
-  const undefended = factsText(l).pieces_left_undefended_by_your_move;
+  const undefended = facts(l).pieces_left_undefended_by_your_move.map((u) =>
+    u.moved ? `the piece you moved, now on ${u.square}` : `${PIECE_NAMES[u.piece]} on ${u.square}`,
+  );
   if (l.principle === "hanging" && undefended.length) {
     lines.push(`Your move left this undefended: ${undefended.join(", ")}.`);
   }

@@ -1,22 +1,32 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_CONFIG,
+  SESSION_STATE_VERSION,
+  STANDARD_START,
   Game,
   MATE_SCORE,
-  SESSION_STATE_VERSION,
   detectMistake,
   gameOutcome,
+  awaitedHappened,
+  diagnosisFacts,
+  judgeLine,
+  lessonFromDossier,
   newSession,
   opponentMove,
+  plyOf,
   pyRound,
   resign,
   reviewTree,
   rewind,
   settledBalance,
+  startUserTurn,
   upgradeSession,
   userMove,
   variationSan,
   type Candidate,
+  type Claim,
+  type Dossier,
+  type LineOutcome,
   type Engine,
   type Engines,
   type Lesson,
@@ -83,6 +93,19 @@ describe("settledBalance", () => {
     const fen = "rnbqkbnr/ppp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2";
     expect(settledBalance(fen, "w")).toBe(0);
     expect(settledBalance(fen, "b")).toBe(0);
+  });
+});
+
+describe("judgeLine", () => {
+  it("credits the first capture of a line that wins a piece, not one cancelled by a later even trade", () => {
+    // Black's queen on e7 left the e5 knight to two attackers. 9. Bxe5 wins it; the bishops
+    // swapped on d6 later in the line are an even trade.
+    const fen = "r3k1nr/pppq1ppp/3b4/3pn3/8/1P2PN2/PBPP2PP/RN1QK2R w KQkq - 0 9";
+    const line = ["b2e5", "g8h6", "b1c3", "e8g8", "e1g1", "f7f6", "e5d6", "d7d6"];
+    const outcome = judgeLine(fen, line, "w", 0, false);
+    expect(outcome.line).toEqual(line);
+    expect(outcome.key?.move).toBe("b2e5");
+    expect(outcome.key?.took).toBe("n");
   });
 });
 
@@ -345,6 +368,65 @@ describe("reviewTree", () => {
   });
 });
 
+describe("one lesson at a time", () => {
+  // White doesn't take the hanging queen (3. h3), then Black moves it away: the chance has gone.
+  const fen = "rnb1kbnr/pppp1ppp/8/4p1q1/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
+  const missed = detectMistake(
+    1,
+    0,
+    fen,
+    "h2h3",
+    new Game(fen, ["h2h3"]),
+    [{ move: "f3g5", score: 900, pv: ["f3g5", "f8e7", "d2d4", "g8f6"] }],
+    [{ move: "g5g6", score: -50, pv: ["g5g6", "b1c3", "b8c6"] }],
+    DEFAULT_CONFIG,
+  );
+  const afterChance = new Game(fen, ["h2h3", "g5g6"]);
+  const quiet: Candidate[] = [{ move: "b1c3", score: -50, pv: ["b1c3", "b8c6", "d2d3"] }];
+  const quietEngine = { analyse: () => Promise.resolve(quiet), play: () => Promise.resolve("b1c3") };
+  const chanceGone = async (lessons: Lesson[]) => {
+    if (missed?.kind !== "missed_chance") throw new Error("expected a missed chance");
+    const s = { ...newSession({ userColour: "w", startFen: fen }), moves: ["h2h3", "g5g6"] };
+    const r = await startUserTurn(
+      { ...s, lessons: [missed, ...lessons] },
+      { analyst: quietEngine, weak: quietEngine },
+    );
+    return r.state.lessons;
+  };
+
+  it("sends a chance that went on the move another lesson was shown to the review", async () => {
+    const shownNow: Lesson = { ...lesson(2, 0, afterChance.ply - 4), resolvedPly: afterChance.ply };
+    expect((await chanceGone([]))[0]).toMatchObject({ status: "triggered", deferred: false });
+    expect((await chanceGone([shownNow]))[0]).toMatchObject({ status: "triggered", deferred: true });
+  });
+
+  it("sends mistakes still waiting to be punished to the review once a lesson is shown", async () => {
+    // A missed chance is shown: the opponent stops pursuing the blunder still pending.
+    const waiting = lesson(2, 0, afterChance.ply - 2, "pending");
+    expect((await chanceGone([waiting]))[1]).toMatchObject({
+      status: "expired",
+      resolvedPly: afterChance.ply,
+    });
+
+    // A blunder is punished (2. Ng5 Qxg5): the other one pending goes to the review with it.
+    const start = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 2";
+    const punished = lesson(1, 0, plyOf(start), "pending");
+    // Made on the latest move, so too recent for its own punishment to have landed yet.
+    const tooRecent = lesson(2, 0, plyOf(start) + 1, "pending");
+    const engine = { analyse: () => Promise.resolve([]), play: () => Promise.resolve("d8g5") };
+    const s = {
+      ...newSession({ userColour: "w", startFen: start, config: { levelUp: false } }),
+      moves: ["f3g5"],
+      lessons: [punished, tooRecent],
+    };
+    const r = await opponentMove(s, { analyst: engine, weak: engine });
+    expect(r.state.lessons).toMatchObject([
+      { status: "triggered", deferred: false },
+      { status: "expired", resolvedPly: plyOf(start) + 2 },
+    ]);
+  });
+});
+
 describe("rewind", () => {
   it("reopens lessons resolved by the moves going, and keeps the line's own outcomes on it", () => {
     const resolved = (l: Lesson, resolvedPly: number): Lesson => ({ ...l, resolvedPly });
@@ -363,5 +445,101 @@ describe("rewind", () => {
     expect(byId(1)).toMatchObject({ status: "pending", resolvedPly: null, line: r.line });
     expect(byId(2)).toMatchObject({ status: "triggered", line: 0 });
     expect(byId(3)).toMatchObject({ status: "fixed", line: 0 });
+  });
+});
+
+describe("diagnosed lessons", () => {
+  // 1. e4 e5, and White to play.
+  const fenBefore = new Game(STANDARD_START, ["e2e4", "e7e5"]).fen;
+  const line = (moves: string[]): LineOutcome => ({
+    line: moves,
+    side: "b",
+    mates: false,
+    balanceEnd: 0,
+    captures: [],
+    key: null,
+    motifs: [],
+  });
+  const dossier = (d: Pick<Dossier, "userMove" | "kind" | "claims" | "concept">): Dossier => ({
+    fenBefore,
+    user: "w",
+    bestMove: "g1f3",
+    winBefore: 54,
+    winAfter: 24,
+    balanceBefore: 0,
+    secondary: null,
+    ...d,
+  });
+  const after = (moves: string[]) => new Game(fenBefore, moves);
+  const SCORES = { best: 40, user: -300 };
+
+  it("waits for the material to fall, not just to be attacked", () => {
+    const lost: Claim = { kind: "punishment", outcome: line(["b8a6"]), lost: 3 };
+    const lesson = lessonFromDossier(
+      1,
+      0,
+      dossier({ userMove: "f1a6", kind: "loses_material", claims: [lost], concept: null }),
+      SCORES,
+      DEFAULT_CONFIG,
+    );
+    expect(awaitedHappened(lesson, after(["f1a6", "d7d6"]), "d7d6")).toBe(false);
+    expect(awaitedHappened(lesson, after(["f1a6", "b8a6"]), "b8a6")).toBe(true);
+  });
+
+  it("is revealed after the opponent's reply when no event shows the mistake", () => {
+    const lesson = lessonFromDossier(
+      1,
+      0,
+      dossier({
+        userMove: "h2h4",
+        kind: "positional",
+        claims: [{ kind: "punishment", outcome: line(["g8f6"]), lost: 0 }],
+        concept: null,
+      }),
+      SCORES,
+      DEFAULT_CONFIG,
+    );
+    expect(awaitedHappened(lesson, after(["h2h4", "g8f6"]), "g8f6")).toBe(true);
+  });
+
+  it("shows a claim's line as far as the capture it says wins", () => {
+    // After 2. d3: the bishop takes the knight on c3 on the seventh ply of Black's line.
+    const moves = ["b8c6", "g1f3", "g8f6", "b1c3", "f8b4", "c1d2", "b4c3", "d2c3"];
+    const outcome: LineOutcome = {
+      ...line(moves),
+      key: { index: 6, move: "b4c3", by: "b", piece: "b", square: "c3", took: "n" },
+    };
+    const lesson = lessonFromDossier(
+      1,
+      0,
+      dossier({
+        userMove: "d2d3",
+        kind: "loses_material",
+        claims: [{ kind: "punishment", outcome, lost: 3 }],
+        concept: null,
+      }),
+      SCORES,
+      DEFAULT_CONFIG,
+    );
+    const [punishment] = diagnosisFacts(lesson).claims;
+    expect(punishment).toMatchObject({ kind: "punishment", wins: { piece: "n", square: "c3" } });
+    expect(punishment && "line" in punishment ? punishment.line : "").toMatch(/Bxc3$/);
+  });
+
+  it("waits for the event that shows its own concept", () => {
+    // Their threat (...Qh4) and their chasing reply (...Nf6 hitting the queen on e4) are both
+    // predicted; the lesson is about lost time, so the chase is what reveals it.
+    const claims: Claim[] = [
+      { kind: "threat", outcome: line(["d8h4"]), wins: 1, swing: 25, ignored: true },
+      { kind: "tempo", move: "g8f6", target: "e4", by: "opponent" },
+    ];
+    const lesson = lessonFromDossier(
+      1,
+      0,
+      dossier({ userMove: "d1h5", kind: "positional", claims, concept: "lost_time" }),
+      SCORES,
+      DEFAULT_CONFIG,
+    );
+    expect(lesson.awaits).toEqual({ kind: "move", move: "g8f6", why: "chase", target: "e4" });
   });
 });

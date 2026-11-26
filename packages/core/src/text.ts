@@ -56,6 +56,18 @@ export type Trigger =
   /** A strategic factor got worse; `detail` is what it measures now. */
   | { kind: "feature"; feature: FeatureName; detail: Detail }
   | { kind: "chance_gone" }
+  /** The opponent carried out the threat the user's move left unanswered. */
+  | { kind: "threat_played"; move: MoveRef }
+  /** The opponent attacked one of the user's pieces, which has to move again. */
+  | { kind: "piece_chased"; move: MoveRef; target: PieceOn }
+  /** The opponent checked the user's king while it was still in the centre. */
+  | { kind: "king_checked"; move: MoveRef }
+  /** The opponent's passed pawn moved on. */
+  | { kind: "pawn_advanced"; move: MoveRef }
+  /** The opponent's rook reached the user's second rank. */
+  | { kind: "rook_invaded"; square: string }
+  /** No single event shows the mistake; the opponent's reply is the moment to look. */
+  | { kind: "replied"; move: MoveRef }
   /** Games saved before triggers were data, where the position can't be rebuilt (it was rewound). */
   | { kind: "legacy"; text: string };
 

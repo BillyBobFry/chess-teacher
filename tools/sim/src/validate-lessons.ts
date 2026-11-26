@@ -26,7 +26,7 @@ import {
   type ClassicalVerdict,
   type Engines,
   type EvalTrace,
-  type Lesson,
+  type FeatureLesson,
   type SessionState,
 } from "@chess-teacher/core";
 import type { UciEngine } from "@chess-teacher/engine";
@@ -61,7 +61,7 @@ function lineEnd(fenBefore: string, line: string[]): string {
 
 interface Row {
   game: number;
-  lesson: Lesson;
+  lesson: FeatureLesson;
   verdict: ClassicalVerdict | null;
   status: string;
 }
@@ -82,14 +82,22 @@ async function main() {
       if (game.isGameOver() || Number(game.fen.split(" ")[5]) > Number(args["max-moves"])) break;
       if (game.turn === userColour) {
         state = (await startUserTurn(state, engines)).state;
-        state = (await userMove(state, await student.play(game.fen, { movetimeMs: 10 }), engines)).state;
+        state = (
+          await userMove(
+            state,
+            await student.play(game.fen, { movetimeMs: 10, history: game.previousFens() }),
+            engines,
+          )
+        ).state;
       } else {
         state = (await opponentMove(state, engines)).state;
       }
     }
     state = finish(state);
     for (const lesson of state.lessons) {
-      if (lesson.feature === "material" || lesson.feature === "mate") continue;
+      // This check is about the feature lessons; diagnosed lessons are measured by the benchmark.
+      if (lesson.source !== "features" || lesson.feature === "material" || lesson.feature === "mate")
+        continue;
       const userFen = lineEnd(lesson.fenBefore, lesson.userLine);
       const bestFen = lineEnd(lesson.fenBefore, lesson.bestLine);
       const [u, b] = await Promise.all([classical.evalTrace(userFen), classical.evalTrace(bestFen)]);

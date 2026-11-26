@@ -1,0 +1,79 @@
+{
+ "b1100-0eeafd": [
+  "hangingPiece"
+ ],
+ "b1400-0846e8": [
+  "interference"
+ ],
+ "b1400-85e82b": [
+  "mateIn5",
+  "mate",
+  "discoveredAttack",
+  "kingsideAttack"
+ ],
+ "b1400-54dd7e": [
+  "fork"
+ ],
+ "b1700-01b765": [
+  "fork"
+ ],
+ "b1700-0739cc": [
+  "attackingF2F7"
+ ],
+ "b1700-07bb70": [
+  "discoveredAttack"
+ ],
+ "b1700-157865": [
+  "fork"
+ ],
+ "b1100-1fb273": [
+  "trappedPiece"
+ ],
+ "b1100-1fd23a": [
+  "hangingPiece"
+ ],
+ "b1100-622bad": [
+  "mateIn1",
+  "mate"
+ ],
+ "b1100-df6a3b": [
+  "mateIn4",
+  "mate",
+  "exposedKing"
+ ],
+ "b1400-0419ca": [
+  "kingsideAttack"
+ ],
+ "b1400-0a4a44": [
+  "discoveredAttack"
+ ],
+ "b1400-120832": [
+  "hangingPiece"
+ ],
+ "b1400-d275f7": [
+  "mateIn5",
+  "mate",
+  "pin"
+ ],
+ "b1400-02c8d2": [
+  "pin"
+ ],
+ "b1400-378e33": [
+  "trappedPiece"
+ ],
+ "b1700-0160ee": [
+  "hangingPiece"
+ ],
+ "b1700-0a70a3": [
+  "hangingPiece"
+ ],
+ "b1700-0ee7c2": [
+  "trappedPiece"
+ ],
+ "b1700-128d15": [
+  "trappedPiece"
+ ],
+ "b1700-161ab2": [
+  "fork"
+ ]
+}

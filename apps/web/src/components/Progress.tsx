@@ -1,6 +1,6 @@
 import type { ProgressResponse } from "@chess-teacher/contract";
-import { isPrincipleId } from "@chess-teacher/core";
-import { principleText, principleTitle } from "@chess-teacher/lesson-text";
+import { isConceptId, isPrincipleId } from "@chess-teacher/core";
+import { conceptText, conceptTitle, principleText, principleTitle } from "@chess-teacher/lesson-text";
 import { useEffect, useState } from "react";
 import { api } from "../api/client.ts";
 import { m } from "../paraglide/messages.js";
@@ -13,10 +13,16 @@ export function Progress({ onBack }: { onBack: () => void }) {
   const [data, setData] = useState<ProgressResponse | null>(null);
   const [error, setError] = useState(false);
   const locale = getLocale();
-  // Ids from the server that this version of the curriculum doesn't know are left out.
-  const principles = (data?.principles ?? []).flatMap((p) =>
-    isPrincipleId(p.id) ? [{ ...p, id: p.id }] : [],
-  );
+  // Ids from the server that this version of the core doesn't know are left out.
+  const principles = (data?.principles ?? []).flatMap((p) => {
+    if (p.kind === "concept" && isConceptId(p.id))
+      return [
+        { ...p, key: `concept:${p.id}`, title: conceptTitle(p.id, locale), text: conceptText(p.id, locale) },
+      ];
+    if (p.kind !== "concept" && isPrincipleId(p.id))
+      return [{ ...p, key: p.id, title: principleTitle(p.id, locale), text: principleText(p.id, locale) }];
+    return [];
+  });
   const focus = principles[0];
 
   useEffect(() => {
@@ -38,15 +44,15 @@ export function Progress({ onBack }: { onBack: () => void }) {
           {focus && (
             <div className="focus">
               <div className="focus-label">{m.progress_focus()}</div>
-              <div className="focus-title">{principleTitle(focus.id, locale)}</div>
-              <p>{principleText(focus.id, locale)}</p>
+              <div className="focus-title">{focus.title}</div>
+              <p>{focus.text}</p>
             </div>
           )}
           <ul className="principles">
             {principles.map((p) => (
-              <li key={p.id}>
+              <li key={p.key}>
                 <div className="principle-row">
-                  <span className="principle-name">{principleTitle(p.id, locale)}</span>
+                  <span className="principle-name">{p.title}</span>
                   <span className="principle-count">{m.progress_lessons({ count: p.lessons })}</span>
                 </div>
                 <div

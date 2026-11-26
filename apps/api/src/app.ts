@@ -17,8 +17,10 @@ import type {
 } from "@chess-teacher/contract";
 import {
   Game,
+  diagnosisFacts,
   facts,
   gameOutcome,
+  isConceptId,
   isPrincipleId,
   playedLine,
   reviewLessons,
@@ -37,7 +39,7 @@ import type { Auth } from "./auth.ts";
 import type { Db } from "./db/client.ts";
 import { explanations, games, lessonFeedback, usage } from "./db/schema.ts";
 import type { Env } from "./env.ts";
-import { PROMPT_VERSION, explainLesson, parseParts, type LlmClient } from "./explain.ts";
+import { PROMPT_VERSION, explainDiagnosis, explainLesson, parseParts, type LlmClient } from "./explain.ts";
 
 export interface AppDeps {
   db: Db;
@@ -127,7 +129,7 @@ export function createApp(deps: AppDeps) {
     id: row.id,
     state: row.state as GameRecord["state"],
     stateVersion: row.stateVersion,
-    opponentSkill: row.opponentSkill,
+    opponentRating: row.opponentRating,
     reveal: row.reveal as GameRecord["reveal"],
     finished: row.finished,
     createdAt: row.createdAt.toISOString(),
@@ -158,7 +160,7 @@ export function createApp(deps: AppDeps) {
     });
   });
 
-  /** Lessons by principle across the user's recent games (most common first). */
+  /** Lessons by principle or concept across the user's recent games (most common first). */
   app.get("/me/progress", async (c) => {
     const rows = await db
       .select({ state: games.state })
@@ -166,17 +168,28 @@ export function createApp(deps: AppDeps) {
       .where(eq(games.userId, c.get("userId")))
       .orderBy(desc(games.updatedAt))
       .limit(50);
-    const byPrinciple = new Map<string, PrincipleProgress>();
+    const byIdea = new Map<string, PrincipleProgress>();
     let lessons = 0;
     rows.forEach((row, gameIndex) => {
       const seenInGame = new Set<string>();
       for (const l of (row.state as { lessons: Lesson[] }).lessons ?? []) {
-        if (l.status === "rewound" || !isPrincipleId(l.principle)) continue;
+        if (l.status === "rewound") continue;
+        // Saved games aren't upgraded here: a lesson without `source` is a feature lesson.
+        const idea =
+          l.source === "diagnosis"
+            ? l.concept && isConceptId(l.concept)
+              ? ({ kind: "concept", id: l.concept } as const)
+              : null
+            : isPrincipleId(l.principle)
+              ? ({ kind: "principle", id: l.principle } as const)
+              : null;
+        if (!idea) continue;
+        const key = `${idea.kind}:${idea.id}`;
         lessons += 1;
         const p =
-          byPrinciple.get(l.principle) ??
+          byIdea.get(key) ??
           ({
-            id: l.principle,
+            ...idea,
             lessons: 0,
             foundYourself: 0,
             revealed: 0,
@@ -187,17 +200,17 @@ export function createApp(deps: AppDeps) {
         if (l.status === "triggered" && l.foundCause !== null) p.revealed += 1;
         if (l.foundCause === true) p.foundYourself += 1;
         if (l.status === "fixed") p.fixed += 1;
-        if (gameIndex < 5 && !seenInGame.has(l.principle)) {
+        if (gameIndex < 5 && !seenInGame.has(key)) {
           p.recentGames += 1;
-          seenInGame.add(l.principle);
+          seenInGame.add(key);
         }
-        byPrinciple.set(l.principle, p);
+        byIdea.set(key, p);
       }
     });
     return c.json<ProgressResponse>({
       games: rows.length,
       lessons,
-      principles: [...byPrinciple.values()].sort((a, b) => b.lessons - a.lessons),
+      principles: [...byIdea.values()].sort((a, b) => b.lessons - a.lessons),
     });
   });
 
@@ -245,7 +258,7 @@ export function createApp(deps: AppDeps) {
       .values({
         userId: c.get("userId"),
         state: body.state,
-        opponentSkill: body.opponentSkill,
+        opponentRating: body.opponentRating,
         reveal: body.reveal,
         finished: body.finished,
       })
@@ -272,7 +285,7 @@ export function createApp(deps: AppDeps) {
         state: body.state,
         reveal: body.reveal,
         finished: body.finished,
-        opponentSkill: body.opponentSkill,
+        opponentRating: body.opponentRating,
         stateVersion: sql`${games.stateVersion} + 1`,
         updatedAt: now(),
       })
@@ -337,8 +350,8 @@ export function createApp(deps: AppDeps) {
         lessonId: lesson.id,
         rating,
         comment: comment ?? null,
-        feature: String(lesson.feature),
-        principle: String(lesson.principle),
+        feature: lesson.source === "features" ? String(lesson.feature) : `diagnosis:${lesson.mistake}`,
+        principle: lesson.source === "features" ? String(lesson.principle) : String(lesson.concept),
         kind: String(lesson.kind),
       })
       .onConflictDoUpdate({
@@ -374,7 +387,7 @@ export function createApp(deps: AppDeps) {
     let lessonFacts;
     let soFar;
     try {
-      lessonFacts = facts(lesson);
+      lessonFacts = lesson.source === "features" ? facts(lesson) : diagnosisFacts(lesson);
       soFar = {
         movesPlayed: variationSan(lesson.fenBefore, playedLine(state, lesson)),
         trigger: lesson.trigger,
@@ -413,7 +426,10 @@ export function createApp(deps: AppDeps) {
     if (!claimed.length) return c.json(respond(await existing(game.id, lesson.id), used));
     const rowId = claimed[0]!.id;
 
-    const result = await explainLesson(llm, env.llmModel, lessonFacts, soFar, locale);
+    const result =
+      lesson.source === "features"
+        ? await explainLesson(llm, env.llmModel, facts(lesson), soFar, locale)
+        : await explainDiagnosis(llm, env.llmModel, diagnosisFacts(lesson), soFar, locale);
     await db
       .update(explanations)
       .set({

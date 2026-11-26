@@ -1,0 +1,15 @@
+{"id":"b1100-029cbf","main":"rook_activity","also":["development","lost_time"],"why":"Rxa8 takes the open a-file and trades off Black's active rook; f4 instead loosens the king and lets the rooks trade on Black's terms."}
+{"id":"b1100-04cdfa","main":"missed_threat","also":["pawn_break","centre_control"],"why":"Black threatened gxh4 and e4; dxe5 dealt with the tension, while Bg3 left the bishop to be hit by e4 and the Nd5 pressure."}
+{"id":"b1100-0d88a4","main":"removed_own_defender","also":["hanging_piece","missed_threat"],"why":"The Bc1 was the only guard of b2, so moving it away let the queen take the pawn."}
+{"id":"b1100-0e3f06","main":"development","also":["king_shelter","centre_control"],"why":"Early f3 weakens the king and blocks the knight instead of developing or capturing the d5 pawn with exd5."}
+{"id":"b1100-1c9697","main":"centre_control","also":["missed_threat","pawn_break"],"why":"dxe4 resolves the central tension; pinning with Bb4 ignored White's exd5 and d4 break."}
+{"id":"b1100-1fa23b","main":"missed_threat","also":["hanging_piece","tempo_attack"],"why":"Nxd5 was threatened; g4 hit the knight with tempo, while fxe5 left the d5 pawn hanging."}
+{"id":"b1100-367c40","main":"development","also":["king_shelter"],"why":"Bf5 develops the bishop outside the pawn chain before ...e6; f5 is an early pawn move that weakens the king."}
+{"id":"b1100-0366bd","main":"hanging_piece","also":["missed_threat","endgame_knowledge"],"why":"The g3 pawn was attacked by the knight and undefended, and a5 ignored that and the king race."}
+{"id":"b1100-57c420","main":"in_between_move","also":["missed_threat","free_material"],"why":"Bb4+ first forces matters before dealing with the bishop on d8; Be7 allowed Bxe7 and Bxc7 ideas."}
+{"id":"b1100-79c328","main":"tempo_attack","also":["rook_activity","endgame_knowledge"],"why":"b4 attacks the rook on c5 with tempo and the king move allowed it; Kf4 kept the king active."}
+{"id":"b1400-0375f8","main":"trapped_piece","also":["missed_threat","bad_placement"],"why":"The knight on g3 was nearly trapped; Nf5 rescued it while g5 let Bxg3 win it."}
+{"id":"b1400-05dfa9","main":"mate_threat","also":["pin","king_shelter"],"why":"White threatened Ng4+ with mate; Rf8 hit the queen, while Kg7 allowed Bc1+ pinning the knight."}
+{"id":"b1400-0a8d92","main":"hanging_piece","also":["missed_threat","back_rank"],"why":"The rook on f1 was undefended and Qxf1+ was a threat, which Qf3 ignored."}
+{"id":"b1400-0fef81","main":"removed_own_defender","also":["missed_threat","hanging_piece"],"why":"The queen on d1 was what defended d5, so moving the bishop away left the pawn to fall."}
+{"id":"b1400-174281","main":"missed_threat","also":["pin","mate_threat"],"why":"Rg1+ was coming and Bg5 walks into a pin; Kh8 sidestepped it."}

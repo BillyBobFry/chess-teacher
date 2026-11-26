@@ -1,0 +1,15 @@
+{"id":"b1700-4fc47a","main":"mate_threat","also":["endgame_knowledge"],"why":"Kc8 walks the king into a forced queen mate; check the opponent's mating nets before stepping the king."}
+{"id":"b1700-0bb611","main":"tempo_attack","also":["bad_placement","free_material"],"why":"Be5 lets f4 hit the bishop with tempo and the b2 pawn falls; Qd6 wins it instead."}
+{"id":"b1700-0c6c6d","main":"tempo_attack","also":["centre_control","free_material"],"why":"Nc3 is kicked by d4; taking on d5 first keeps the initiative."}
+{"id":"b1700-03dccc","main":"greedy_grab","also":["king_in_centre","back_rank"],"why":"Grabbing c2 leaves the king on c8 exposed to Bd7+ and Rd8+ instead of consolidating."}
+{"id":"b1700-07c844","main":"pawn_break","also":["pawn_weakness"],"why":"Bd7 is passive; a5 attacks the b4 pawn and challenges White's queenside."}
+{"id":"b1700-0eccf8","main":"free_material","also":["pawn_weakness"],"why":"Retaking on d4 ignores the loose g5 pawn that Bd3 first would win."}
+{"id":"b1700-4a71c7","main":"missed_threat","also":["tempo_attack","rook_activity"],"why":"Rd4 ignores the threat on the d3 rook line and Bf5 and Bxc2 gain tempi; Rd2 answers it."}
+{"id":"b1100-0d8ebe","main":"count_attackers","also":["free_material","centre_control"],"why":"d5 pushes into a square attacked more than defended; take the loose c4 pawn instead."}
+{"id":"b1100-104406","main":"missed_threat","also":["pawn_break","tempo_attack"],"why":"e6 ignores Black's g5 and d3 ideas; d3 first deals with the pawn pressure."}
+{"id":"b1100-18efe6","main":"removed_own_defender","also":["missed_threat","hanging_piece"],"why":"Castling queenside takes the rook off e8, leaving the e7 knight undefended."}
+{"id":"b1100-1a6e6f","main":"back_rank","also":["escape_square","tempo_attack"],"why":"Nc6 allows d5 and Rc8+ with the king boxed on the back rank; Kf8 gives it room."}
+{"id":"b1100-1ae735","main":"fork","also":["missed_threat","bad_placement"],"why":"Nb4 lets d4 attack the knight and the c5 bishop together."}
+{"id":"b1100-1b93b5","main":"missed_threat","also":["pawn_weakness","rook_activity"],"why":"Kf6 ignores the rook on c6 hitting a6 and the a-pawn falls; Re8 keeps the rook active."}
+{"id":"b1100-31dd85","main":"king_in_centre","also":["missed_threat","rook_activity"],"why":"Ke7 leaves the king in the centre facing checks and rook invasion; Kd7 is safer."}
+{"id":"b1100-3ab80c","main":"missed_threat","also":["hanging_piece","king_shelter"],"why":"Nf4 leaves d4 hanging with check on b6 and ignores the Be3+ threat; f4 covers it."}

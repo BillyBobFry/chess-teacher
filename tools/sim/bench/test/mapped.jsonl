@@ -1,0 +1,387 @@
+{"file": "1-A.jsonl", "line": 1, "main": "removed_own_defender", "also": ["hanging_piece"]}
+{"file": "1-A.jsonl", "line": 2, "main": "passed_pawn", "also": ["tempo_attack", "rook_activity"]}
+{"file": "1-A.jsonl", "line": 3, "main": "hanging_piece", "also": []}
+{"file": "1-A.jsonl", "line": 4, "main": "attack_the_king", "also": []}
+{"file": "1-A.jsonl", "line": 5, "main": "in_between_move", "also": ["free_material"]}
+{"file": "1-A.jsonl", "line": 6, "main": "bad_placement", "also": ["centre_control"]}
+{"file": "1-A.jsonl", "line": 7, "main": "bad_placement", "also": ["rook_activity"]}
+{"file": "1-A.jsonl", "line": 8, "main": "false_defender", "also": ["pin"]}
+{"file": "1-A.jsonl", "line": 9, "main": "lost_time", "also": ["missed_threat"]}
+{"file": "1-A.jsonl", "line": 10, "main": "none", "also": []}
+{"file": "1-A.jsonl", "line": 11, "main": "none", "also": []}
+{"file": "1-A.jsonl", "line": 12, "main": "none", "also": []}
+{"file": "1-A.jsonl", "line": 13, "main": "none", "also": []}
+{"file": "1-A.jsonl", "line": 14, "main": "trade_decisions", "also": ["in_between_move"]}
+{"file": "1-A.jsonl", "line": 15, "main": "fork", "also": ["hanging_piece"]}
+{"file": "1-A.jsonl", "line": 16, "main": "fork", "also": ["mate_threat", "opened_line"]}
+{"file": "1-A.jsonl", "line": 17, "main": "hanging_piece", "also": []}
+{"file": "1-A.jsonl", "line": 18, "main": "hanging_piece", "also": ["in_between_move"]}
+{"file": "1-A.jsonl", "line": 19, "main": "mate_threat", "also": []}
+{"file": "1-A.jsonl", "line": 20, "main": "pawn_break", "also": ["bad_placement", "tempo_attack"]}
+{"file": "1-B.jsonl", "line": 1, "main": "removed_own_defender", "also": ["hanging_piece"]}
+{"file": "1-B.jsonl", "line": 2, "main": "passed_pawn", "also": ["tempo_attack"]}
+{"file": "1-B.jsonl", "line": 3, "main": "hanging_piece", "also": []}
+{"file": "1-B.jsonl", "line": 4, "main": "attack_the_king", "also": ["king_in_centre"]}
+{"file": "1-B.jsonl", "line": 5, "main": "in_between_move", "also": ["free_material"]}
+{"file": "1-B.jsonl", "line": 6, "main": "bad_placement", "also": ["pawn_weakness"]}
+{"file": "1-B.jsonl", "line": 7, "main": "rook_activity", "also": ["bad_placement", "attack_the_king"]}
+{"file": "1-B.jsonl", "line": 8, "main": "remove_the_guard", "also": ["false_defender"]}
+{"file": "1-B.jsonl", "line": 9, "main": "lost_time", "also": ["missed_threat"]}
+{"file": "1-B.jsonl", "line": 10, "main": "none", "also": []}
+{"file": "1-B.jsonl", "line": 11, "main": "none", "also": []}
+{"file": "1-B.jsonl", "line": 12, "main": "none", "also": []}
+{"file": "1-B.jsonl", "line": 13, "main": "none", "also": []}
+{"file": "1-B.jsonl", "line": 14, "main": "trade_decisions", "also": []}
+{"file": "1-B.jsonl", "line": 15, "main": "hanging_piece", "also": ["fork"]}
+{"file": "1-B.jsonl", "line": 16, "main": "opened_line", "also": ["fork"]}
+{"file": "1-B.jsonl", "line": 17, "main": "hanging_piece", "also": []}
+{"file": "1-B.jsonl", "line": 18, "main": "missed_threat", "also": ["in_between_move"]}
+{"file": "1-B.jsonl", "line": 19, "main": "mate_threat", "also": []}
+{"file": "1-B.jsonl", "line": 20, "main": "pawn_break", "also": ["tempo_attack"]}
+{"file": "1-C.jsonl", "line": 1, "main": "removed_own_defender", "also": ["hanging_piece"]}
+{"file": "1-C.jsonl", "line": 2, "main": "passed_pawn", "also": ["tempo_attack"]}
+{"file": "1-C.jsonl", "line": 3, "main": "hanging_piece", "also": []}
+{"file": "1-C.jsonl", "line": 4, "main": "attack_the_king", "also": []}
+{"file": "1-C.jsonl", "line": 5, "main": "in_between_move", "also": ["free_material"]}
+{"file": "1-C.jsonl", "line": 6, "main": "bad_placement", "also": ["pawn_weakness"]}
+{"file": "1-C.jsonl", "line": 7, "main": "bad_placement", "also": ["rook_activity", "pin"]}
+{"file": "1-C.jsonl", "line": 8, "main": "remove_the_guard", "also": ["count_attackers"]}
+{"file": "1-C.jsonl", "line": 9, "main": "lost_time", "also": ["missed_threat"]}
+{"file": "1-C.jsonl", "line": 10, "main": "none", "also": []}
+{"file": "1-C.jsonl", "line": 11, "main": "none", "also": []}
+{"file": "1-C.jsonl", "line": 12, "main": "none", "also": []}
+{"file": "1-C.jsonl", "line": 13, "main": "none", "also": []}
+{"file": "1-C.jsonl", "line": 14, "main": "missed_threat", "also": ["trade_decisions"]}
+{"file": "1-C.jsonl", "line": 15, "main": "hanging_piece", "also": []}
+{"file": "1-C.jsonl", "line": 16, "main": "hanging_piece", "also": ["false_defender", "fork"]}
+{"file": "1-C.jsonl", "line": 17, "main": "hanging_piece", "also": []}
+{"file": "1-C.jsonl", "line": 18, "main": "missed_threat", "also": ["in_between_move"]}
+{"file": "1-C.jsonl", "line": 19, "main": "mate_threat", "also": ["fork"]}
+{"file": "1-C.jsonl", "line": 20, "main": "tempo_attack", "also": ["pawn_break", "key_square"]}
+{"file": "2-A.jsonl", "line": 1, "main": "rook_activity", "also": ["perpetual_check"]}
+{"file": "2-A.jsonl", "line": 2, "main": "hanging_piece", "also": ["development"]}
+{"file": "2-A.jsonl", "line": 3, "main": "free_material", "also": ["tempo_attack"]}
+{"file": "2-A.jsonl", "line": 4, "main": "discovered_attack", "also": ["attack_the_king"]}
+{"file": "2-A.jsonl", "line": 5, "main": "tempo_attack", "also": ["lost_time", "trade_decisions"]}
+{"file": "2-A.jsonl", "line": 6, "main": "none", "also": []}
+{"file": "2-A.jsonl", "line": 7, "main": "none", "also": []}
+{"file": "2-A.jsonl", "line": 8, "main": "none", "also": []}
+{"file": "2-A.jsonl", "line": 9, "main": "none", "also": ["rook_activity"]}
+{"file": "2-A.jsonl", "line": 10, "main": "tempo_attack", "also": ["lost_time"]}
+{"file": "2-A.jsonl", "line": 11, "main": "hanging_piece", "also": ["fork"]}
+{"file": "2-A.jsonl", "line": 12, "main": "missed_threat", "also": ["opened_line"]}
+{"file": "2-A.jsonl", "line": 13, "main": "fork", "also": ["attack_the_king"]}
+{"file": "2-A.jsonl", "line": 14, "main": "fork", "also": ["in_between_move"]}
+{"file": "2-A.jsonl", "line": 15, "main": "centre_control", "also": ["hanging_piece", "pawn_weakness"]}
+{"file": "2-A.jsonl", "line": 16, "main": "removed_own_defender", "also": ["remove_the_guard", "count_attackers"]}
+{"file": "2-A.jsonl", "line": 17, "main": "passed_pawn", "also": ["opened_line", "tempo_attack"]}
+{"file": "2-A.jsonl", "line": 18, "main": "fork", "also": ["endgame_knowledge"]}
+{"file": "2-A.jsonl", "line": 19, "main": "other", "also": ["remove_the_guard"]}
+{"file": "2-A.jsonl", "line": 20, "main": "none", "also": []}
+{"file": "2-B.jsonl", "line": 1, "main": "perpetual_check", "also": ["rook_activity"]}
+{"file": "2-B.jsonl", "line": 2, "main": "hanging_piece", "also": ["fork"]}
+{"file": "2-B.jsonl", "line": 3, "main": "free_material", "also": ["tempo_attack"]}
+{"file": "2-B.jsonl", "line": 4, "main": "attack_the_king", "also": ["discovered_attack"]}
+{"file": "2-B.jsonl", "line": 5, "main": "tempo_attack", "also": ["trade_decisions"]}
+{"file": "2-B.jsonl", "line": 6, "main": "none", "also": []}
+{"file": "2-B.jsonl", "line": 7, "main": "none", "also": []}
+{"file": "2-B.jsonl", "line": 8, "main": "none", "also": []}
+{"file": "2-B.jsonl", "line": 9, "main": "none", "also": []}
+{"file": "2-B.jsonl", "line": 10, "main": "tempo_attack", "also": ["king_in_centre", "development"]}
+{"file": "2-B.jsonl", "line": 11, "main": "fork", "also": ["hanging_piece"]}
+{"file": "2-B.jsonl", "line": 12, "main": "fork", "also": ["lost_time"]}
+{"file": "2-B.jsonl", "line": 13, "main": "attack_the_king", "also": ["free_material"]}
+{"file": "2-B.jsonl", "line": 14, "main": "fork", "also": ["free_material"]}
+{"file": "2-B.jsonl", "line": 15, "main": "centre_control", "also": ["removed_own_defender"]}
+{"file": "2-B.jsonl", "line": 16, "main": "removed_own_defender", "also": ["remove_the_guard"]}
+{"file": "2-B.jsonl", "line": 17, "main": "passed_pawn", "also": ["tempo_attack"]}
+{"file": "2-B.jsonl", "line": 18, "main": "fork", "also": ["endgame_knowledge"]}
+{"file": "2-B.jsonl", "line": 19, "main": "other", "also": ["remove_the_guard"]}
+{"file": "2-B.jsonl", "line": 20, "main": "none", "also": []}
+{"file": "2-C.jsonl", "line": 1, "main": "rook_activity", "also": ["attack_the_king"]}
+{"file": "2-C.jsonl", "line": 2, "main": "hanging_piece", "also": ["development"]}
+{"file": "2-C.jsonl", "line": 3, "main": "free_material", "also": ["tempo_attack"]}
+{"file": "2-C.jsonl", "line": 4, "main": "discovered_attack", "also": ["attack_the_king"]}
+{"file": "2-C.jsonl", "line": 5, "main": "lost_time", "also": ["king_in_centre", "tempo_attack"]}
+{"file": "2-C.jsonl", "line": 6, "main": "none", "also": []}
+{"file": "2-C.jsonl", "line": 7, "main": "none", "also": []}
+{"file": "2-C.jsonl", "line": 8, "main": "none", "also": []}
+{"file": "2-C.jsonl", "line": 9, "main": "none", "also": []}
+{"file": "2-C.jsonl", "line": 10, "main": "tempo_attack", "also": ["lost_time"]}
+{"file": "2-C.jsonl", "line": 11, "main": "fork", "also": ["hanging_piece"]}
+{"file": "2-C.jsonl", "line": 12, "main": "lost_time", "also": ["fork"]}
+{"file": "2-C.jsonl", "line": 13, "main": "attack_the_king", "also": ["trapped_piece"]}
+{"file": "2-C.jsonl", "line": 14, "main": "fork", "also": ["free_material"]}
+{"file": "2-C.jsonl", "line": 15, "main": "centre_control", "also": ["hanging_piece", "pawn_weakness"]}
+{"file": "2-C.jsonl", "line": 16, "main": "removed_own_defender", "also": ["remove_the_guard"]}
+{"file": "2-C.jsonl", "line": 17, "main": "passed_pawn", "also": ["tempo_attack"]}
+{"file": "2-C.jsonl", "line": 18, "main": "fork", "also": ["endgame_knowledge"]}
+{"file": "2-C.jsonl", "line": 19, "main": "other", "also": ["remove_the_guard"]}
+{"file": "2-C.jsonl", "line": 20, "main": "none", "also": []}
+{"file": "3-A.jsonl", "line": 1, "main": "none", "also": ["pin"]}
+{"file": "3-A.jsonl", "line": 2, "main": "none", "also": ["trapped_piece"]}
+{"file": "3-A.jsonl", "line": 3, "main": "none", "also": ["tempo_attack"]}
+{"file": "3-A.jsonl", "line": 4, "main": "rook_activity", "also": ["pawn_weakness"]}
+{"file": "3-A.jsonl", "line": 5, "main": "remove_the_guard", "also": ["rook_activity"]}
+{"file": "3-B.jsonl", "line": 1, "main": "none", "also": ["tempo_attack"]}
+{"file": "3-B.jsonl", "line": 2, "main": "none", "also": ["trapped_piece"]}
+{"file": "3-B.jsonl", "line": 3, "main": "none", "also": ["trapped_piece", "tempo_attack"]}
+{"file": "3-B.jsonl", "line": 4, "main": "rook_activity", "also": ["key_square"]}
+{"file": "3-B.jsonl", "line": 5, "main": "remove_the_guard", "also": ["rook_activity"]}
+{"file": "3-C.jsonl", "line": 1, "main": "none", "also": []}
+{"file": "3-C.jsonl", "line": 2, "main": "none", "also": ["trapped_piece"]}
+{"file": "3-C.jsonl", "line": 3, "main": "none", "also": ["in_between_move"]}
+{"file": "3-C.jsonl", "line": 4, "main": "rook_activity", "also": []}
+{"file": "3-C.jsonl", "line": 5, "main": "remove_the_guard", "also": ["rook_activity"]}
+{"file": "4-A.jsonl", "line": 1, "main": "pin", "also": ["false_defender"]}
+{"file": "4-A.jsonl", "line": 2, "main": "removed_own_defender", "also": ["fork"]}
+{"file": "4-A.jsonl", "line": 3, "main": "hanging_piece", "also": ["missed_threat"]}
+{"file": "4-A.jsonl", "line": 4, "main": "hanging_piece", "also": ["opened_line"]}
+{"file": "4-A.jsonl", "line": 5, "main": "trapped_piece", "also": ["bad_placement"]}
+{"file": "4-A.jsonl", "line": 6, "main": "missed_threat", "also": []}
+{"file": "4-A.jsonl", "line": 7, "main": "mate_threat", "also": []}
+{"file": "4-A.jsonl", "line": 8, "main": "removed_own_defender", "also": []}
+{"file": "4-A.jsonl", "line": 9, "main": "removed_own_defender", "also": ["hanging_piece"]}
+{"file": "4-A.jsonl", "line": 10, "main": "king_shelter", "also": []}
+{"file": "4-A.jsonl", "line": 11, "main": "opened_line", "also": ["hanging_piece", "rook_activity"]}
+{"file": "4-A.jsonl", "line": 12, "main": "key_square", "also": ["king_in_centre"]}
+{"file": "4-A.jsonl", "line": 13, "main": "king_shelter", "also": ["bad_placement"]}
+{"file": "4-A.jsonl", "line": 14, "main": "development", "also": []}
+{"file": "4-A.jsonl", "line": 15, "main": "pin", "also": []}
+{"file": "4-A.jsonl", "line": 16, "main": "remove_the_guard", "also": ["fork"]}
+{"file": "4-A.jsonl", "line": 17, "main": "free_material", "also": ["removed_own_defender"]}
+{"file": "4-A.jsonl", "line": 18, "main": "none", "also": []}
+{"file": "4-A.jsonl", "line": 19, "main": "none", "also": ["development"]}
+{"file": "4-A.jsonl", "line": 20, "main": "free_material", "also": []}
+{"file": "4-B.jsonl", "line": 1, "main": "remove_the_guard", "also": ["pin"]}
+{"file": "4-B.jsonl", "line": 2, "main": "removed_own_defender", "also": ["lost_time"]}
+{"file": "4-B.jsonl", "line": 3, "main": "hanging_piece", "also": ["missed_threat"]}
+{"file": "4-B.jsonl", "line": 4, "main": "missed_threat", "also": ["fork"]}
+{"file": "4-B.jsonl", "line": 5, "main": "trapped_piece", "also": ["bad_placement"]}
+{"file": "4-B.jsonl", "line": 6, "main": "hanging_piece", "also": []}
+{"file": "4-B.jsonl", "line": 7, "main": "mate_threat", "also": ["pin"]}
+{"file": "4-B.jsonl", "line": 8, "main": "removed_own_defender", "also": ["pin"]}
+{"file": "4-B.jsonl", "line": 9, "main": "removed_own_defender", "also": ["hanging_piece"]}
+{"file": "4-B.jsonl", "line": 10, "main": "king_shelter", "also": []}
+{"file": "4-B.jsonl", "line": 11, "main": "opened_line", "also": ["rook_activity"]}
+{"file": "4-B.jsonl", "line": 12, "main": "key_square", "also": ["king_in_centre"]}
+{"file": "4-B.jsonl", "line": 13, "main": "king_shelter", "also": ["bad_placement"]}
+{"file": "4-B.jsonl", "line": 14, "main": "count_attackers", "also": ["development"]}
+{"file": "4-B.jsonl", "line": 15, "main": "pin", "also": ["opened_line"]}
+{"file": "4-B.jsonl", "line": 16, "main": "remove_the_guard", "also": ["fork"]}
+{"file": "4-B.jsonl", "line": 17, "main": "free_material", "also": ["removed_own_defender"]}
+{"file": "4-B.jsonl", "line": 18, "main": "none", "also": []}
+{"file": "4-B.jsonl", "line": 19, "main": "none", "also": ["development"]}
+{"file": "4-B.jsonl", "line": 20, "main": "free_material", "also": []}
+{"file": "4-C.jsonl", "line": 1, "main": "pin", "also": ["remove_the_guard", "missed_threat"]}
+{"file": "4-C.jsonl", "line": 2, "main": "removed_own_defender", "also": ["fork"]}
+{"file": "4-C.jsonl", "line": 3, "main": "hanging_piece", "also": ["missed_threat"]}
+{"file": "4-C.jsonl", "line": 4, "main": "missed_threat", "also": ["opened_line"]}
+{"file": "4-C.jsonl", "line": 5, "main": "trapped_piece", "also": ["missed_threat"]}
+{"file": "4-C.jsonl", "line": 6, "main": "hanging_piece", "also": ["missed_threat"]}
+{"file": "4-C.jsonl", "line": 7, "main": "mate_threat", "also": []}
+{"file": "4-C.jsonl", "line": 8, "main": "removed_own_defender", "also": []}
+{"file": "4-C.jsonl", "line": 9, "main": "removed_own_defender", "also": []}
+{"file": "4-C.jsonl", "line": 10, "main": "king_shelter", "also": []}
+{"file": "4-C.jsonl", "line": 11, "main": "opened_line", "also": ["trapped_piece", "rook_activity"]}
+{"file": "4-C.jsonl", "line": 12, "main": "king_in_centre", "also": ["key_square"]}
+{"file": "4-C.jsonl", "line": 13, "main": "king_shelter", "also": ["bad_placement"]}
+{"file": "4-C.jsonl", "line": 14, "main": "hanging_piece", "also": ["development"]}
+{"file": "4-C.jsonl", "line": 15, "main": "opened_line", "also": ["pin"]}
+{"file": "4-C.jsonl", "line": 16, "main": "remove_the_guard", "also": []}
+{"file": "4-C.jsonl", "line": 17, "main": "free_material", "also": ["removed_own_defender"]}
+{"file": "4-C.jsonl", "line": 18, "main": "none", "also": []}
+{"file": "4-C.jsonl", "line": 19, "main": "none", "also": ["development"]}
+{"file": "4-C.jsonl", "line": 20, "main": "free_material", "also": ["discovered_attack"]}
+{"file": "5-A.jsonl", "line": 1, "main": "none", "also": ["discovered_attack"]}
+{"file": "5-A.jsonl", "line": 2, "main": "none", "also": ["pin"]}
+{"file": "5-A.jsonl", "line": 3, "main": "none", "also": ["development"]}
+{"file": "5-A.jsonl", "line": 4, "main": "none", "also": []}
+{"file": "5-A.jsonl", "line": 5, "main": "none", "also": []}
+{"file": "5-A.jsonl", "line": 6, "main": "none", "also": []}
+{"file": "5-A.jsonl", "line": 7, "main": "tempo_attack", "also": ["pin"]}
+{"file": "5-A.jsonl", "line": 8, "main": "centre_control", "also": ["king_in_centre"]}
+{"file": "5-A.jsonl", "line": 9, "main": "discovered_attack", "also": ["in_between_move"]}
+{"file": "5-A.jsonl", "line": 10, "main": "missed_threat", "also": ["tempo_attack"]}
+{"file": "5-A.jsonl", "line": 11, "main": "count_attackers", "also": []}
+{"file": "5-A.jsonl", "line": 12, "main": "trapped_piece", "also": ["king_in_centre"]}
+{"file": "5-A.jsonl", "line": 13, "main": "endgame_knowledge", "also": ["trade_decisions"]}
+{"file": "5-A.jsonl", "line": 14, "main": "other", "also": ["development"]}
+{"file": "5-A.jsonl", "line": 15, "main": "back_rank", "also": ["removed_own_defender"]}
+{"file": "5-A.jsonl", "line": 16, "main": "false_defender", "also": []}
+{"file": "5-A.jsonl", "line": 17, "main": "trade_decisions", "also": ["count_attackers"]}
+{"file": "5-A.jsonl", "line": 18, "main": "trapped_piece", "also": ["removed_own_defender"]}
+{"file": "5-A.jsonl", "line": 19, "main": "free_material", "also": ["lost_time"]}
+{"file": "5-A.jsonl", "line": 20, "main": "pin", "also": ["lost_time", "false_defender"]}
+{"file": "5-B.jsonl", "line": 1, "main": "discovered_attack", "also": []}
+{"file": "5-B.jsonl", "line": 2, "main": "none", "also": ["pin"]}
+{"file": "5-B.jsonl", "line": 3, "main": "none", "also": []}
+{"file": "5-B.jsonl", "line": 4, "main": "none", "also": []}
+{"file": "5-B.jsonl", "line": 5, "main": "none", "also": []}
+{"file": "5-B.jsonl", "line": 6, "main": "none", "also": []}
+{"file": "5-B.jsonl", "line": 7, "main": "tempo_attack", "also": []}
+{"file": "5-B.jsonl", "line": 8, "main": "centre_control", "also": ["king_in_centre", "pawn_break"]}
+{"file": "5-B.jsonl", "line": 9, "main": "discovered_attack", "also": ["missed_threat"]}
+{"file": "5-B.jsonl", "line": 10, "main": "hanging_piece", "also": ["missed_threat"]}
+{"file": "5-B.jsonl", "line": 11, "main": "count_attackers", "also": []}
+{"file": "5-B.jsonl", "line": 12, "main": "trapped_piece", "also": ["king_in_centre"]}
+{"file": "5-B.jsonl", "line": 13, "main": "endgame_knowledge", "also": ["trade_decisions"]}
+{"file": "5-B.jsonl", "line": 14, "main": "other", "also": ["development"]}
+{"file": "5-B.jsonl", "line": 15, "main": "back_rank", "also": ["bad_placement"]}
+{"file": "5-B.jsonl", "line": 16, "main": "false_defender", "also": ["free_material"]}
+{"file": "5-B.jsonl", "line": 17, "main": "trade_decisions", "also": ["pawn_weakness"]}
+{"file": "5-B.jsonl", "line": 18, "main": "trapped_piece", "also": []}
+{"file": "5-B.jsonl", "line": 19, "main": "lost_time", "also": ["free_material"]}
+{"file": "5-B.jsonl", "line": 20, "main": "lost_time", "also": ["hanging_piece"]}
+{"file": "5-C.jsonl", "line": 1, "main": "none", "also": []}
+{"file": "5-C.jsonl", "line": 2, "main": "none", "also": ["remove_the_guard"]}
+{"file": "5-C.jsonl", "line": 3, "main": "none", "also": []}
+{"file": "5-C.jsonl", "line": 4, "main": "none", "also": []}
+{"file": "5-C.jsonl", "line": 5, "main": "none", "also": []}
+{"file": "5-C.jsonl", "line": 6, "main": "none", "also": []}
+{"file": "5-C.jsonl", "line": 7, "main": "centre_control", "also": ["tempo_attack"]}
+{"file": "5-C.jsonl", "line": 8, "main": "centre_control", "also": ["king_in_centre"]}
+{"file": "5-C.jsonl", "line": 9, "main": "hanging_piece", "also": ["discovered_attack"]}
+{"file": "5-C.jsonl", "line": 10, "main": "missed_threat", "also": ["tempo_attack"]}
+{"file": "5-C.jsonl", "line": 11, "main": "count_attackers", "also": ["discovered_attack"]}
+{"file": "5-C.jsonl", "line": 12, "main": "trapped_piece", "also": ["king_in_centre"]}
+{"file": "5-C.jsonl", "line": 13, "main": "endgame_knowledge", "also": ["trade_decisions"]}
+{"file": "5-C.jsonl", "line": 14, "main": "other", "also": ["development"]}
+{"file": "5-C.jsonl", "line": 15, "main": "back_rank", "also": ["development"]}
+{"file": "5-C.jsonl", "line": 16, "main": "false_defender", "also": ["free_material"]}
+{"file": "5-C.jsonl", "line": 17, "main": "trade_decisions", "also": ["pawn_weakness"]}
+{"file": "5-C.jsonl", "line": 18, "main": "trapped_piece", "also": []}
+{"file": "5-C.jsonl", "line": 19, "main": "free_material", "also": ["lost_time"]}
+{"file": "5-C.jsonl", "line": 20, "main": "false_defender", "also": ["pin"]}
+{"file": "6-A.jsonl", "line": 1, "main": "opened_line", "also": ["pawn_weakness", "passed_pawn"]}
+{"file": "6-A.jsonl", "line": 2, "main": "centre_control", "also": ["tempo_attack", "bad_placement"]}
+{"file": "6-A.jsonl", "line": 3, "main": "development", "also": ["false_defender", "king_in_centre"]}
+{"file": "6-A.jsonl", "line": 4, "main": "hanging_piece", "also": ["opened_line"]}
+{"file": "6-A.jsonl", "line": 5, "main": "opened_line", "also": ["pawn_weakness", "trade_decisions"]}
+{"file": "6-A.jsonl", "line": 6, "main": "none", "also": []}
+{"file": "6-A.jsonl", "line": 7, "main": "none", "also": []}
+{"file": "6-A.jsonl", "line": 8, "main": "none", "also": ["pin"]}
+{"file": "6-A.jsonl", "line": 9, "main": "none", "also": ["trade_decisions"]}
+{"file": "6-A.jsonl", "line": 10, "main": "none", "also": []}
+{"file": "6-A.jsonl", "line": 11, "main": "none", "also": []}
+{"file": "6-A.jsonl", "line": 12, "main": "none", "also": []}
+{"file": "6-A.jsonl", "line": 13, "main": "none", "also": []}
+{"file": "6-A.jsonl", "line": 14, "main": "none", "also": []}
+{"file": "6-A.jsonl", "line": 15, "main": "tempo_attack", "also": ["centre_control", "lost_time"]}
+{"file": "6-A.jsonl", "line": 16, "main": "in_between_move", "also": ["trade_decisions", "bad_placement"]}
+{"file": "6-A.jsonl", "line": 17, "main": "free_material", "also": ["discovered_attack", "count_attackers"]}
+{"file": "6-A.jsonl", "line": 18, "main": "hanging_piece", "also": []}
+{"file": "6-A.jsonl", "line": 19, "main": "discovered_attack", "also": ["hanging_piece"]}
+{"file": "6-A.jsonl", "line": 20, "main": "pin", "also": ["missed_threat"]}
+{"file": "6-B.jsonl", "line": 1, "main": "pawn_weakness", "also": ["missed_threat", "hanging_piece"]}
+{"file": "6-B.jsonl", "line": 2, "main": "centre_control", "also": ["tempo_attack"]}
+{"file": "6-B.jsonl", "line": 3, "main": "tempo_attack", "also": ["pin", "development"]}
+{"file": "6-B.jsonl", "line": 4, "main": "hanging_piece", "also": ["king_shelter"]}
+{"file": "6-B.jsonl", "line": 5, "main": "opened_line", "also": ["hanging_piece"]}
+{"file": "6-B.jsonl", "line": 6, "main": "none", "also": []}
+{"file": "6-B.jsonl", "line": 7, "main": "none", "also": []}
+{"file": "6-B.jsonl", "line": 8, "main": "none", "also": ["tempo_attack"]}
+{"file": "6-B.jsonl", "line": 9, "main": "none", "also": ["trade_decisions"]}
+{"file": "6-B.jsonl", "line": 10, "main": "none", "also": []}
+{"file": "6-B.jsonl", "line": 11, "main": "none", "also": []}
+{"file": "6-B.jsonl", "line": 12, "main": "none", "also": []}
+{"file": "6-B.jsonl", "line": 13, "main": "none", "also": []}
+{"file": "6-B.jsonl", "line": 14, "main": "none", "also": []}
+{"file": "6-B.jsonl", "line": 15, "main": "removed_own_defender", "also": ["lost_time"]}
+{"file": "6-B.jsonl", "line": 16, "main": "bad_placement", "also": ["trade_decisions"]}
+{"file": "6-B.jsonl", "line": 17, "main": "pin", "also": ["in_between_move"]}
+{"file": "6-B.jsonl", "line": 18, "main": "hanging_piece", "also": []}
+{"file": "6-B.jsonl", "line": 19, "main": "discovered_attack", "also": []}
+{"file": "6-B.jsonl", "line": 20, "main": "hanging_piece", "also": ["in_between_move"]}
+{"file": "6-C.jsonl", "line": 1, "main": "removed_own_defender", "also": ["pawn_weakness", "passed_pawn"]}
+{"file": "6-C.jsonl", "line": 2, "main": "attack_the_king", "also": ["pawn_break"]}
+{"file": "6-C.jsonl", "line": 3, "main": "tempo_attack", "also": ["pawn_weakness", "development"]}
+{"file": "6-C.jsonl", "line": 4, "main": "hanging_piece", "also": []}
+{"file": "6-C.jsonl", "line": 5, "main": "opened_line", "also": ["trade_decisions"]}
+{"file": "6-C.jsonl", "line": 6, "main": "none", "also": []}
+{"file": "6-C.jsonl", "line": 7, "main": "none", "also": []}
+{"file": "6-C.jsonl", "line": 8, "main": "none", "also": ["pin"]}
+{"file": "6-C.jsonl", "line": 9, "main": "none", "also": ["trade_decisions"]}
+{"file": "6-C.jsonl", "line": 10, "main": "none", "also": []}
+{"file": "6-C.jsonl", "line": 11, "main": "none", "also": []}
+{"file": "6-C.jsonl", "line": 12, "main": "none", "also": []}
+{"file": "6-C.jsonl", "line": 13, "main": "none", "also": []}
+{"file": "6-C.jsonl", "line": 14, "main": "none", "also": []}
+{"file": "6-C.jsonl", "line": 15, "main": "lost_time", "also": ["centre_control", "tempo_attack"]}
+{"file": "6-C.jsonl", "line": 16, "main": "in_between_move", "also": ["trade_decisions"]}
+{"file": "6-C.jsonl", "line": 17, "main": "count_attackers", "also": ["pin"]}
+{"file": "6-C.jsonl", "line": 18, "main": "discovered_attack", "also": ["hanging_piece"]}
+{"file": "6-C.jsonl", "line": 19, "main": "hanging_piece", "also": ["tempo_attack"]}
+{"file": "6-C.jsonl", "line": 20, "main": "in_between_move", "also": ["missed_threat"]}
+{"file": "7-A.jsonl", "line": 1, "main": "trapped_piece", "also": []}
+{"file": "7-A.jsonl", "line": 2, "main": "fork", "also": ["tempo_attack", "bad_placement"]}
+{"file": "7-A.jsonl", "line": 3, "main": "key_square", "also": ["king_in_centre", "tempo_attack"]}
+{"file": "7-A.jsonl", "line": 4, "main": "hanging_piece", "also": ["rook_activity", "trade_decisions"]}
+{"file": "7-A.jsonl", "line": 5, "main": "hanging_piece", "also": ["lost_time"]}
+{"file": "7-A.jsonl", "line": 6, "main": "pawn_weakness", "also": ["trade_decisions"]}
+{"file": "7-A.jsonl", "line": 7, "main": "centre_control", "also": ["mate_threat", "lost_time", "pawn_break"]}
+{"file": "7-A.jsonl", "line": 8, "main": "remove_the_guard", "also": ["king_in_centre"]}
+{"file": "7-A.jsonl", "line": 9, "main": "king_shelter", "also": ["removed_own_defender", "discovered_attack"]}
+{"file": "7-A.jsonl", "line": 10, "main": "tempo_attack", "also": ["lost_time"]}
+{"file": "7-A.jsonl", "line": 11, "main": "king_shelter", "also": ["mate_threat"]}
+{"file": "7-A.jsonl", "line": 12, "main": "none", "also": []}
+{"file": "7-A.jsonl", "line": 13, "main": "none", "also": []}
+{"file": "7-A.jsonl", "line": 14, "main": "none", "also": []}
+{"file": "7-A.jsonl", "line": 15, "main": "none", "also": ["king_in_centre"]}
+{"file": "7-A.jsonl", "line": 16, "main": "none", "also": ["bad_placement"]}
+{"file": "7-A.jsonl", "line": 17, "main": "none", "also": []}
+{"file": "7-A.jsonl", "line": 18, "main": "none", "also": []}
+{"file": "7-A.jsonl", "line": 19, "main": "none", "also": []}
+{"file": "7-A.jsonl", "line": 20, "main": "none", "also": []}
+{"file": "7-B.jsonl", "line": 1, "main": "trapped_piece", "also": []}
+{"file": "7-B.jsonl", "line": 2, "main": "fork", "also": ["tempo_attack"]}
+{"file": "7-B.jsonl", "line": 3, "main": "tempo_attack", "also": ["king_in_centre", "passed_pawn", "fork"]}
+{"file": "7-B.jsonl", "line": 4, "main": "hanging_piece", "also": ["trade_decisions"]}
+{"file": "7-B.jsonl", "line": 5, "main": "free_material", "also": ["hanging_piece"]}
+{"file": "7-B.jsonl", "line": 6, "main": "pawn_weakness", "also": ["key_square"]}
+{"file": "7-B.jsonl", "line": 7, "main": "centre_control", "also": ["opened_line", "pawn_break"]}
+{"file": "7-B.jsonl", "line": 8, "main": "remove_the_guard", "also": ["trade_decisions"]}
+{"file": "7-B.jsonl", "line": 9, "main": "king_shelter", "also": ["removed_own_defender", "discovered_attack"]}
+{"file": "7-B.jsonl", "line": 10, "main": "tempo_attack", "also": ["lost_time"]}
+{"file": "7-B.jsonl", "line": 11, "main": "king_shelter", "also": ["opened_line"]}
+{"file": "7-B.jsonl", "line": 12, "main": "none", "also": []}
+{"file": "7-B.jsonl", "line": 13, "main": "none", "also": []}
+{"file": "7-B.jsonl", "line": 14, "main": "none", "also": []}
+{"file": "7-B.jsonl", "line": 15, "main": "none", "also": []}
+{"file": "7-B.jsonl", "line": 16, "main": "none", "also": ["bad_placement"]}
+{"file": "7-B.jsonl", "line": 17, "main": "none", "also": []}
+{"file": "7-B.jsonl", "line": 18, "main": "none", "also": []}
+{"file": "7-B.jsonl", "line": 19, "main": "none", "also": []}
+{"file": "7-B.jsonl", "line": 20, "main": "none", "also": []}
+{"file": "7-C.jsonl", "line": 1, "main": "trapped_piece", "also": []}
+{"file": "7-C.jsonl", "line": 2, "main": "fork", "also": ["bad_placement"]}
+{"file": "7-C.jsonl", "line": 3, "main": "key_square", "also": ["passed_pawn", "fork"]}
+{"file": "7-C.jsonl", "line": 4, "main": "trade_decisions", "also": ["rook_activity"]}
+{"file": "7-C.jsonl", "line": 5, "main": "hanging_piece", "also": ["removed_own_defender", "free_material"]}
+{"file": "7-C.jsonl", "line": 6, "main": "pawn_weakness", "also": ["key_square"]}
+{"file": "7-C.jsonl", "line": 7, "main": "pawn_break", "also": ["lost_time"]}
+{"file": "7-C.jsonl", "line": 8, "main": "remove_the_guard", "also": ["trade_decisions"]}
+{"file": "7-C.jsonl", "line": 9, "main": "discovered_attack", "also": ["removed_own_defender", "king_shelter"]}
+{"file": "7-C.jsonl", "line": 10, "main": "tempo_attack", "also": ["lost_time"]}
+{"file": "7-C.jsonl", "line": 11, "main": "mate_threat", "also": ["king_shelter"]}
+{"file": "7-C.jsonl", "line": 12, "main": "none", "also": []}
+{"file": "7-C.jsonl", "line": 13, "main": "none", "also": []}
+{"file": "7-C.jsonl", "line": 14, "main": "none", "also": []}
+{"file": "7-C.jsonl", "line": 15, "main": "none", "also": ["king_in_centre"]}
+{"file": "7-C.jsonl", "line": 16, "main": "bad_placement", "also": []}
+{"file": "7-C.jsonl", "line": 17, "main": "none", "also": []}
+{"file": "7-C.jsonl", "line": 18, "main": "none", "also": []}
+{"file": "7-C.jsonl", "line": 19, "main": "none", "also": []}
+{"file": "7-C.jsonl", "line": 20, "main": "none", "also": []}
+{"file": "8-A.jsonl", "line": 1, "main": "king_shelter", "also": ["king_in_centre"]}
+{"file": "8-A.jsonl", "line": 2, "main": "tempo_attack", "also": ["king_in_centre"]}
+{"file": "8-A.jsonl", "line": 3, "main": "lost_time", "also": ["king_shelter"]}
+{"file": "8-A.jsonl", "line": 4, "main": "missed_threat", "also": ["king_shelter"]}
+{"file": "8-B.jsonl", "line": 1, "main": "king_shelter", "also": ["bad_placement", "king_in_centre"]}
+{"file": "8-B.jsonl", "line": 2, "main": "tempo_attack", "also": ["king_in_centre", "key_square"]}
+{"file": "8-B.jsonl", "line": 3, "main": "king_shelter", "also": ["lost_time", "hanging_piece"]}
+{"file": "8-B.jsonl", "line": 4, "main": "missed_threat", "also": ["king_shelter"]}
+{"file": "8-C.jsonl", "line": 1, "main": "key_square", "also": ["king_in_centre", "bad_placement"]}
+{"file": "8-C.jsonl", "line": 2, "main": "tempo_attack", "also": ["king_in_centre"]}
+{"file": "8-C.jsonl", "line": 3, "main": "lost_time", "also": ["hanging_piece", "trapped_piece"]}
+{"file": "8-C.jsonl", "line": 4, "main": "hanging_piece", "also": ["missed_threat"]}

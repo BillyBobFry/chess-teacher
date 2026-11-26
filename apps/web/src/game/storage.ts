@@ -17,7 +17,7 @@ export interface SavedGame {
   /** The server's version of this game, for conflict detection. */
   stateVersion: number;
   state: SessionState;
-  opponentSkill: number;
+  opponentRating: number;
   reveal: RevealState | null;
   finished: boolean;
 }
@@ -35,7 +35,7 @@ export async function loadGame(id: string): Promise<SavedGame> {
     stateVersion: g.stateVersion,
     // Games saved by an older version are brought up to date here, once, on load.
     state: upgradeSession(g.state as unknown as SavedSessionState),
-    opponentSkill: g.opponentSkill,
+    opponentRating: g.opponentRating,
     reveal: g.reveal,
     finished: g.finished,
   };
@@ -79,7 +79,7 @@ export class Saver {
       try {
         const r = await api.saveGame(g.id, {
           state: g.state as never,
-          opponentSkill: g.opponentSkill,
+          opponentRating: g.opponentRating,
           reveal: g.reveal,
           finished: g.finished,
           expectedVersion: this.version,

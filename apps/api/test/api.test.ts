@@ -7,11 +7,21 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  DEFAULT_CONFIG,
+  Game,
+  Position,
+  STANDARD_START,
+  detectMistake,
+  diagnosisFacts,
   newSession,
   opponentMove,
+  squareName,
   startUserTurn,
   userMove,
+  type DiagnosedLesson,
   type Engines,
+  type FeatureLesson,
+  type Lesson,
   type SessionState,
   type TeachingConfig,
 } from "@chess-teacher/core";
@@ -46,6 +56,48 @@ async function stateWithLessons(): Promise<SessionState> {
   return s;
 }
 const recorded = await stateWithLessons();
+
+/** Recorded games come from `diagnose`, so every lesson in them is a diagnosed lesson. */
+function diagnosed(l: Lesson): DiagnosedLesson {
+  if (l.source !== "diagnosis") throw new Error(`lesson ${l.id} is not a diagnosed lesson`);
+  return l;
+}
+
+/** Squares of the first recorded lesson's position, with or without a piece on them. */
+function squaresOfFirstLesson(occupied: boolean): string[] {
+  const l = diagnosed(recorded.lessons[0]!);
+  const pos = new Position(l.fenBefore);
+  const out: string[] = [];
+  for (let s = 0; s < 64; s++) if ((pos.pieceAt(s) !== null) === occupied) out.push(squareName(s));
+  return out;
+}
+
+const occupiedSquare = (): string => squaresOfFirstLesson(true)[0]!;
+
+/** An empty square the first recorded lesson's facts never mention. */
+function squareNobodyMentions(): string {
+  const said = JSON.stringify(diagnosisFacts(diagnosed(recorded.lessons[0]!)));
+  const square = squaresOfFirstLesson(false).find((s) => !said.includes(s));
+  if (!square) throw new Error("every empty square is mentioned");
+  return square;
+}
+
+/** A lesson as games saved before diagnosis made them: 1. e4 e5 2. Ba6, and the knight takes. */
+function featureLesson(): FeatureLesson {
+  const before = new Game(STANDARD_START, ["e2e4", "e7e5"]);
+  const l = detectMistake(
+    1,
+    0,
+    before.fen,
+    "f1a6",
+    new Game(STANDARD_START, ["e2e4", "e7e5", "f1a6"]),
+    [{ move: "g1f3", score: 40, pv: ["g1f3", "b8c6", "f1c4"] }],
+    [{ move: "b8a6", score: 320, pv: ["b8a6", "g1f3", "d7d6"] }],
+    DEFAULT_CONFIG,
+  );
+  if (!l) throw new Error("expected a lesson for 2. Ba6");
+  return l;
+}
 
 /** A fake LLM that answers with whatever text the test sets. */
 function fakeLlm() {
@@ -111,7 +163,7 @@ async function setup(opts: { llm?: LlmClient | null; perMonth?: number } = {}) {
 
 const newGameBody = (state: SessionState = newSession({ userColour: "w" })) => ({
   state,
-  opponentSkill: 3,
+  opponentRating: 1100,
   reveal: null,
   finished: false,
 });
@@ -276,7 +328,7 @@ describe("explanations", () => {
 
   it("rejects explanations that mention squares not in the facts, without charging", async () => {
     const llm = fakeLlm();
-    llm.parts = { ...llm.parts, why_better: "The knight on h7 was the problem." };
+    llm.parts = { ...llm.parts, why_better: `The knight on ${squareNobodyMentions()} was the problem.` };
     const { call, signUp } = await setup({ llm });
     const cookie = await signUp("fay@example.com");
     const game = await (
@@ -290,6 +342,24 @@ describe("explanations", () => {
       })
     ).json();
     expect(res).toEqual({ status: "rejected", remaining: 30 });
+  });
+
+  it("lets the coach name a square a piece stands on", async () => {
+    const llm = fakeLlm();
+    llm.parts = { ...llm.parts, why_better: `The piece on ${occupiedSquare()} was the problem.` };
+    const { call, signUp } = await setup({ llm });
+    const cookie = await signUp("fen@example.com");
+    const game = await (
+      await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
+    ).json();
+    const res = await (
+      await call(`/api/games/${game.id}/lessons/${lessonIds[0]}/explanation`, {
+        method: "POST",
+        cookie,
+        json: EN_GB,
+      })
+    ).json();
+    expect(res.status).toBe("ready");
   });
 
   it("stops at the monthly allowance", async () => {
@@ -394,12 +464,13 @@ describe("lesson feedback", () => {
     const { lessonFeedback } = await import("../src/db/schema.ts");
     const rows = await server.db.select().from(lessonFeedback);
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toMatchObject({ rating: 1, comment: null, feature: recorded.lessons[0]!.feature });
+    const lesson = diagnosed(recorded.lessons[0]!);
+    expect(rows[0]).toMatchObject({ rating: 1, comment: null, feature: `diagnosis:${lesson.mistake}` });
   });
 });
 
 describe("progress", () => {
-  it("counts lessons by principle across the user's games", async () => {
+  it("counts lessons by concept across the user's games", async () => {
     const { call, signUp } = await setup({ llm: null });
     const cookie = await signUp("pia@example.com");
     expect(await (await call("/api/me/progress", { cookie })).json()).toEqual({
@@ -408,17 +479,24 @@ describe("progress", () => {
       principles: [],
     });
 
+    // Lessons with a concept are counted under it; the first such lesson is found once.
+    const index = recorded.lessons.findIndex((l) => diagnosed(l).concept !== null);
+    const concept = diagnosed(recorded.lessons[index]!).concept;
     const found = structuredClone(recorded);
-    found.lessons[0]!.status = "triggered";
-    found.lessons[0]!.foundCause = true;
+    found.lessons[index]!.status = "triggered";
+    found.lessons[index]!.foundCause = true;
     await call("/api/games", { method: "POST", cookie, json: newGameBody(found) });
     await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) });
 
     const progress = await (await call("/api/me/progress", { cookie })).json();
     expect(progress.games).toBe(2);
-    const counted = recorded.lessons.filter((l) => l.status !== "rewound").length;
+    const counted = recorded.lessons.filter(
+      (l) => l.status !== "rewound" && diagnosed(l).concept !== null,
+    ).length;
     expect(progress.lessons).toBe(2 * counted);
-    const first = progress.principles.find((p: { id: string }) => p.id === recorded.lessons[0]!.principle);
+    const first = progress.principles.find(
+      (p: { kind: string; id: string }) => p.kind === "concept" && p.id === concept,
+    );
     expect(first.foundYourself).toBeGreaterThanOrEqual(1);
     expect(first.recentGames).toBe(2);
     expect((await call("/api/me/progress")).status).toBe(401);
@@ -427,9 +505,9 @@ describe("progress", () => {
 
 describe("AI prompt facts", () => {
   it("gives the moves really played apart from the engine's predictions", async () => {
-    const { promptFacts, SYSTEM_PROMPT } = await import("../src/explain.ts");
-    const { facts } = await import("@chess-teacher/core");
-    const f = promptFacts(facts(recorded.lessons[0]!), {
+    const { diagnosisPromptFacts, DIAGNOSIS_PROMPT } = await import("../src/explain.ts");
+    const { diagnosisFacts } = await import("@chess-teacher/core");
+    const f = diagnosisPromptFacts(diagnosisFacts(diagnosed(recorded.lessons[0]!)), {
       movesPlayed: "15. e4 dxe4 16. fxe4",
       trigger: { kind: "losing_material" },
     });
@@ -439,13 +517,26 @@ describe("AI prompt facts", () => {
     });
     expect(f).toHaveProperty("predicted_continuation_after_your_move");
     expect(f).not.toHaveProperty("your_line");
-    expect(SYSTEM_PROMPT).toMatch(/has NOT happened/);
+    expect(DIAGNOSIS_PROMPT).toMatch(/has NOT happened/);
   });
 
-  it("words the facts in en-GB from the catalogue", async () => {
+  it("words the verified facts and the concepts in en-GB from the catalogue", async () => {
+    const { diagnosisPromptFacts } = await import("../src/explain.ts");
+    const { diagnosisFacts } = await import("@chess-teacher/core");
+    const f = diagnosisPromptFacts(diagnosisFacts(diagnosed(recorded.lessons[0]!)), {
+      movesPlayed: "",
+      trigger: null,
+    });
+    for (const value of [...f.verified_facts, ...f.concepts.map((c) => c.name)]) {
+      expect(typeof value).toBe("string");
+      expect(value).not.toBe("");
+    }
+  });
+
+  it("still words the facts of a lesson saved before diagnosis", async () => {
     const { promptFacts } = await import("../src/explain.ts");
     const { facts } = await import("@chess-teacher/core");
-    const f = promptFacts(facts(recorded.lessons[0]!), { movesPlayed: "", trigger: null });
+    const f = promptFacts(facts(featureLesson()), { movesPlayed: "", trigger: null });
     for (const value of [f.key_factor, f.before_your_move, f.end_of_your_line, f.principle.title]) {
       expect(typeof value).toBe("string");
       expect(value).not.toBe("");
@@ -512,23 +603,28 @@ describe("explanation language", () => {
     const llm = fakeLlm();
     const { call, signUp } = await setup({ llm });
     const cookie = await signUp("wes@example.com");
-    // Version 1 kept details and triggers as English text.
+    // Version 1 kept details and triggers as English text, and lessons didn't say their source.
+    const { trigger, ...lesson } = featureLesson();
     const v1 = {
-      ...recorded,
+      ...newSession({ userColour: "w" }),
+      moves: ["e2e4", "e7e5", "f1a6", "b8a6"],
       version: 1,
-      lessons: recorded.lessons.map(({ trigger, ...l }) => ({
-        ...l,
-        baselineDetail: "material balance +0",
-        userDetail: "material balance -3",
-        bestDetail: "material balance +0",
-        triggerText: trigger ? "You've lost a knight: you're 3 pawns worse off than before." : "",
-      })),
+      lessons: [
+        {
+          ...lesson,
+          source: undefined,
+          baselineDetail: "material balance +0",
+          userDetail: "material balance -3",
+          bestDetail: "material balance +0",
+          triggerText: trigger ? "You've lost a bishop: you're 3 pawns worse off than before." : "",
+        },
+      ],
     };
     const game = await (
       await call("/api/games", { method: "POST", cookie, json: newGameBody(v1 as never) })
     ).json();
     const res = await (
-      await call(`/api/games/${game.id}/lessons/${recorded.lessons[0]!.id}/explanation`, {
+      await call(`/api/games/${game.id}/lessons/${lesson.id}/explanation`, {
         method: "POST",
         cookie,
         json: EN_GB,
@@ -585,12 +681,12 @@ describe("structured explanations", () => {
       body = b as typeof body;
       return create();
     };
-    const { explainLesson } = await import("../src/explain.ts");
-    const { facts } = await import("@chess-teacher/core");
-    const r = await explainLesson(
+    const { explainDiagnosis } = await import("../src/explain.ts");
+    const { diagnosisFacts } = await import("@chess-teacher/core");
+    const r = await explainDiagnosis(
       llm as never,
       "claude-opus-5-5",
-      facts(recorded.lessons[0]!),
+      diagnosisFacts(diagnosed(recorded.lessons[0]!)),
       { movesPlayed: "", trigger: null },
       "en-GB",
     );

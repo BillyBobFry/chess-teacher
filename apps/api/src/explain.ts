@@ -1,14 +1,27 @@
 /**
- * LLM explanations. The model sees only the lesson's measured facts (from the core's
- * `facts()`, worded in en-GB from the message catalogue), never the board, and its output is
- * rejected if it mentions any square that isn't in those facts. It writes in the player's
+ * LLM explanations. For a feature lesson the model sees only the measured facts (from the
+ * core's `facts()`, worded in en-GB from the message catalogue), never the board; for a
+ * diagnosed lesson it also sees the position, and picks the concept. Its output is rejected
+ * if it mentions a square that isn't in the facts (or, for a diagnosed lesson, on which no
+ * piece stands). It writes in the player's
  * locale. The template explanation is always the fallback.
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import { CONSEQUENCE, type LessonFacts, type Trigger } from "@chess-teacher/core";
+import {
+  CONCEPT_IDS,
+  CONSEQUENCE,
+  Position,
+  squareName,
+  type DiagnosisFacts,
+  type LessonFacts,
+  type Trigger,
+} from "@chess-teacher/core";
 import {
   baseLocale,
+  claimText,
+  conceptText,
+  conceptTitle,
   detailText,
   factorText,
   principleText,
@@ -21,8 +34,9 @@ import {
 /**
  * 4: facts worded from the catalogue, and the explanation written in the player's locale.
  * 5: written at the reveal, with the moves really played and what they led to.
+ * 6: diagnosed lessons: verified claims and the position, and the coach picks the concept.
  */
-export const PROMPT_VERSION = 5;
+export const PROMPT_VERSION = 6;
 
 export const SYSTEM_PROMPT = `You are a friendly chess coach. Your student knows how the pieces move but \
 not the strategy. You will receive facts about one of their moves. A chess engine and \
@@ -68,6 +82,8 @@ export interface ExplanationParts {
   headline: string;
   what_it_allowed: string;
   why_better: string;
+  /** For a diagnosed lesson, the concept the coach chose (a core `ConceptId`). */
+  concept?: string;
 }
 
 const PARTS_SCHEMA = {
@@ -126,6 +142,7 @@ export function parseParts(raw: string | null | undefined): ExplanationParts | n
   try {
     const p = JSON.parse(raw) as Partial<ExplanationParts>;
     const ok = [p.headline, p.what_it_allowed, p.why_better].every((x) => typeof x === "string" && x.trim());
+    if (p.concept !== undefined && typeof p.concept !== "string") return null;
     return ok ? (p as ExplanationParts) : null;
   } catch {
     return null;
@@ -183,12 +200,135 @@ export async function explainLesson(
   locale: Locale,
 ): Promise<ExplanationResult> {
   const factJson = JSON.stringify(promptFacts(facts, game), null, 2);
+  return callModel(
+    client,
+    model,
+    systemPrompt(locale),
+    `Facts about the mistake:\n${factJson}`,
+    PARTS_SCHEMA,
+    factJson,
+  );
+}
+
+export const DIAGNOSIS_PROMPT = `You are a friendly chess coach. Your student knows how the pieces move but \
+not the strategy (rated about 600 to 1400). You will receive one of their moves, the position \
+before it, and facts that a chess engine and checking code verified about it. Every fact is \
+correct.
+
+- "moves_played_in_the_game" are the real moves, starting with "move_played", up to the \
+moment the student is shown this lesson, and "what_happened_in_the_game" is what they led to. \
+Describe these as events. The "predicted_..." lines are the engine's predictions: any of their \
+moves that isn't in the real game has NOT happened, so describe it conditionally.
+- "verified_facts" were each checked by the engine or by code.
+
+First choose the one idea a strong coach would teach from this mistake: the idea that, had \
+the student understood it, would have stopped the mistake. Pick its id from "concepts". \
+Prefer the idea that explains why the move went wrong over a restatement of the outcome. \
+You may read the position to understand the facts and to choose.
+
+Then fill in three short parts, shown as a headline and two short paragraphs above two boards \
+that already show both lines move by move, and a card with the idea you chose:
+- "headline": what went wrong, or what was missed, in at most 10 words. No move sequences.
+- "what_it_allowed": what the move allowed in the game (or, for a missed chance, what it \
+missed), in 1–2 sentences and at most 40 words.
+- "why_better": why the better move was better, naming it, in 1–2 sentences and at most 40 words.
+Connect the facts and say why they matter, but state only what they support: do not mention \
+any move or square that isn't in the facts, and don't claim anything they don't show. Mention \
+at most one short sequence of up to three moves; don't recite the lines. Don't restate the \
+idea's title. Plain text in each part: no markdown.`;
+
+const diagnosisSystemPrompt = (locale: Locale): string =>
+  `${DIAGNOSIS_PROMPT}\n\nWrite every part in ${languageName(locale)} (${locale}), with its spelling and ` +
+  `conventions. Keep moves and squares in standard algebraic notation, as in the facts.`;
+
+const DIAGNOSIS_SCHEMA = {
+  type: "object",
+  properties: {
+    concept: { type: "string", enum: [...CONCEPT_IDS] },
+    headline: { type: "string" },
+    what_it_allowed: { type: "string" },
+    why_better: { type: "string" },
+  },
+  required: ["concept", "headline", "what_it_allowed", "why_better"],
+  additionalProperties: false,
+};
+
+const MISTAKE_DESCRIPTION: Record<DiagnosisFacts["mistake"], string> = {
+  mated: "the move allowed a forced checkmate",
+  loses_material: "the move lost material",
+  misses_mate: "the move missed a forced checkmate",
+  misses_material: "the move missed winning material",
+  positional: "the move made the position worse without losing material at once",
+};
+
+/** A diagnosed lesson's facts as the model sees them, worded in en-GB. */
+export function diagnosisPromptFacts(f: DiagnosisFacts, game: GameSoFar) {
+  const locale = baseLocale;
+  return {
+    move_played: f.you_played,
+    moves_played_in_the_game: game.movesPlayed,
+    what_happened_in_the_game: game.trigger ? triggerText(game.trigger, locale) : null,
+    move_number: f.move_number,
+    player_colour: f.player_colour,
+    position_before_the_move: f.position,
+    better_move: f.better_was,
+    mistake_type: MISTAKE_DESCRIPTION[f.mistake],
+    winning_chances: `${f.winning_chances_before}% with the better move, ${f.winning_chances_after}% after the move played`,
+    verified_facts: f.claims.map((c) => claimText(c, locale)),
+    predicted_continuation_after_your_move: f.your_line,
+    predicted_continuation_after_better_move: f.better_line,
+    concepts: CONCEPT_IDS.map((id) => ({
+      id,
+      name: conceptTitle(id, locale),
+      meaning: conceptText(id, locale),
+    })),
+  };
+}
+
+/** The squares with a piece on them in a position. */
+function occupied(fen: string): string[] {
+  const pos = new Position(fen);
+  const out: string[] = [];
+  for (let s = 0; s < 64; s++) if (pos.pieceAt(s)) out.push(squareName(s));
+  return out;
+}
+
+export async function explainDiagnosis(
+  client: LlmClient,
+  model: string,
+  facts: DiagnosisFacts,
+  game: GameSoFar,
+  locale: Locale,
+): Promise<ExplanationResult> {
+  const prompt = diagnosisPromptFacts(facts, game);
+  const factJson = JSON.stringify(prompt, null, 2);
+  return callModel(
+    client,
+    model,
+    diagnosisSystemPrompt(locale),
+    `Facts about the mistake:\n${factJson}`,
+    DIAGNOSIS_SCHEMA,
+    // The coach reads the position, so a square with a piece on it may be named too. The
+    // concept list names a few squares as examples; only the facts about this move count.
+    `${JSON.stringify({ ...prompt, concepts: undefined })} ${occupied(facts.position).join(" ")}`,
+  );
+}
+
+/** Ask the model, and check its answer: the parts are present and every square is in `allowedFrom`. */
+async function callModel(
+  client: LlmClient,
+  model: string,
+  system: string,
+  content: string,
+  schema: object,
+  allowedFrom: string,
+): Promise<ExplanationResult> {
   const body = {
     model,
     max_tokens: 2000,
-    output_config: { effort: "low", format: { type: "json_schema", schema: PARTS_SCHEMA } },
-    system: systemPrompt(locale),
-    messages: [{ role: "user", content: `Facts about the mistake:\n${factJson}` }],
+    output_config: { effort: "low", format: { type: "json_schema", schema } },
+    system,
+    messages: [{ role: "user", content }],
     ...(FALLBACK_MODELS.has(model)
       ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" }
       : {}),
@@ -224,7 +364,7 @@ export async function explainLesson(
   const text = JSON.stringify(parts);
 
   // Guardrail: every square mentioned must appear in the facts.
-  const allowed = new Set(factJson.match(SQUARE) ?? []);
+  const allowed = new Set(allowedFrom.match(SQUARE) ?? []);
   const said = [parts.headline, parts.what_it_allowed, parts.why_better].join(" ");
   const invented = [...new Set(said.match(SQUARE) ?? [])].filter((s) => !allowed.has(s));
   if (invented.length)
@@ -242,15 +382,18 @@ export function createFakeLlmClient(): LlmClient {
       messages: {
         create: (async (body: { messages: { content: string }[] }) => {
           const json = body.messages[0]!.content.replace(/^[^{]*/, "");
-          const f = JSON.parse(json) as ReturnType<typeof promptFacts>;
+          const f = JSON.parse(json) as Partial<ReturnType<typeof promptFacts>> &
+            Partial<ReturnType<typeof diagnosisPromptFacts>>;
+          const better = f.better_was ?? f.better_move ?? "";
+          const factor = f.key_factor ?? f.mistake_type ?? "";
           return {
             content: [
               {
                 type: "text",
                 text: JSON.stringify({
-                  headline: `(Sample) ${f.move_played} missed something`,
-                  what_it_allowed: `This sample explanation was written without an AI model. The difference is ${f.key_factor}.`,
-                  why_better: `${f.better_was} was better for ${f.key_factor}.`,
+                  headline: `(Sample) ${f.move_played ?? ""} missed something`,
+                  what_it_allowed: `This sample explanation was written without an AI model. The difference is ${factor}.`,
+                  why_better: `${better} was better.`,
                 } satisfies ExplanationParts),
               },
             ],
