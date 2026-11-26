@@ -10,7 +10,7 @@ import { moveTitle } from "./MoveButton.tsx";
 
 /**
  * The engine's evaluation after every move of the line on the board, as a graph the replay can be
- * moved along. Each lesson is marked where its mistake was played (a dot), and, where it cost
+ * moved along: the player's share is filled, from the line down, so past the middle they're ahead. Each lesson is marked where its mistake was played (a dot), and, where it cost
  * the player, shaded from there to the move it cost them (a ring): the evaluation usually drops
  * at the mistake, not when the cost shows on the board.
  */
@@ -37,7 +37,8 @@ export function BalanceGraph({ state, replay }: { state: SessionState; replay: R
       const [first] = run;
       const last = run.at(-1);
       if (first && last) {
-        area += `M${first[0]} 1 ${run.map(([x, h]) => `L${x} ${h}`).join(" ")} L${last[0]} 1 Z `;
+        // Down to the bottom: the player's share of the strip, which grows as they get ahead.
+        area += `M${first[0]} 2 ${run.map(([x, h]) => `L${x} ${h}`).join(" ")} L${last[0]} 2 Z `;
         line += `M${run.map(([x, h]) => `${x} ${h}`).join(" L")} `;
       }
       run = [];
@@ -102,15 +103,16 @@ export function BalanceGraph({ state, replay }: { state: SessionState; replay: R
                 />
               ),
             )}
+            <path d={paths.area} className="fill-fg/15" />
+            {/* Even: over the fill, so it shows on both sides of it. */}
             <line
               x1={0}
               x2={Math.max(total, 1)}
               y1={1}
               y2={1}
-              className="stroke-border"
+              className="stroke-fg-muted/50"
               vectorEffect="non-scaling-stroke"
             />
-            <path d={paths.area} className="fill-fg/10" />
             <path
               d={paths.line}
               className="fill-none stroke-fg-muted"
