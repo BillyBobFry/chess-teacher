@@ -17,6 +17,7 @@ it as mandatory; don't load everything up front.
 | Controls, styling and tokens (React Aria, Tailwind, `ui/`)       | `docs/design/components.md`                     | Adding or changing a control, a style, a colour or a primitive in `apps/web`                                 |
 | Localisation setup, adding a string or a locale                  | `docs/design/README.md`                         | Adding or changing any user-facing string                                                                    |
 | How to build it on the web platform (layout, CSS, HTML, INP...)  | skill `modern-web-guidance` (`.claude/skills/`) | Before writing HTML, CSS or client-side JS in `apps/web`. UX principles, then components.md, win on conflict |
+| Architecture upkeep: the gardener backlog in `docs/gardener/`    | skill `architecture-gardener`                   | Surveying the architecture, or shipping a backlog item (`ARCH-n`) from `docs/gardener/`                      |
 
 ## Commands
 
