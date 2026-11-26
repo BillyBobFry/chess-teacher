@@ -127,7 +127,7 @@ function fakeLlm() {
 
 async function setup(opts: { llm?: LlmClient | null; perMonth?: number } = {}) {
   const env = {
-    ...readEnv({ FREE_EXPLANATIONS_PER_MONTH: String(opts.perMonth ?? 30) }),
+    ...readEnv({ FREE_COACHED_GAMES_PER_MONTH: String(opts.perMonth ?? 30) }),
     authUrl: ORIGIN,
     trustedOrigins: [ORIGIN],
   };
@@ -180,7 +180,7 @@ describe("auth", () => {
     const cookie = await signUp("ada@example.com");
     const me = await (await call("/api/me", { cookie })).json();
     expect(me.user.email).toBe("ada@example.com");
-    expect(me.explanations).toEqual({ enabled: true, used: 0, limit: 30, remaining: 30 });
+    expect(me.coachedGames).toEqual({ enabled: true, used: 0, limit: 30, remaining: 30 });
   });
 
   it("signs in again with the same password", async () => {
@@ -319,9 +319,9 @@ describe("explanations", () => {
 
     expect(await (await call(url, { cookie })).json()).toMatchObject({ status: "pending" });
     const first = await (await call(url, { method: "POST", cookie, json: EN_GB })).json();
-    expect(first).toEqual({ status: "ready", parts: llm.parts, remaining: 29 });
+    expect(first).toEqual({ status: "ready", parts: llm.parts, coachedGamesRemaining: 29 });
     const again = await (await call(url, { method: "POST", cookie, json: EN_GB })).json();
-    expect(again).toEqual({ status: "ready", parts: llm.parts, remaining: 29 });
+    expect(again).toEqual({ status: "ready", parts: llm.parts, coachedGamesRemaining: 29 });
     expect(llm.calls).toBe(1);
     expect(await (await call(url, { cookie })).json()).toMatchObject({ status: "ready" });
   });
@@ -341,7 +341,7 @@ describe("explanations", () => {
         json: EN_GB,
       })
     ).json();
-    expect(res).toEqual({ status: "rejected", remaining: 30 });
+    expect(res).toEqual({ status: "rejected", coachedGamesRemaining: 30 });
   });
 
   it("lets the coach name a square a piece stands on", async () => {
@@ -362,18 +362,30 @@ describe("explanations", () => {
     expect(res.status).toBe("ready");
   });
 
-  it("stops at the monthly allowance", async () => {
-    const { call, signUp } = await setup({ perMonth: 1 });
+  it("counts each coached game once, and stops new games at the monthly allowance", async () => {
+    const llm = fakeLlm();
+    const { call, signUp } = await setup({ llm, perMonth: 1 });
     const cookie = await signUp("gus@example.com");
-    const game = await (
-      await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })
-    ).json();
-    const post = (id: number) =>
+    const newGame = async () =>
+      (await (await call("/api/games", { method: "POST", cookie, json: newGameBody(recorded) })).json()).id;
+    const post = (gameId: string, id: number) =>
       Promise.resolve(
-        call(`/api/games/${game.id}/lessons/${id}/explanation`, { method: "POST", cookie, json: EN_GB }),
+        call(`/api/games/${gameId}/lessons/${id}/explanation`, { method: "POST", cookie, json: EN_GB }),
       ).then((r) => r.json());
-    expect((await post(lessonIds[0]!)).status).toBe("ready");
-    expect(await post(lessonIds[1]!)).toEqual({ status: "quota", remaining: 0 });
+    const first = await newGame();
+    expect(await post(first, lessonIds[0]!)).toEqual({
+      status: "ready",
+      parts: llm.parts,
+      coachedGamesRemaining: 0,
+    });
+    expect(await post(first, lessonIds[1]!)).toEqual({
+      status: "ready",
+      parts: llm.parts,
+      coachedGamesRemaining: 0,
+    });
+    expect(await post(await newGame(), lessonIds[0]!)).toEqual({ status: "quota", coachedGamesRemaining: 0 });
+    const me = await (await call("/api/me", { cookie })).json();
+    expect(me.coachedGames).toEqual({ enabled: true, used: 1, limit: 1, remaining: 0 });
   });
 
   it("says AI explanations are unavailable without an API key", async () => {
@@ -670,7 +682,7 @@ describe("structured explanations", () => {
         json: EN_GB,
       })
     ).json();
-    expect(res).toEqual({ status: "error", remaining: 30 });
+    expect(res).toEqual({ status: "error", coachedGamesRemaining: 30 });
   });
 
   it("asks the API for the three-part structure", async () => {

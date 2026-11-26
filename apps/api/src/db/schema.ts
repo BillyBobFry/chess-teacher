@@ -127,17 +127,22 @@ export const explanations = pgTable(
   (t) => [uniqueIndex("explanations_game_lesson_idx").on(t.gameId, t.lessonId)],
 );
 
-/** AI explanations used per user per calendar month (the free/paid allowance). */
-export const usage = pgTable(
-  "usage",
+/**
+ * Coached games, the unit of the monthly allowance (D13): a game is coached in a month when
+ * its first AI explanation of that month is written. The game id has no foreign key, so
+ * deleting a game doesn't give its allowance back.
+ */
+export const coachedGames = pgTable(
+  "coached_games",
   {
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     period: text("period").notNull(), // "2026-11"
-    explanationsUsed: integer("explanations_used").notNull().default(0),
+    gameId: uuid("game_id").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
   },
-  (t) => [primaryKey({ columns: [t.userId, t.period] })],
+  (t) => [primaryKey({ columns: [t.userId, t.period, t.gameId] })],
 );
 
 /** "Did this lesson make sense?" ratings, for measuring and improving lesson quality. */

@@ -172,7 +172,7 @@ A Hono API on Vercel Functions, Neon Postgres via Drizzle. Endpoint sketch (fina
 ```
 GET  /api/config                                  is Google sign-in / are AI explanations available
 GET|POST /api/auth/*                              Better Auth (sign up, sign in, Google, sign out)
-GET  /api/me                                      user + AI explanation allowance
+GET  /api/me                                      user + allowance of coached games
 GET  /api/games?status=active                     recent unfinished games
 GET  /api/games?status=finished                   recent finished games, with outcome and lesson count
 POST /api/games                                   create a game (session state)
@@ -181,7 +181,8 @@ PUT  /api/games/:id                               save { state, reveal, finished
                                                   409 if another device saved first
 GET  /api/games/:id/lessons/:lessonId/explanation the stored AI explanation, if any
 POST /api/games/:id/lessons/:lessonId/explanation generate it (from the *saved* lesson), or
-                                                  return the stored one; counts against the allowance
+                                                  return the stored one; the game's first this month
+                                                  counts against the allowance
 ```
 
 The client saves the whole session state after every step (one queued, coalesced save at
@@ -195,13 +196,13 @@ the cost of anyone faking them.
 
 **Data model (first cut):**
 
-| Table          | Key columns                                                                                                                                                           |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `users`        | id, email, plan, created_at                                                                                                                                           |
-| `games`        | id, user_id, colour, settings (json), moves (UCI[]), state (json, the latest `SessionState`), state_version, status (active/finished), result, created_at, updated_at |
-| `lessons`      | id, game_id, ply, principle, feature, kind, facts (json), status, found_cause, hints_used, rewound                                                                    |
-| `explanations` | lesson_id, model, prompt_version, text, input_tokens, output_tokens, cost_usd, guardrail_ok                                                                           |
-| `usage`        | user_id, period, explanations_used                                                                                                                                    |
+| Table           | Key columns                                                                                                                                                           |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `users`         | id, email, plan, created_at                                                                                                                                           |
+| `games`         | id, user_id, colour, settings (json), moves (UCI[]), state (json, the latest `SessionState`), state_version, status (active/finished), result, created_at, updated_at |
+| `lessons`       | id, game_id, ply, principle, feature, kind, facts (json), status, found_cause, hints_used, rewound                                                                    |
+| `explanations`  | lesson_id, model, prompt_version, text, input_tokens, output_tokens, cost_usd, guardrail_ok                                                                           |
+| `coached_games` | user_id, period, game_id                                                                                                                                              |
 
 Lessons are stored as data from day one: they drive progress tracking and are how the
 teaching gets improved (which principles players rarely find, which explanation versions
@@ -316,7 +317,8 @@ Vercel account), and speed on real phones.
   any device; abandoning a game finishes it.
 - AI explanations: requested when the lesson is revealed (originally when it was
   _created_; see D5), generated from the saved lesson's facts only, guardrail-checked, stored once per
-  lesson, counted against a monthly allowance (default 30) only when successful. Shown
+  lesson. A game is coached once one succeeds, and coached games count against a monthly
+  allowance (default 30, D13); further explanations in a coached game are free. Shown
   above the measured facts; the facts stand alone when there's no AI explanation.
 - `packages/contract`: API schemas in Zod, used for validation and client types.
 - Static landing page at `/`; the app at `/app/`; sign-in screens in the app.

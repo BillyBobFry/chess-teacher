@@ -277,11 +277,11 @@ function GameApp({
             header={
               <>
                 <span className="block font-semibold">{userName}</span>
-                {g.me?.explanations.enabled && (
+                {g.me?.coachedGames.enabled && (
                   <span className="block text-sm text-fg-muted">
                     {m.account_allowance({
-                      remaining: g.me.explanations.remaining,
-                      limit: g.me.explanations.limit,
+                      remaining: g.me.coachedGames.remaining,
+                      limit: g.me.coachedGames.limit,
                     })}
                   </span>
                 )}

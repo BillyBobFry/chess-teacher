@@ -18,8 +18,8 @@ export interface Env {
   /** Anthropic API key. Unset → AI explanations are off and the app uses templates. */
   anthropicApiKey?: string;
   llmModel: string;
-  /** AI explanations per user per calendar month. */
-  explanationsPerMonth: number;
+  /** Coached games (games with an AI explanation, D13) per user per calendar month. */
+  coachedGamesPerMonth: number;
 }
 
 const DEV_SECRET = "dev-only-secret-change-me-in-production-0123456789";
@@ -50,6 +50,6 @@ export function readEnv(e: Record<string, string | undefined> = process.env): En
         : undefined,
     anthropicApiKey: e.ANTHROPIC_API_KEY || undefined,
     llmModel: e.LLM_MODEL || "claude-opus-5-5",
-    explanationsPerMonth: Number(e.FREE_EXPLANATIONS_PER_MONTH ?? 30),
+    coachedGamesPerMonth: Number(e.FREE_COACHED_GAMES_PER_MONTH ?? 30),
   };
 }

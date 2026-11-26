@@ -29,6 +29,13 @@
       "when": 1795691621408,
       "tag": "0003_opponent_rating",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795726866707,
+      "tag": "0004_coached_games",
+      "breakpoints": true
     }
   ]
 }

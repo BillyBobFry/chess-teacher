@@ -55,8 +55,8 @@
       ],
       "selectors": ["limitPlural"],
       "match": {
-        "limitPlural=one": "{remainingCount} of {limitCount} AI explanation left this month",
-        "limitPlural=other": "{remainingCount} of {limitCount} AI explanations left this month"
+        "limitPlural=one": "{remainingCount} of {limitCount} coached game left this month",
+        "limitPlural=other": "{remainingCount} of {limitCount} coached games left this month"
       }
     }
   ],
@@ -187,7 +187,7 @@
   "explanation_missed_improved": "Your move wasn't a disaster, but {#better}{better}{/better} would have improved {factor}.",
   "explanation_undefended": "Your move left this undefended: {pieces}.",
   "ai_writing": "Your coach is writing an explanation…",
-  "ai_quota": "You've used this month's AI explanations. Here's what we measured:",
+  "ai_quota": "You've used this month's coached games. Here's what we measured:",
   "ai_label": "Your coach",
   "ai_foot": [
     {
@@ -198,8 +198,8 @@
       ],
       "selectors": ["remainingPlural"],
       "match": {
-        "remainingPlural=one": "Written by AI from the measured facts below · {remainingCount} AI explanation left this month",
-        "remainingPlural=other": "Written by AI from the measured facts below · {remainingCount} AI explanations left this month"
+        "remainingPlural=one": "Written by AI from the measured facts below · {remainingCount} coached game left this month",
+        "remainingPlural=other": "Written by AI from the measured facts below · {remainingCount} coached games left this month"
       }
     }
   ],
