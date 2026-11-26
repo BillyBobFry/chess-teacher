@@ -184,6 +184,14 @@ function GameApp({
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
   const [confirmingResign, setConfirmingResign] = useState(false);
   const saved = g.game;
+  const inProgress = !!saved && !saved.finished;
+  // Away from the game in progress (a page from the account menu, or choosing a new game),
+  // the way back to it is always in the header.
+  const awayFromGame = inProgress && (route.page !== "play" || choosing);
+  const backToGame = () => {
+    if (route.page !== "play") navigate(PLAY);
+    setChoosing(false);
+  };
   const chooseNewGame = () => {
     if (route.page !== "play") navigate(PLAY);
     setChoosing(true);
@@ -222,10 +230,14 @@ function GameApp({
 
   const nav = (
     <>
-      {saved && !saved.finished && !choosing && (
-        <Button onPress={() => setConfirmingResign(true)} isDisabled={!!saved.reveal}>
-          {m.nav_resign()}
-        </Button>
+      {awayFromGame ? (
+        <Button onPress={backToGame}>{m.game_back_to_current()}</Button>
+      ) : (
+        inProgress && (
+          <Button onPress={() => setConfirmingResign(true)} isDisabled={!!saved.reveal}>
+            {m.nav_resign()}
+          </Button>
+        )
       )}
       {saved && !choosing && <Button onPress={requestNewGame}>{m.nav_new_game()}</Button>}
       {saved && board && (
@@ -250,7 +262,9 @@ function GameApp({
           cancelLabel={m.confirm_new_game_cancel()}
           onClose={(confirmed) => {
             setConfirmingNewGame(false);
+            // Keep playing means play: from a past game or another page, that's back to the board.
             if (confirmed) chooseNewGame();
+            else backToGame();
           }}
         />
       )}
@@ -310,7 +324,11 @@ function GameApp({
     return (
       <Shell nav={nav}>
         <main className="page">
-          <Games onNewGame={requestNewGame} onBack={() => goBack(PLAY)} />
+          <Games
+            onNewGame={requestNewGame}
+            onBackToGame={inProgress ? backToGame : null}
+            onBack={() => goBack(PLAY)}
+          />
         </main>
       </Shell>
     );
@@ -323,6 +341,7 @@ function GameApp({
           key={route.id}
           id={route.id}
           onNewGame={requestNewGame}
+          onBackToGame={inProgress ? backToGame : null}
           onProgress={() => navigate({ page: "progress" })}
         />
       </Shell>
@@ -342,11 +361,6 @@ function GameApp({
               setChoosing(false);
             }}
           />
-          {saved && choosing && (
-            <Button variant="link" className="mt-4" onPress={() => setChoosing(false)}>
-              {m.game_back_to_current()}
-            </Button>
-          )}
         </main>
       </Shell>
     );
@@ -397,6 +411,7 @@ function GameApp({
               state={state}
               result={resultText(board.game, state)}
               onNewGame={() => setChoosing(true)}
+              onBackToGame={null}
               onProgress={() => navigate({ page: "progress" })}
             />
           ) : revealLesson && saved.reveal ? (

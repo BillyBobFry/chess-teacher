@@ -431,6 +431,27 @@ try {
     await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 60_000 });
   });
 
+  await step("away from a game in progress, the way back to it is clear", async () => {
+    const openPastGame = async () => {
+      await page.getByRole("button", { name: "Account" }).click();
+      await page.getByRole("menuitem", { name: "Your games" }).click();
+      await page.getByRole("grid", { name: "Finished games" }).getByRole("row").first().click();
+      await page.getByRole("heading", { name: "Game review" }).waitFor({ timeout: 30_000 });
+    };
+    await openPastGame();
+    await page.getByRole("button", { name: "Back to the current game" }).first().waitFor();
+    await shot("6e-past-game-in-progress", true);
+    // Keep playing goes back to the board, not just shuts the dialog over the past game.
+    await page.getByRole("button", { name: "New game" }).click();
+    await page.getByRole("alertdialog", { name: "Start a new game?" }).waitFor();
+    await page.getByRole("button", { name: "Keep playing" }).click();
+    await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 30_000 });
+    // The review's own next step is the game in progress, not a new game that would resign it.
+    await openPastGame();
+    await page.locator(".review").getByRole("button", { name: "Back to the current game" }).click();
+    await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 30_000 });
+  });
+
   await step("licences", async () => {
     await page.getByRole("link", { name: "Licences" }).click();
     await page.getByRole("heading", { name: "Licences" }).waitFor();
