@@ -200,24 +200,25 @@ lessons", not `${n} lessons`). Join inline facts with `·`.
 **UX-59 One word for each thing.** Use the same word for the same thing everywhere, in labels,
 buttons, headings and errors. The glossary (en-GB; each locale keeps its own list):
 
-| Word              | Means                                                                              | Not                                  |
-| :---------------- | :--------------------------------------------------------------------------------- | :----------------------------------- |
-| game              | one game against the opponent                                                      | match                                |
-| move              | one player's move                                                                  | ply, half-move, turn                 |
-| opponent          | the side the player plays against                                                  | bot, computer, AI                    |
-| engine            | Stockfish, only when we mean its analysis or its prediction                        | AI, computer                         |
-| mistake           | a move with a clearly better alternative that cost, or would have cost, the player | blunder, inaccuracy, error           |
-| missed chance     | a clearly better option the player didn't take                                     |                                      |
-| better move       | the move that would have been better                                               | best move, engine move, correct move |
-| lesson            | one mistake or missed chance, with its explanation                                 | tip, card                            |
-| principle         | one idea from the curriculum ("Keep your king safe")                               | rule, tip, theme                     |
-| coach             | the voice of the AI explanation ("Your coach")                                     | AI tutor, assistant, bot             |
-| AI explanation    | one explanation written by the coach; the unit of the monthly allowance            | credit, token, analysis              |
-| rewind            | go back to before the mistake and play on from there                               | undo, take back                      |
-| undo, redo        | remove the player's latest move and the opponent's reply; play them again          | take back, takeback, rewind          |
-| carry on          | continue the game after a lesson                                                   | resume, continue                     |
-| resign            | end the game before it's over, as a loss; starting a new game mid-game does it too | abandon, forfeit, end game, quit     |
-| sign in, sign out | start and end a session; a new player's button is "Create account"                 | log in, log out, register            |
+| Word              | Means                                                                                  | Not                                    |
+| :---------------- | :------------------------------------------------------------------------------------- | :------------------------------------- |
+| game              | one game against the opponent                                                          | match                                  |
+| move              | one player's move                                                                      | ply, half-move, turn                   |
+| opponent          | the side the player plays against                                                      | bot, computer, AI                      |
+| engine            | Stockfish, only when we mean its analysis or its prediction                            | AI, computer                           |
+| balance of power  | the engine's evaluation of who's ahead after each move, as the review's graph shows it | eval, evaluation bar, advantage, score |
+| mistake           | a move with a clearly better alternative that cost, or would have cost, the player     | blunder, inaccuracy, error             |
+| missed chance     | a clearly better option the player didn't take                                         |                                        |
+| better move       | the move that would have been better                                                   | best move, engine move, correct move   |
+| lesson            | one mistake or missed chance, with its explanation                                     | tip, card                              |
+| principle         | one idea from the curriculum ("Keep your king safe")                                   | rule, tip, theme                       |
+| coach             | the voice of the AI explanation ("Your coach")                                         | AI tutor, assistant, bot               |
+| AI explanation    | one explanation written by the coach; the unit of the monthly allowance                | credit, token, analysis                |
+| rewind            | go back to before the mistake and play on from there                                   | undo, take back                        |
+| undo, redo        | remove the player's latest move and the opponent's reply; play them again              | take back, takeback, rewind            |
+| carry on          | continue the game after a lesson                                                       | resume, continue                       |
+| resign            | end the game before it's over, as a loss; starting a new game mid-game does it too     | abandon, forfeit, end game, quit       |
+| sign in, sign out | start and end a session; a new player's button is "Create account"                     | log in, log out, register              |
 
 **UX-60 Copy mechanics.** Sentence case for every piece of UI text, buttons and headings included.
 Put the key words first in headings, links and list items. A link's text names where it goes,
