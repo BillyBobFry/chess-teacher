@@ -57,6 +57,7 @@ export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] 
             label={real ? m.futures_what_happened() : m.futures_your_move()}
             fen={a.fen}
             orientation={orientation}
+            focusable={false}
             lastMove={a.lastMove}
             arrows={a.arrows}
             showNotation={false}
@@ -70,6 +71,7 @@ export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] 
             label={m.futures_better()}
             fen={b.fen}
             orientation={orientation}
+            focusable={false}
             lastMove={b.lastMove}
             arrows={b.arrows}
             showNotation={false}

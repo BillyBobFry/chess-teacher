@@ -53,6 +53,7 @@ export function MoveButton({
           label={m.moves_board_before({ move: title })}
           fen={move.before}
           orientation={orientation}
+          focusable={false}
           arrows={[{ from: move.from, to: move.to, color: MOVE_ARROW }]}
           showNotation={false}
         />

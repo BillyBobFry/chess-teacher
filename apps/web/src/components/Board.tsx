@@ -22,6 +22,11 @@ interface Props {
   label: string;
   fen: string;
   orientation: Orientation;
+  /**
+   * Whether the board is in the tab order. Only the board of the game being played is: the
+   * others (popovers, lessons, past games) are pictures, and a tab stop there is a detour.
+   */
+  focusable: boolean;
   /** When set, the user can move pieces of the side to move (click, drag or keyboard). */
   onMove?: (uci: string) => boolean;
   /** The move that led to `fen`, marked on the board and read out to screen readers. */
@@ -69,6 +74,7 @@ export function Board({
   label,
   fen,
   orientation,
+  focusable,
   onMove,
   lastMove,
   arrows,
@@ -273,7 +279,7 @@ export function Board({
                 className="board-cell"
                 role="gridcell"
                 data-square={square}
-                tabIndex={square === active ? 0 : -1}
+                tabIndex={focusable ? (square === active ? 0 : -1) : undefined}
                 aria-selected={square === selected ? true : undefined}
                 onFocus={() => setFocused(square)}
               >

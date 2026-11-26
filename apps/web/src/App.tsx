@@ -433,6 +433,7 @@ function GameApp({
               label={m.board_game()}
               fen={board.fen}
               orientation={orientation}
+              focusable={!saved.finished}
               lastMove={board.lastMove}
               onMove={canMove ? g.move : undefined}
             />
