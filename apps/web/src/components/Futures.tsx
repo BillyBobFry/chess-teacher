@@ -2,10 +2,10 @@ import type { Lesson } from "@chess-teacher/core";
 import type { Move } from "chess.js";
 import { useMemo, useState } from "react";
 import { lineMoves } from "../lib/moves.ts";
-import { Board, orientationOf } from "./Board.tsx";
+import { ARROW, Board, orientationOf } from "./Board.tsx";
 import { MoveButton } from "./MoveButton.tsx";
 import { m } from "../paraglide/messages.js";
-import { Button } from "../ui/Button.tsx";
+import { Stepper } from "./Stepper.tsx";
 
 /**
  * What actually happened after the mistake, beside how the better move could have gone,
@@ -31,8 +31,8 @@ export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] 
       arrows: i === 0 && first ? [{ from: first.from, to: first.to, color: colour }] : [],
     };
   };
-  const a = view(mine, "#c2552b");
-  const b = view(better, "#2f8f5f");
+  const a = view(mine, ARROW.yours);
+  const b = view(better, ARROW.better);
 
   const sanLine = (moves: Move[]) => (
     <ol className="line">
@@ -79,35 +79,15 @@ export function Futures({ lesson, played }: { lesson: Lesson; played?: string[] 
           {sanLine(better)}
         </figure>
       </div>
-      <div
-        className="my-3 flex items-center justify-center gap-1"
-        role="group"
-        aria-label={m.futures_stepper()}
-      >
-        <Button onPress={() => setStep(0)} isDisabled={step === 0} aria-label={m.futures_start()}>
-          ⏮
-        </Button>
-        <Button
-          onPress={() => setStep((s) => Math.max(0, s - 1))}
-          isDisabled={step === 0}
-          aria-label={m.futures_back()}
-        >
-          ◀
-        </Button>
-        {/* A fixed width, so the buttons hold still as the label changes (UX-52). */}
-        <span className="min-w-28 text-center text-sm text-fg-muted tabular-nums">
-          {step === 0 ? m.futures_before() : m.futures_step({ step, total: plies })}
-        </span>
-        <Button
-          onPress={() => setStep((s) => Math.min(plies, s + 1))}
-          isDisabled={step === plies}
-          aria-label={m.futures_forward()}
-        >
-          ▶
-        </Button>
-        <Button onPress={() => setStep(plies)} isDisabled={step === plies} aria-label={m.futures_end()}>
-          ⏭
-        </Button>
+      <div className="my-3">
+        <Stepper
+          label={m.futures_stepper()}
+          step={step}
+          total={plies}
+          position={step === 0 ? m.futures_before() : m.futures_step({ step, total: plies })}
+          onStep={setStep}
+          shortcuts={false}
+        />
       </div>
     </div>
   );

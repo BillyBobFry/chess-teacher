@@ -114,3 +114,22 @@ export function reviewTree(s: SessionState): ReviewLine {
 }
 
 const idOf = (item: ReviewItem): number => (item.kind === "lesson" ? item.lesson.id : item.line.id);
+
+/**
+ * The reviewable lessons whose mistake was played on `line` (`SessionState.line` or a
+ * `Branch.id`), in the order played. A mistake on moves two lines share belongs to both,
+ * whichever line recorded it.
+ */
+export function lessonsOnLine(s: SessionState, line: number): Lesson[] {
+  const lines = new Map([[s.line, s.moves], ...s.branches.map((b): [number, string[]] => [b.id, b.moves])]);
+  const moves = lines.get(line);
+  if (!moves) return [];
+  const start = plyOf(s.startFen);
+  return reviewLessons(s)
+    .filter((l) => {
+      const at = l.ply - start;
+      const own = lines.get(l.line) ?? s.moves;
+      return at < moves.length && commonPrefix(own, moves) > at;
+    })
+    .sort((a, b) => a.ply - b.ply || a.id - b.id);
+}

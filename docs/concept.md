@@ -64,8 +64,10 @@ letting the player explore, and was chosen deliberately.
 After the game, the **review** lists every lesson as a tree of the lines played. When the
 player went back past a lesson they had been shown (by rewinding, or undoing that far) and
 played on differently, what they played first is kept and hangs off the move they went
-back to, with its own lessons and what really happened after each. Finished games and their
-reviews stay in the player's account, under "Your games".
+back to, with its own lessons and what really happened after each. Beside it the board
+replays the game move by move, linked both ways with the lessons: opening a lesson puts the
+board just before its mistake, and stepping onto a mistake names its lesson. Finished games and
+their reviews stay in the player's account, under "Your games".
 
 Because the rule is simply _"reveal when the consequence lands"_, tactics and strategy
 are handled the same way: a hanging piece is revealed one move later; a weak pawn might

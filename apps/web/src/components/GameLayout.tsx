@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Drawer } from "../ui/Drawer.tsx";
 
 /**
@@ -8,6 +8,7 @@ import { Drawer } from "../ui/Drawer.tsx";
  */
 export function GameLayout({
   board,
+  under,
   panel,
   panelLabel,
   expanded,
@@ -15,6 +16,11 @@ export function GameLayout({
 }: {
   /** The board, with the status line above it and anything that belongs under it. */
   board: ReactNode;
+  /**
+   * The height of what `board` holds under the board, as a CSS length ("0rem" for nothing), so
+   * the board leaves room for it instead of pushing it out of view.
+   */
+  under: string;
   panel: ReactNode;
   panelLabel: string;
   expanded: boolean;
@@ -23,15 +29,19 @@ export function GameLayout({
   return (
     // A size container: the board and the drawer measure the screen from it. `--peek` is the
     // least the collapsed drawer shows: its handle, a heading row and a couple of moves.
-    <main className="flex min-h-0 flex-1 flex-col [--peek:11rem] [container-type:size] wide:flex-row">
-      {/* Using the board means playing: put the drawer away so all of it shows (UX-105). */}
+    <main
+      className="flex min-h-0 flex-1 flex-col [--peek:11rem] [container-type:size] wide:flex-row"
+      style={{ "--under": under } as CSSProperties}
+    >
+      {/* Using the board means playing: put the drawer away so all of it shows (UX-105).
+          Isolated, so the board's own layers (a replay's arrow) stay under the drawer. */}
       <div
-        className="flex shrink-0 justify-center px-4 pt-3 pb-2 wide:min-w-0 wide:flex-1 wide:items-[safe_center] wide:overflow-y-auto wide:p-6 wide:[container-type:size]"
+        className="isolate flex shrink-0 justify-center px-4 pt-3 pb-2 wide:min-w-0 wide:flex-1 wide:items-[safe_center] wide:overflow-y-auto wide:p-6 wide:[container-type:size]"
         onPointerDown={() => onExpandedChange(false)}
       >
         {/* As wide as the space allows, and short enough to leave the status line and the
             drawer's least room below it. */}
-        <div className="flex w-[min(100cqi_-_2rem,100cqb_-_var(--peek)_-_3.5rem)] flex-col gap-2 wide:w-[min(100cqi,100cqb_-_2.5rem,48rem)]">
+        <div className="flex w-[min(100cqi_-_2rem,100cqb_-_var(--peek)_-_3.5rem_-_var(--under))] flex-col gap-2 wide:w-[min(100cqi,100cqb_-_2.5rem_-_var(--under),48rem)]">
           {board}
         </div>
       </div>

@@ -16,6 +16,7 @@ import {
   plyOf,
   pyRound,
   resign,
+  lessonsOnLine,
   reviewTree,
   rewind,
   settledBalance,
@@ -365,6 +366,28 @@ describe("reviewTree", () => {
   it("is a plain list for a game that was never rewound", () => {
     const state = { ...newSession({ userColour: "w" }), moves: ["e2e4", "e7e5"], lessons: [lesson(2, 0, 0)] };
     expect(shape(reviewTree(state))).toEqual([2]);
+  });
+});
+
+describe("lessonsOnLine", () => {
+  // The game ended on line 1; line 0 went 2. Bb5 where line 1 went 2. Bc4.
+  const state = {
+    ...newSession({ userColour: "w" }),
+    line: 1,
+    moves: ["e2e4", "e7e5", "f1c4", "g8f6"],
+    branches: [{ id: 0, moves: ["e2e4", "e7e5", "f1b5", "a7a6"] }],
+    lessons: [
+      lesson(1, 0, 0), // on the moves both lines share
+      lesson(2, 0, 2), // 2. Bb5: only line 0's
+      lesson(3, 1, 2), // 2. Bc4: only line 1's
+      lesson(4, 1, 0, "rewound"), // undone: not reviewed
+    ],
+  };
+  const ids = (line: number) => lessonsOnLine(state, line).map((l) => l.id);
+
+  it("finds the lessons whose mistake was played on a line, whichever line recorded them", () => {
+    expect(ids(1)).toEqual([1, 3]);
+    expect(ids(0)).toEqual([1, 2]);
   });
 });
 

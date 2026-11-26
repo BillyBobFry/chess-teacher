@@ -53,6 +53,16 @@ export const button = tv({
         "underline decoration-fg-muted decoration-dotted underline-offset-[0.2em]",
         "data-hovered:bg-fg/10 data-pressed:bg-fg/15 aria-expanded:bg-fg/10",
       ],
+      /**
+       * An item in a list that shows something when pressed, like a move that puts the board
+       * there. `aria-current` marks the one being shown.
+       */
+      item: [
+        "rounded-inline border-0 bg-transparent px-1 text-start text-inherit",
+        "data-hovered:bg-fg/10 data-pressed:bg-fg/15",
+        "aria-[current=true]:bg-primary aria-[current=true]:font-semibold aria-[current=true]:text-on-primary",
+        "aria-[current=true]:data-hovered:bg-primary-hover aria-[current=true]:data-pressed:bg-primary-pressed",
+      ],
     },
     size: { medium: "", large: "" },
     /** `circle` is for a single glyph or initial, like the account menu's. */
@@ -84,7 +94,14 @@ type ButtonProps = Omit<AriaButtonProps, "className"> &
     className?: string;
     /** The keyboard shortcuts that also do this, for screen readers ("Control+Z Meta+Z"). */
     "aria-keyshortcuts"?: string;
+    /** Marks the item being shown, in a list of them (the `item` variant). */
+    "aria-current"?: "true";
   };
+
+const setAttribute = (el: HTMLElement | null, name: string, value: string | undefined) => {
+  if (value) el?.setAttribute(name, value);
+  else el?.removeAttribute(name);
+};
 
 /** Every button in the app (UX-37). Props are React Aria's: `onPress`, `isDisabled`, `type`. */
 export function Button({
@@ -93,14 +110,15 @@ export function Button({
   shape,
   className,
   "aria-keyshortcuts": keyShortcuts,
+  "aria-current": current,
   ...props
 }: ButtonProps) {
-  // React Aria doesn't pass aria-keyshortcuts through to the element, so set it here.
+  // React Aria doesn't pass these through to the element, so set them here.
   const ref = useRef<HTMLButtonElement>(null);
   useLayoutEffect(() => {
-    if (keyShortcuts) ref.current?.setAttribute("aria-keyshortcuts", keyShortcuts);
-    else ref.current?.removeAttribute("aria-keyshortcuts");
-  }, [keyShortcuts]);
+    setAttribute(ref.current, "aria-keyshortcuts", keyShortcuts);
+    setAttribute(ref.current, "aria-current", current);
+  }, [keyShortcuts, current]);
 
   return (
     <AriaButton
