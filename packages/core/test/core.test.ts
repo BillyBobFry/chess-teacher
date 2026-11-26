@@ -8,6 +8,7 @@ import {
   detectMistake,
   gameOutcome,
   awaitedHappened,
+  balanceOf,
   diagnosisFacts,
   judgeLine,
   lessonFromDossier,
@@ -188,6 +189,16 @@ describe("upgradeSession", () => {
     };
     expect(upgradeSession(saved).scores).toEqual([20]);
   });
+
+  it("gives the lines a version 5 save left behind no evaluations", () => {
+    const saved: SavedSessionState = {
+      ...newSession({ userColour: "w" }),
+      version: 5,
+      line: 1,
+      branches: [{ id: 0, moves: ["e2e4"] }],
+    };
+    expect(upgradeSession(saved).branches).toEqual([{ id: 0, moves: ["e2e4"], scores: [] }]);
+  });
 });
 
 describe("detectMistake", () => {
@@ -325,9 +336,9 @@ describe("reviewTree", () => {
       line: 3,
       moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "g8f6"],
       branches: [
-        { id: 0, moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5", "a7a6"] },
-        { id: 1, moves: ["e2e4", "e7e5", "d2d4"] },
-        { id: 2, moves: ["e2e4", "c7c5"] },
+        { id: 0, moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5", "a7a6"], scores: [] },
+        { id: 1, moves: ["e2e4", "e7e5", "d2d4"], scores: [] },
+        { id: 2, moves: ["e2e4", "c7c5"], scores: [] },
       ],
       lessons: [
         lesson(1, 0, 0), // on line 0, but on the moves it shares with the game's line
@@ -352,8 +363,8 @@ describe("reviewTree", () => {
       line: 2,
       moves: ["e2e4", "e7e5", "f1c4"],
       branches: [
-        { id: 0, moves: ["e2e4", "e7e5", "f1b5"] },
-        { id: 1, moves: ["e2e4", "e7e5", "d1h5"] },
+        { id: 0, moves: ["e2e4", "e7e5", "f1b5"], scores: [] },
+        { id: 1, moves: ["e2e4", "e7e5", "d1h5"], scores: [] },
       ],
       lessons: [lesson(1, 0, 2), lesson(2, 1, 2)],
     };
@@ -369,13 +380,23 @@ describe("reviewTree", () => {
   });
 });
 
+describe("balanceOf", () => {
+  it("reads a score as pawns ahead or behind, or a forced mate in the mating side's moves", () => {
+    expect(balanceOf(150)).toEqual({ kind: "pawns", pawns: 1.5 });
+    expect(balanceOf(-40)).toEqual({ kind: "pawns", pawns: -0.4 });
+    expect(balanceOf(MATE_SCORE - 3)).toEqual({ kind: "mate", moves: 2, winning: true });
+    expect(balanceOf(-(MATE_SCORE - 1))).toEqual({ kind: "mate", moves: 1, winning: false });
+    expect(balanceOf(MATE_SCORE)).toEqual({ kind: "mate", moves: 0, winning: true });
+  });
+});
+
 describe("lessonsOnLine", () => {
   // The game ended on line 1; line 0 went 2. Bb5 where line 1 went 2. Bc4.
   const state = {
     ...newSession({ userColour: "w" }),
     line: 1,
     moves: ["e2e4", "e7e5", "f1c4", "g8f6"],
-    branches: [{ id: 0, moves: ["e2e4", "e7e5", "f1b5", "a7a6"] }],
+    branches: [{ id: 0, moves: ["e2e4", "e7e5", "f1b5", "a7a6"], scores: [] }],
     lessons: [
       lesson(1, 0, 0), // on the moves both lines share
       lesson(2, 0, 2), // 2. Bb5: only line 0's
@@ -464,7 +485,7 @@ describe("rewind", () => {
     };
     const r = rewind(state, 2);
     const byId = (id: number) => r.lessons.find((l) => l.id === id);
-    expect(r.branches).toEqual([{ id: 0, moves: state.moves }]);
+    expect(r.branches).toEqual([{ id: 0, moves: state.moves, scores: state.scores }]);
     expect(byId(1)).toMatchObject({ status: "pending", resolvedPly: null, line: r.line });
     expect(byId(2)).toMatchObject({ status: "triggered", line: 0 });
     expect(byId(3)).toMatchObject({ status: "fixed", line: 0 });

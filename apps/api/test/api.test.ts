@@ -560,7 +560,7 @@ describe("a principle's lessons", () => {
       moves: recorded.moves.slice(0, later.ply - plyOf(recorded.startFen)),
       lessons: recorded.lessons.map((l) => ({ ...l, line: 0 })),
       line: 1,
-      branches: [{ id: 0, moves: recorded.moves }],
+      branches: [{ id: 0, moves: recorded.moves, scores: recorded.scores }],
     };
     await call("/api/games", { method: "POST", cookie, json: newGameBody(branched) });
 

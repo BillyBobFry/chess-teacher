@@ -52,7 +52,7 @@ describe("rewind", () => {
 
     // The line left behind is kept, so the review can still show what happened after the mistake,
     // even once a different move has been played in its place.
-    expect(rewound.branches).toEqual([{ id: state.line, moves: state.moves }]);
+    expect(rewound.branches).toEqual([{ id: state.line, moves: state.moves, scores: state.scores }]);
     expect(rewound.line).not.toBe(state.line);
     const other = new Game(lesson.fenBefore).chess
       .moves({ verbose: true })

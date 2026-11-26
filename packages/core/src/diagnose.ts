@@ -17,7 +17,7 @@ import {
   type LineOutcome,
 } from "./claims.ts";
 import { chooseConcepts, type ConceptId, type MistakeKind } from "./concepts.ts";
-import { MATE_SCORE, type Candidate, type Engine } from "./engine.ts";
+import { balanceOf, type Candidate, type Engine } from "./engine.ts";
 import { Game, turnOf, uciParts } from "./game.ts";
 
 export interface DiagnoseConfig {
@@ -55,7 +55,7 @@ export const DIAGNOSE_CONFIG: DiagnoseConfig = {
 /** Winning chances (%) from centipawns, Lichess's formula. */
 export const winChance = (cp: number): number => 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * cp)) - 1);
 
-const isMate = (score: number): boolean => Math.abs(score) >= MATE_SCORE - 300;
+const isMate = (score: number): boolean => balanceOf(score).kind === "mate";
 
 export interface Dossier {
   fenBefore: string;

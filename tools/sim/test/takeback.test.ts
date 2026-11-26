@@ -132,7 +132,7 @@ describe("takeBack", () => {
             continue;
           }
           kept++;
-          expect(back.branches.at(-1)).toEqual({ id: after.line, moves: after.moves });
+          expect(back.branches.at(-1)).toEqual({ id: after.line, moves: after.moves, scores: after.scores });
           expect(back.line).not.toBe(after.line);
           // The review still shows what really happened after each of those mistakes.
           for (const l of shown) expect(playedLine(back, lessonIn(back, l.id))).toEqual(playedLine(after, l));

@@ -66,7 +66,10 @@ player went back past a lesson they had been shown (by rewinding, or undoing tha
 played on differently, what they played first is kept and hangs off the move they went
 back to, with its own lessons and what really happened after each. Beside it the board
 replays the game move by move, linked both ways with the lessons: opening a lesson puts the
-board just before its mistake, and stepping onto a mistake names its lesson. Finished games and
+board just before its mistake, and stepping onto a mistake names its lesson. Under the board, a
+graph of the engine's evaluation after every move (the balance of power) shows each lesson from
+its mistake to what it cost: the evaluation usually drops at the mistake, not when the cost
+shows on the board, which is the lesson of credit assignment in a picture. Finished games and
 their reviews stay in the player's account, under "Your games".
 
 Because the rule is simply _"reveal when the consequence lands"_, tactics and strategy

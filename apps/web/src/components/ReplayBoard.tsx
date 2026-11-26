@@ -8,6 +8,7 @@ import { getLocale } from "../paraglide/runtime.js";
 import { Button } from "../ui/Button.tsx";
 import type { Key } from "../ui/Disclosure.tsx";
 import { Kbd } from "../ui/Kbd.tsx";
+import { BalanceGraph } from "./BalanceGraph.tsx";
 import { ARROW, Board, orientationOf } from "./Board.tsx";
 import { moveTitle } from "./MoveButton.tsx";
 import { lessonRowId } from "./Review.tsx";
@@ -38,11 +39,14 @@ export function ReplayBoard({
   id,
   state,
   replay,
+  balance,
   onShowLesson,
 }: {
   id: string;
   state: SessionState;
   replay: Replay;
+  /** Show the balance of power: the line has evaluations to draw (saves before version 3 don't). */
+  balance: boolean;
   /** "Show lesson" was pressed: the review must be in view (a phone's drawer opened). */
   onShowLesson: () => void;
 }) {
@@ -120,6 +124,7 @@ export function ReplayBoard({
         arrows={coming && next ? [{ from: next.from, to: next.to, color: ARROW.yours }] : []}
         animate={replay.stepped}
       />
+      {balance && <BalanceGraph state={state} replay={replay} />}
       <Stepper
         label={m.replay_stepper()}
         step={step}

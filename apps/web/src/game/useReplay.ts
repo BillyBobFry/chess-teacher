@@ -1,4 +1,11 @@
-import { lessonsOnLine, movesOfLine, plyOf, type Lesson, type SessionState } from "@chess-teacher/core";
+import {
+  lessonsOnLine,
+  movesOfLine,
+  plyOf,
+  scoresOfLine,
+  type Lesson,
+  type SessionState,
+} from "@chess-teacher/core";
 import type { Move } from "chess.js";
 import { useCallback, useMemo, useState } from "react";
 import { lineMoves } from "../lib/moves.ts";
@@ -11,6 +18,8 @@ export interface Replay {
   step: number;
   /** The line's moves, in order. */
   moves: Move[];
+  /** The engine's evaluation after each of them, from the player's side; null where unknown. */
+  scores: (number | null)[];
   /** The line's lessons, each with the step its mistake is played from. */
   lessons: { lesson: Lesson; at: number }[];
   /** False after a jump of more than one move, which the board shows without sliding pieces. */
@@ -80,6 +89,7 @@ export function useReplay(state: SessionState, initialLesson: number | null): Re
     line: view.line,
     step: Math.min(view.step, moves.length),
     moves,
+    scores: scoresOfLine(state, view.line),
     lessons,
     stepped: view.stepped,
     open,

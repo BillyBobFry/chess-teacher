@@ -36,8 +36,9 @@ import type { Detail, MoveRef } from "./text.ts";
  * 4: lines of play left behind by going back past a revealed lesson (`line`, `branches`).
  * 5: lessons from `diagnose` (claims, concepts and the event they await) beside the older
  *    feature lessons, which say so in `source`.
+ * 6: lines left behind keep their evaluations (`Branch.scores`).
  */
-export const SESSION_STATE_VERSION = 5;
+export const SESSION_STATE_VERSION = 6;
 
 /**
  * A line of play the game left behind: the player went back to before a lesson they had been
@@ -48,6 +49,8 @@ export interface Branch {
   id: number;
   /** All its moves, from the start position (the part it shares with other lines included). */
   moves: string[];
+  /** The evaluation after each of its moves, as `SessionState.scores`; empty before version 6. */
+  scores: (number | null)[];
 }
 
 export interface SessionState {
@@ -149,7 +152,7 @@ function backTo(s: SessionState, moves: number): void {
   const pastCut = (l: Lesson) => l.resolvedPly !== null && l.resolvedPly - start > moves;
   const old = s.line;
   if (s.lessons.some((l) => l.line === old && l.status === "triggered" && pastCut(l))) {
-    s.branches.push({ id: old, moves: s.moves });
+    s.branches.push({ id: old, moves: s.moves, scores: s.scores });
     s.line = Math.max(old, ...s.branches.map((b) => b.id)) + 1;
     // Lessons told entirely before the cut, and those still pending, carry on with the new line.
     for (const l of s.lessons) {
@@ -518,6 +521,14 @@ export function movesOfLine(s: SessionState, line: number): string[] {
   return branch.moves;
 }
 
+/** The evaluation after each move of a line of play (`scores`): the current line or a branch. */
+export function scoresOfLine(s: SessionState, line: number): (number | null)[] {
+  if (line === s.line) return s.scores;
+  const branch = s.branches.find((b) => b.id === line);
+  if (!branch) throw new Error(`No line ${line}`);
+  return branch.scores;
+}
+
 /**
  * The moves actually played from a lesson's mistake (included) up to when it was resolved
  * (revealed, fixed or expired), or up to now if it's still pending. Capped at `maxPlies`.
@@ -555,7 +566,7 @@ export type SavedSessionState = Omit<
   scores?: (number | null)[];
   resigned?: boolean;
   line?: number;
-  branches?: Branch[];
+  branches?: (Omit<Branch, "scores"> & { scores?: (number | null)[] })[];
 };
 
 /**
@@ -564,7 +575,8 @@ export type SavedSessionState = Omit<
  * consequence's trigger can't always be rebuilt (the game may have been rewound past it),
  * so it keeps its saved text. Version 2 and earlier recorded no evaluations or resignations.
  * Version 3 and earlier kept no lines left behind: every lesson is on the one line there is.
- * Version 4 and earlier had only feature lessons, which didn't say so.
+ * Version 4 and earlier had only feature lessons, which didn't say so. Version 5 and earlier
+ * kept no evaluations for lines left behind.
  */
 export function upgradeSession(saved: SavedSessionState): SessionState {
   const line = saved.line ?? 0;
@@ -584,7 +596,10 @@ export function upgradeSession(saved: SavedSessionState): SessionState {
     scores: (saved.scores ?? []).slice(0, saved.moves.length),
     resigned: saved.resigned ?? false,
     line,
-    branches: saved.branches ?? [],
+    branches: (saved.branches ?? []).map((b) => ({
+      ...b,
+      scores: (b.scores ?? []).slice(0, b.moves.length),
+    })),
   };
 }
 

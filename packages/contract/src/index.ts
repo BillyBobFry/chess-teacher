@@ -29,7 +29,14 @@ export const SessionStateSchema = z.looseObject({
   // past a revealed lesson, which then stays on it, so there are never more branches than lessons.
   line: z.number().int().min(0).optional(),
   branches: z
-    .array(z.object({ id: z.number().int().min(0), moves: z.array(uci).max(1200) }))
+    .array(
+      z.object({
+        id: z.number().int().min(0),
+        moves: z.array(uci).max(1200),
+        // Optional: saves from version 5 and earlier have none.
+        scores: z.array(z.number().int().nullable()).max(1200).optional(),
+      }),
+    )
     .max(400)
     .optional(),
 });
