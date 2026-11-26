@@ -6,6 +6,7 @@
  *   the new-game dialog → reload and resume →
  *   a recorded game at a reveal (wrong guess → hint → answer → AI explanation → futures →
  *   rewind) → resign and see the earlier try in the review → resign a game and review it →
+ *   a principle's lessons from the progress page, and on into a game's review →
  *   past games, with the coach's explanation kept → a past game's URL survives a reload, and
  *   back and forward move between pages → sign out and back in → licences → phone layout.
  * Fails on any console error. Screenshots go to the directory given.
@@ -360,7 +361,27 @@ try {
     await page.getByText("Your focus").waitFor();
     if (await page.getByRole("menu").count()) throw new Error("account menu still open");
     await shot("6b-progress", true);
-    await page.getByRole("button", { name: "Back" }).click();
+  });
+
+  await step("a principle's lessons, side by side, and into the game", async () => {
+    const principle = page.getByRole("grid", { name: "Your lessons by principle" }).getByRole("row").first();
+    const title = (await principle.locator(".font-semibold").first().textContent()) ?? "";
+    await principle.click();
+    await page.waitForURL(/\/app\/progress\/(principle|concept)\/[^/]+$/);
+    await page.getByRole("heading", { level: 1, name: title }).waitFor();
+    await page.getByRole("main").getByRole("button", { expanded: false }).first().click();
+    await page.locator("figcaption").filter({ hasText: "What happened" }).first().waitFor();
+    await shot("6b2-principle", true);
+    // The game's review opens on the lesson open here, and Back leads back to this page.
+    await page.getByRole("link", { name: "See the whole game" }).first().click();
+    await page.waitForURL(/\/app\/games\/[^/]+\/lessons\/\d+$/);
+    await page.getByRole("heading", { name: "Game review" }).waitFor({ timeout: 30_000 });
+    await page.locator(".review figcaption").filter({ hasText: "What happened" }).first().waitFor();
+    await page.getByRole("button", { name: `Back to ${title}` }).click();
+    await page.getByRole("heading", { level: 1, name: title }).waitFor();
+    await page.getByRole("button", { name: "Back to your progress" }).click();
+    await page.getByRole("heading", { name: "Your progress" }).waitFor();
+    await page.getByRole("button", { name: "Back", exact: true }).click();
   });
 
   await step("past games, from the account menu, open their review", async () => {

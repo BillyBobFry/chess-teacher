@@ -12,18 +12,14 @@ import type {
   GameRecord,
   GameSummary,
   MeResponse,
-  PrincipleProgress,
+  PrincipleDetailResponse,
   ProgressResponse,
 } from "@chess-teacher/contract";
 import {
   Game,
   diagnosisFacts,
   facts,
-  gameOutcome,
-  isConceptId,
-  isPrincipleId,
   playedLine,
-  reviewLessons,
   upgradeSession,
   variationSan,
   type Lesson,
@@ -38,6 +34,7 @@ import { createMiddleware } from "hono/factory";
 import type { Auth } from "./auth.ts";
 import type { Db } from "./db/client.ts";
 import { coachedGames, explanations, games, lessonFeedback } from "./db/schema.ts";
+import { isIdea, principleDetailOf, progressOf, PROGRESS_GAMES, summaryOf } from "./progress.ts";
 import type { Env } from "./env.ts";
 import { PROMPT_VERSION, explainDiagnosis, explainLesson, parseParts, type LlmClient } from "./explain.ts";
 
@@ -175,58 +172,25 @@ export function createApp(deps: AppDeps) {
     });
   });
 
-  /** Lessons by principle or concept across the user's recent games (most common first). */
-  app.get("/me/progress", async (c) => {
-    const rows = await db
-      .select({ state: games.state })
+  /** The user's recent games, newest first: the ones progress counts. */
+  const recentGames = (userId: string) =>
+    db
+      .select()
       .from(games)
-      .where(eq(games.userId, c.get("userId")))
+      .where(eq(games.userId, userId))
       .orderBy(desc(games.updatedAt))
-      .limit(50);
-    const byIdea = new Map<string, PrincipleProgress>();
-    let lessons = 0;
-    rows.forEach((row, gameIndex) => {
-      const seenInGame = new Set<string>();
-      for (const l of (row.state as { lessons: Lesson[] }).lessons ?? []) {
-        if (l.status === "rewound") continue;
-        // Saved games aren't upgraded here: a lesson without `source` is a feature lesson.
-        const idea =
-          l.source === "diagnosis"
-            ? l.concept && isConceptId(l.concept)
-              ? ({ kind: "concept", id: l.concept } as const)
-              : null
-            : isPrincipleId(l.principle)
-              ? ({ kind: "principle", id: l.principle } as const)
-              : null;
-        if (!idea) continue;
-        const key = `${idea.kind}:${idea.id}`;
-        lessons += 1;
-        const p =
-          byIdea.get(key) ??
-          ({
-            ...idea,
-            lessons: 0,
-            foundYourself: 0,
-            revealed: 0,
-            fixed: 0,
-            recentGames: 0,
-          } satisfies PrincipleProgress);
-        p.lessons += 1;
-        if (l.status === "triggered" && l.foundCause !== null) p.revealed += 1;
-        if (l.foundCause === true) p.foundYourself += 1;
-        if (l.status === "fixed") p.fixed += 1;
-        if (gameIndex < 5 && !seenInGame.has(key)) {
-          p.recentGames += 1;
-          seenInGame.add(key);
-        }
-        byIdea.set(key, p);
-      }
-    });
-    return c.json<ProgressResponse>({
-      games: rows.length,
-      lessons,
-      principles: [...byIdea.values()].sort((a, b) => b.lessons - a.lessons),
-    });
+      .limit(PROGRESS_GAMES);
+
+  /** Lessons by principle or concept across the user's recent games (most common first). */
+  app.get("/me/progress", async (c) =>
+    c.json<ProgressResponse>(progressOf(await recentGames(c.get("userId")))),
+  );
+
+  /** One principle (`/principle/:id`) or concept (`/concept/:id`): its counts and the lessons behind them. */
+  app.get("/me/progress/:kind/:id", async (c) => {
+    const { kind, id } = c.req.param();
+    if (!isIdea(kind, id)) return c.json(failure("not_found"), 404);
+    return c.json<PrincipleDetailResponse>(principleDetailOf(await recentGames(c.get("userId")), kind, id));
   });
 
   // ------------------------------------------------------------------ games
@@ -247,21 +211,7 @@ export function createApp(deps: AppDeps) {
       )
       .orderBy(desc(games.updatedAt))
       .limit(20);
-    return c.json<GameSummary[]>(
-      rows.map((r) => {
-        // Read as saved: what's summarised here is the same in every version.
-        const s = r.state as SavedSessionState;
-        return {
-          id: r.id,
-          userColour: s.userColour,
-          moves: s.moves.length,
-          finished: r.finished,
-          outcome: r.finished ? gameOutcome({ ...s, resigned: s.resigned ?? false }) : null,
-          lessons: reviewLessons(s).length,
-          updatedAt: r.updatedAt.toISOString(),
-        };
-      }),
-    );
+    return c.json<GameSummary[]>(rows.map(summaryOf));
   });
 
   app.post("/games", limit, zValidator("json", CreateGameBody), async (c) => {

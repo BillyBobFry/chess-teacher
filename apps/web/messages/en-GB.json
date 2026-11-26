@@ -317,6 +317,15 @@
       }
     }
   ],
+  "progress_list": "Your lessons by principle",
+  "progress_back": "Back to your progress",
+  "principle_error": "These lessons didn't load. Check your connection and try again.",
+  "principle_empty": "None of your recent games had a lesson on this.",
+  "principle_current_game": "Your current game",
+  "principle_whole_game": "See the whole game",
+  "principle_go_to_game": "Go to your game",
+  "principle_earlier_try": "In an earlier try",
+  "principle_back": "Back to {name}",
   "licences_title": "Licences",
   "licences_stockfish": "The chess engine running in your browser is Stockfish 19 (the WebAssembly build by the stockfish.js project), licensed under the {#gpl}GNU General Public License v3{/gpl}. Source code: {#stockfish}Stockfish{/stockfish} and {#stockfishjs}stockfish.js{/stockfishjs}. A second engine, Stockfish 11 (also GPL v3, {#licence11}licence{/licence11}), is used for its classical evaluation when checking strategic lessons. This app talks to both engines only through the UCI text protocol.",
   "licences_maia_heading": "Maia",

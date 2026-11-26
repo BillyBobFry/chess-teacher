@@ -15,6 +15,8 @@ import {
   diagnosisFacts,
   newSession,
   opponentMove,
+  playedLine,
+  plyOf,
   squareName,
   startUserTurn,
   userMove,
@@ -512,6 +514,74 @@ describe("progress", () => {
     expect(first.foundYourself).toBeGreaterThanOrEqual(1);
     expect(first.recentGames).toBe(2);
     expect((await call("/api/me/progress")).status).toBe(401);
+  });
+});
+
+describe("a principle's lessons", () => {
+  const counted = recorded.lessons.filter((l) => l.status !== "rewound");
+  const withConcept = counted.filter((l) => diagnosed(l).concept !== null);
+  const first = withConcept[0];
+  if (!first) throw new Error("the recorded game has no lesson with a concept");
+  const concept = diagnosed(first).concept;
+  const onConcept = counted.filter((l) => diagnosed(l).concept === concept);
+
+  it("lists each game's lessons on it, with its counts as on the progress page", async () => {
+    const { call, signUp } = await setup({ llm: null });
+    const cookie = await signUp("ida@example.com");
+    const finished = { ...newGameBody({ ...recorded, resigned: true }), finished: true };
+    const game = await (await call("/api/games", { method: "POST", cookie, json: finished })).json();
+
+    const detail = await (await call(`/api/me/progress/concept/${concept}`, { cookie })).json();
+    const progress = await (await call("/api/me/progress", { cookie })).json();
+    expect(detail.games).toBe(1);
+    expect(detail.progress).toEqual(
+      progress.principles.find((p: { kind: string; id: string }) => p.kind === "concept" && p.id === concept),
+    );
+    expect(detail.occurrences).toHaveLength(1);
+    expect(detail.occurrences[0].game).toMatchObject({ id: game.id, finished: true, outcome: "lost" });
+    expect(detail.occurrences[0].lessons).toEqual(
+      onConcept.map((l) => ({
+        lesson: expect.objectContaining({ id: l.id, concept }),
+        played: playedLine(recorded, l),
+        onGameLine: true,
+      })),
+    );
+  });
+
+  it("marks a lesson in an earlier try", async () => {
+    const { call, signUp } = await setup({ llm: null });
+    const cookie = await signUp("jo@example.com");
+    // The player went back to just before a later lesson on another concept: what they played
+    // first, from there on, is an earlier try. Lessons before it are on the line the game ended on.
+    const later = withConcept.filter((l) => diagnosed(l).concept !== concept && l.ply > first.ply).at(-1);
+    if (!later) throw new Error("the recorded game has no later lesson on another concept");
+    const branched: SessionState = {
+      ...recorded,
+      moves: recorded.moves.slice(0, later.ply - plyOf(recorded.startFen)),
+      lessons: recorded.lessons.map((l) => ({ ...l, line: 0 })),
+      line: 1,
+      branches: [{ id: 0, moves: recorded.moves }],
+    };
+    await call("/api/games", { method: "POST", cookie, json: newGameBody(branched) });
+
+    const flags = async (c: string | null) => {
+      const detail = await (await call(`/api/me/progress/concept/${c}`, { cookie })).json();
+      const lessons: { lesson: { id: number }; onGameLine: boolean }[] = detail.occurrences[0].lessons;
+      return lessons.map((l) => [l.lesson.id, l.onGameLine]);
+    };
+    const expected = (c: string | null) =>
+      counted.filter((l) => diagnosed(l).concept === c).map((l) => [l.id, l.ply < later.ply]);
+    // `first` is before where they went back, on the game's line; `later` is in the earlier try.
+    expect(await flags(concept)).toEqual(expected(concept));
+    expect(await flags(diagnosed(later).concept)).toEqual(expected(diagnosed(later).concept));
+  });
+
+  it("is only there for a principle or concept the core knows, and only signed in", async () => {
+    const { call, signUp } = await setup({ llm: null });
+    const cookie = await signUp("kit@example.com");
+    expect((await call("/api/me/progress/concept/not_a_concept", { cookie })).status).toBe(404);
+    expect((await call(`/api/me/progress/principle/${concept}`, { cookie })).status).toBe(404);
+    expect((await call(`/api/me/progress/concept/${concept}`)).status).toBe(401);
   });
 });
 

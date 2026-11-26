@@ -387,39 +387,6 @@ main.page {
 .focus p {
   margin: 0.3rem 0 0;
 }
-.principles {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.5rem;
-}
-.principles li {
-  padding: 0.7rem 0;
-  border-bottom: 1px solid var(--color-border);
-}
-.principle-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-.principle-name {
-  font-weight: 600;
-}
-.principle-count {
-  color: var(--color-fg-muted);
-  white-space: nowrap;
-}
-.bar {
-  height: 6px;
-  background: var(--color-primary);
-  border-radius: 3px;
-  margin: 0.4rem 0;
-  opacity: 0.7;
-}
-.principle-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1rem;
-}
 
 .futures-note {
   margin: 0.5rem 0 0.4rem;

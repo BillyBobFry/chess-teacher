@@ -10,6 +10,7 @@ import { Licences } from "./components/Licences.tsx";
 import { MoveList } from "./components/MoveList.tsx";
 import { NewGame } from "./components/NewGame.tsx";
 import { PastGame } from "./components/PastGame.tsx";
+import { Principle } from "./components/Principle.tsx";
 import { Progress } from "./components/Progress.tsx";
 import { Reveal } from "./components/Reveal.tsx";
 import { Alert } from "./ui/Alert.tsx";
@@ -101,6 +102,7 @@ const PAGE_TITLE: Record<Route["page"], (() => string) | null> = {
   games: m.games_title,
   pastGame: m.review_title,
   progress: m.progress_title,
+  principle: m.progress_title,
   licences: m.licences_title,
 };
 
@@ -352,6 +354,16 @@ function GameApp({
     );
   }
 
+  if (route.page === "principle") {
+    return (
+      <Shell nav={nav} layout="page">
+        <main className="page">
+          <Principle key={`${route.kind}:${route.id}`} kind={route.kind} id={route.id} />
+        </main>
+      </Shell>
+    );
+  }
+
   if (route.page === "games") {
     return (
       <Shell nav={nav} layout="page">
@@ -370,8 +382,10 @@ function GameApp({
     return (
       <Shell nav={nav} layout="game">
         <PastGame
-          key={route.id}
+          // A new lesson to open is a fresh review, opened on it.
+          key={`${route.id}:${route.lesson ?? ""}`}
           id={route.id}
+          openLesson={route.lesson ?? null}
           onNewGame={requestNewGame}
           onBackToGame={inProgress ? backToGame : null}
           onProgress={() => navigate({ page: "progress" })}
@@ -453,6 +467,7 @@ function GameApp({
               gameId={saved.id}
               state={state}
               result={resultText(board.game, state)}
+              openLesson={null}
               onNewGame={() => setChoosing(true)}
               onBackToGame={null}
               onProgress={() => navigate({ page: "progress" })}
