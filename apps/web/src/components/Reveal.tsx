@@ -163,6 +163,7 @@ function FindCause({
             label={m.moves_board_before({ move: moveTitle(current.move) })}
             fen={current.move.before}
             orientation={orientation}
+            focusable={false}
             arrows={[{ from: current.move.from, to: current.move.to, color: MOVE_ARROW }]}
             showNotation={false}
           />

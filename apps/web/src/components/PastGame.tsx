@@ -83,6 +83,7 @@ export function PastGame({
           label={m.board_game()}
           fen={board.fen}
           orientation={orientationOf(game.state.userColour)}
+          focusable={false}
           lastMove={board.lastMove}
         />
       }

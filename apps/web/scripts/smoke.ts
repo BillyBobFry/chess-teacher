@@ -113,6 +113,21 @@ const YOUR_MOVE = /^Your move$/;
 /** The name of the focused element, as a screen reader would start reading it. */
 const focusedText = (page: Page) => page.evaluate(() => document.activeElement?.textContent ?? "");
 
+/** The boards a keyboard user can tab to: only the game being played should be one. */
+const tabbableBoards = (page: Page) =>
+  page.evaluate(() => [
+    ...new Set(
+      [...document.querySelectorAll(".board-cell[tabindex]")].map((el) =>
+        el.closest("[data-board-id]")?.getAttribute("data-board-id"),
+      ),
+    ),
+  ]);
+const expectTabbableBoards = async (page: Page, expected: string[]) => {
+  const actual = await tabbableBoards(page);
+  if (actual.join() !== expected.join())
+    throw new Error(`expected tab stops on boards [${expected.join()}], got [${actual.join()}]`);
+};
+
 // ---- server: the production build, with a fresh embedded database
 
 const pglite = mkdtempSync(join(tmpdir(), "chess-teacher-smoke-"));
@@ -284,6 +299,7 @@ try {
     await page.locator(".ai-headline").filter({ hasText: "(Sample)" }).waitFor();
     await page.getByText(/What it (allowed|missed)/).waitFor();
     await page.locator("figcaption").filter({ hasText: "What happened" }).waitFor();
+    await expectTabbableBoards(page, ["main"]);
     await page.getByRole("button", { name: "Forward" }).click();
     await page.getByRole("button", { name: "Forward" }).click();
     await shot("4-reveal-explain", true);
@@ -361,6 +377,7 @@ try {
     await page.getByText("You resigned.").first().waitFor();
     await page.locator(".review").getByRole("button", { expanded: false }).first().click();
     await page.locator("figcaption").filter({ hasText: "What happened" }).waitFor();
+    await expectTabbableBoards(page, []);
     await page.getByRole("button", { name: "Back to your games" }).click();
     await page.getByRole("heading", { name: "Your games" }).waitFor();
     // The oldest: the game whose lesson was revealed, so its review shows the coach's explanation.
