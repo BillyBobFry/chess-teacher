@@ -452,8 +452,9 @@ try {
     await page.getByRole("status").filter({ hasText: YOUR_MOVE }).waitFor({ timeout: 30_000 });
   });
 
-  await step("licences", async () => {
-    await page.getByRole("link", { name: "Licences" }).click();
+  await step("licences, from the account menu on a game screen", async () => {
+    await page.getByRole("button", { name: "Account" }).click();
+    await page.getByRole("menuitem", { name: "Licences" }).click();
     await page.getByRole("heading", { name: "Licences" }).waitFor();
     await page.waitForURL(`${BASE}/app/licences`);
   });
@@ -481,7 +482,9 @@ try {
     await mobile.getByText("The better move, then…").first().waitFor({ timeout: 30_000 });
     await mobile.getByText("Your coach", { exact: true }).waitFor({ timeout: 30_000 });
     // The browser asks for en-US, so the app speaks it (UX-39).
-    await mobile.getByRole("link", { name: "Licenses" }).waitFor();
+    await mobile.getByRole("button", { name: "Account" }).click();
+    await mobile.getByRole("menuitem", { name: "Licenses" }).waitFor();
+    await mobile.keyboard.press("Escape");
     if ((await mobile.evaluate(() => document.documentElement.lang)) !== "en-US") {
       throw new Error("<html lang> doesn't follow the locale");
     }
@@ -489,6 +492,18 @@ try {
     if (await mobile.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)) {
       throw new Error("horizontal scroll on phone");
     }
+  });
+
+  await step("phone: the panel is a drawer the page never scrolls past", async () => {
+    if (await mobile.evaluate(() => document.documentElement.scrollHeight > window.innerHeight)) {
+      throw new Error("the game page scrolls on a phone");
+    }
+    // A lesson opens the drawer; its handle puts it away to show the whole board.
+    const handle = mobile.getByRole("button", { name: "Lesson" });
+    if ((await handle.getAttribute("aria-expanded")) !== "true") throw new Error("lesson drawer not open");
+    await handle.click();
+    if ((await handle.getAttribute("aria-expanded")) !== "false") throw new Error("drawer didn't close");
+    await mobile.screenshot({ path: join(outDir, "7b-phone-drawer-closed.png") });
   });
 
   await step("no unexpected console errors", async () => {

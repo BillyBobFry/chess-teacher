@@ -7,6 +7,7 @@ import { m } from "../paraglide/messages.js";
 import { Alert } from "../ui/Alert.tsx";
 import { Button } from "../ui/Button.tsx";
 import { Board, orientationOf } from "./Board.tsx";
+import { GameLayout } from "./GameLayout.tsx";
 import { Review } from "./Review.tsx";
 
 /** A finished game from the player's account: its final position and its review. */
@@ -25,6 +26,8 @@ export function PastGame({
   const [game, setGame] = useState<SavedGame | null>(null);
   const backToGames = () => goBackTo({ page: "games" });
   const [error, setError] = useState(false);
+  // The review is what the player came for, so on a phone its drawer starts open.
+  const [expanded, setExpanded] = useState(true);
 
   const fetchGame = useCallback(
     () =>
@@ -70,8 +73,11 @@ export function PastGame({
   }
 
   return (
-    <main className="game">
-      <div className="board-col">
+    <GameLayout
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      panelLabel={m.review_title()}
+      board={
         <Board
           id="past"
           label={m.board_game()}
@@ -79,20 +85,22 @@ export function PastGame({
           orientation={orientationOf(game.state.userColour)}
           lastMove={board.lastMove}
         />
-      </div>
-      <aside className="panel">
-        <Button variant="link" className="mb-3" onPress={backToGames}>
-          {m.games_back()}
-        </Button>
-        <Review
-          gameId={game.id}
-          state={game.state}
-          result={resultText(board.game, game.state)}
-          onNewGame={onNewGame}
-          onBackToGame={onBackToGame}
-          onProgress={onProgress}
-        />
-      </aside>
-    </main>
+      }
+      panel={
+        <>
+          <Button variant="link" className="mb-3 self-start" onPress={backToGames}>
+            {m.games_back()}
+          </Button>
+          <Review
+            gameId={game.id}
+            state={game.state}
+            result={resultText(board.game, game.state)}
+            onNewGame={onNewGame}
+            onBackToGame={onBackToGame}
+            onProgress={onProgress}
+          />
+        </>
+      }
+    />
   );
 }

@@ -41,18 +41,6 @@ body {
   font-size: 0.875rem;
 }
 
-.app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-footer.bottom {
-  margin-top: auto;
-  padding: 1rem 16px;
-  font-size: 0.875rem;
-}
-
 main.page {
   width: 100%;
   max-width: 640px;
@@ -70,25 +58,6 @@ main.page {
 
 /* ---------- game layout */
 
-main.game {
-  display: grid;
-  grid-template-columns: minmax(0, 560px) minmax(0, 400px);
-  justify-content: center;
-  gap: 24px;
-  padding: 20px 16px;
-  align-items: start;
-}
-@media (max-width: 900px) {
-  main.game {
-    grid-template-columns: minmax(0, 560px);
-  }
-}
-
-.board-col {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
 .board {
   position: relative;
   width: 100%;
@@ -161,31 +130,6 @@ main.game {
   box-shadow: inset 0 0 0 5px var(--color-surface);
 }
 
-.status {
-  font-weight: 600;
-  min-height: 1.5em;
-}
-.status.your-move {
-  color: var(--color-primary);
-}
-
-.panel {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-panel);
-  padding: 1rem;
-  min-width: 0;
-}
-.panel-title {
-  font-size: 1rem;
-  margin: 0 0 0.5rem;
-}
-
-.moves {
-  max-height: 340px;
-  overflow-y: auto;
-}
 .moves ol {
   list-style: none;
   margin: 0;
@@ -208,13 +152,6 @@ main.game {
 }
 .moves .move {
   font-weight: inherit;
-}
-
-.move-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0.75rem 0;
 }
 
 /* ---------- reveal */

@@ -4,6 +4,7 @@ import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { api, authClient } from "./api/client.ts";
 import { Board, orientationOf } from "./components/Board.tsx";
+import { GameLayout } from "./components/GameLayout.tsx";
 import { Games } from "./components/Games.tsx";
 import { Licences } from "./components/Licences.tsx";
 import { MoveList } from "./components/MoveList.tsx";
@@ -54,9 +55,21 @@ function stepKey(e: KeyboardEvent): "undo" | "redo" | null {
   return null;
 }
 
-function Shell({ nav, children }: { nav?: ReactNode; children: ReactNode }) {
+function Shell({
+  nav,
+  layout,
+  children,
+}: {
+  nav?: ReactNode;
+  /**
+   * `page` scrolls, with the footer at the end. `game` fills the screen exactly, with nothing
+   * to scroll past: its panel scrolls instead, and Licences is in the account menu.
+   */
+  layout: "page" | "game";
+  children: ReactNode;
+}) {
   return (
-    <div className="app">
+    <div className={`flex flex-col ${layout === "game" ? "h-dvh" : "min-h-dvh"}`}>
       {/* Wraps rather than scrolls: on a narrow phone the nav takes a second line (UX-40). */}
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border bg-surface px-4 py-3 max-sm:px-3 max-sm:py-2">
         <a className="text-lg font-bold whitespace-nowrap text-fg no-underline" href="/app/">
@@ -68,11 +81,13 @@ function Shell({ nav, children }: { nav?: ReactNode; children: ReactNode }) {
         <nav className="ms-auto flex items-center gap-2">{nav}</nav>
       </header>
       {children}
-      <footer className="bottom">
-        <Link variant="link" href={hrefOf({ page: "licences" })}>
-          {m.footer_licences()}
-        </Link>
-      </footer>
+      {layout === "page" && (
+        <footer className="mt-auto px-4 py-4 text-sm">
+          <Link variant="link" href={hrefOf({ page: "licences" })}>
+            {m.footer_licences()}
+          </Link>
+        </footer>
+      )}
     </div>
   );
 }
@@ -136,7 +151,7 @@ export function App() {
 
   if (route.page === "licences") {
     return (
-      <Shell>
+      <Shell layout="page">
         <main className="page">
           <Licences onBack={() => goBack(PLAY)} />
         </main>
@@ -145,7 +160,7 @@ export function App() {
   }
   if (session.isPending || !config) {
     return (
-      <Shell>
+      <Shell layout="page">
         <main className="page muted">{m.loading()}</main>
       </Shell>
     );
@@ -153,7 +168,7 @@ export function App() {
   // Signed out on any page: signing in shows the page the URL names.
   if (!session.data) {
     return (
-      <Shell>
+      <Shell layout="page">
         <main className="page">
           <SignIn googleEnabled={config.googleEnabled} />
         </main>
@@ -220,6 +235,22 @@ function GameApp({
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [undo, redo]);
+
+  const canMove =
+    !!saved && !saved.finished && !saved.reveal && !g.busy && !g.pendingMove && isUserTurn(saved.state);
+  const panel: "moves" | "lesson" | "review" = saved?.finished
+    ? "review"
+    : saved?.reveal
+      ? "lesson"
+      : "moves";
+  // On a phone the panel is a drawer over the board. A lesson or a review opens it, since it
+  // needs the room; the player's move closes it, since they need the board (UX-105).
+  const [drawer, setDrawer] = useState({ panel, canMove, expanded: panel !== "moves" });
+  if (drawer.panel !== panel || drawer.canMove !== canMove) {
+    const expanded = drawer.panel !== panel ? panel !== "moves" : canMove ? false : drawer.expanded;
+    setDrawer({ panel, canMove, expanded });
+  }
+  const setDrawerExpanded = (expanded: boolean) => setDrawer((d) => ({ ...d, expanded }));
 
   const revealId = saved?.reveal?.lessonId;
   const { explanation } = g;
@@ -290,6 +321,7 @@ function GameApp({
           >
             <MenuItem href={hrefOf({ page: "games" })}>{m.account_games()}</MenuItem>
             <MenuItem href={hrefOf({ page: "progress" })}>{m.account_progress()}</MenuItem>
+            <MenuItem href={hrefOf({ page: "licences" })}>{m.footer_licences()}</MenuItem>
             {/* A full load of the app's home: nothing of this account's state stays behind. */}
             <MenuItem
               onAction={() => void authClient.signOut().then(() => window.location.assign(hrefOf(PLAY)))}
@@ -304,7 +336,7 @@ function GameApp({
 
   if (!g.loaded) {
     return (
-      <Shell nav={nav}>
+      <Shell nav={nav} layout="page">
         <main className="page muted">{BUSY_TEXT.loading()}</main>
       </Shell>
     );
@@ -312,7 +344,7 @@ function GameApp({
 
   if (route.page === "progress") {
     return (
-      <Shell nav={nav}>
+      <Shell nav={nav} layout="page">
         <main className="page">
           <Progress onBack={() => goBack(PLAY)} />
         </main>
@@ -322,7 +354,7 @@ function GameApp({
 
   if (route.page === "games") {
     return (
-      <Shell nav={nav}>
+      <Shell nav={nav} layout="page">
         <main className="page">
           <Games
             onNewGame={requestNewGame}
@@ -336,7 +368,7 @@ function GameApp({
 
   if (route.page === "pastGame") {
     return (
-      <Shell nav={nav}>
+      <Shell nav={nav} layout="game">
         <PastGame
           key={route.id}
           id={route.id}
@@ -350,7 +382,7 @@ function GameApp({
 
   if (choosing || !saved || !board) {
     return (
-      <Shell nav={nav}>
+      <Shell nav={nav} layout="page">
         <main className="page">
           {g.error && <Alert className="mb-4">{g.error}</Alert>}
           <NewGame
@@ -369,7 +401,6 @@ function GameApp({
   const state = saved.state;
   const orientation = orientationOf(state.userColour);
   const revealLesson = saved.reveal ? state.lessons.find((l) => l.id === saved.reveal!.lessonId) : undefined;
-  const canMove = !saved.finished && !saved.reveal && !g.busy && !g.pendingMove && isUserTurn(state);
   const status = saved.finished
     ? resultText(board.game, state)
     : saved.reveal
@@ -381,31 +412,42 @@ function GameApp({
           : "…";
 
   return (
-    <Shell nav={nav}>
-      <main className="game">
-        <div className="board-col">
-          <div className={`status ${canMove ? "your-move" : ""}`} role="status" aria-live="polite">
-            {status}
-          </div>
-          <Board
-            id="main"
-            label={m.board_game()}
-            fen={board.fen}
-            orientation={orientation}
-            lastMove={board.lastMove}
-            onMove={canMove ? g.move : undefined}
-          />
-          {g.error && (
-            <Alert>
-              {g.error}{" "}
-              <Button variant="link" onPress={g.dismissError}>
-                {m.dismiss()}
-              </Button>
-            </Alert>
-          )}
-        </div>
-        <aside className="panel">
-          {saved.finished ? (
+    <Shell nav={nav} layout="game">
+      <GameLayout
+        expanded={drawer.expanded}
+        onExpandedChange={setDrawerExpanded}
+        panelLabel={
+          panel === "review" ? m.review_title() : panel === "lesson" ? m.panel_lesson() : m.panel_moves()
+        }
+        board={
+          <>
+            <div
+              className={`min-h-[1.5em] font-semibold ${canMove ? "text-primary" : ""}`}
+              role="status"
+              aria-live="polite"
+            >
+              {status}
+            </div>
+            <Board
+              id="main"
+              label={m.board_game()}
+              fen={board.fen}
+              orientation={orientation}
+              lastMove={board.lastMove}
+              onMove={canMove ? g.move : undefined}
+            />
+            {g.error && (
+              <Alert>
+                {g.error}{" "}
+                <Button variant="link" onPress={g.dismissError}>
+                  {m.dismiss()}
+                </Button>
+              </Alert>
+            )}
+          </>
+        }
+        panel={
+          saved.finished ? (
             <Review
               gameId={saved.id}
               state={state}
@@ -428,10 +470,10 @@ function GameApp({
               onContinue={g.closeReveal}
             />
           ) : (
-            <>
-              <h2 className="panel-title">{m.panel_moves()}</h2>
-              <MoveList startFen={state.startFen} moves={state.moves} orientation={orientation} />
-              <div className="move-actions">
+            // The list scrolls and the rest stays put, so Undo and Redo are always in reach.
+            <div className="flex min-h-0 flex-1 flex-col gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="m-0 me-auto text-base">{m.panel_moves()}</h2>
                 <Button onPress={undo} isDisabled={!g.canUndo} aria-keyshortcuts="Control+Z Meta+Z">
                   {m.moves_undo()}{" "}
                   <Kbd aria-hidden>{APPLE ? m.shortcut_undo_apple() : m.shortcut_undo()}</Kbd>
@@ -445,18 +487,21 @@ function GameApp({
                   <Kbd aria-hidden>{APPLE ? m.shortcut_redo_apple() : m.shortcut_redo()}</Kbd>
                 </Button>
               </div>
-              <p className="muted small">{m.panel_play_hint()}</p>
-              <p className="muted small">
-                <ParaglideMessage
-                  message={m.board_keyboard_hint}
-                  inputs={{}}
-                  markup={{ kbd: ({ children }) => <Kbd>{children}</Kbd> }}
-                />
-              </p>
-            </>
-          )}
-        </aside>
-      </main>
+              <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                <MoveList startFen={state.startFen} moves={state.moves} orientation={orientation} />
+                <p className="muted small">{m.panel_play_hint()}</p>
+                <p className="muted small">
+                  <ParaglideMessage
+                    message={m.board_keyboard_hint}
+                    inputs={{}}
+                    markup={{ kbd: ({ children }) => <Kbd>{children}</Kbd> }}
+                  />
+                </p>
+              </div>
+            </div>
+          )
+        }
+      />
       <Toasts toasts={g.toasts} />
     </Shell>
   );

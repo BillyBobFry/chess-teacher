@@ -48,6 +48,8 @@
 
   --shadow-*: initial;
   --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 14px rgb(0 0 0 / 0.06);
+  /* A bottom drawer's shadow, cast upwards over what it covers. */
+  --shadow-drawer: 0 -1px 2px rgb(0 0 0 / 0.06), 0 -4px 14px rgb(0 0 0 / 0.1);
 
   /* UX-25: utility chrome settles, it doesn't bounce. */
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
@@ -94,3 +96,7 @@
     outline: none;
   }
 }
+
+/* Room for the board and a sidebar side by side: landscape screens, and portrait ones wide
+   enough (a large tablet). Narrower portrait screens put the game's panel in a bottom drawer. */
+@custom-variant wide (@media (orientation: landscape), (min-width: 64rem));
