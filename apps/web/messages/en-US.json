@@ -150,6 +150,71 @@
   "replay_show_lesson": "Show lesson",
   "replay_back_to_game": "Back to the game",
   "replay_keyboard_hint": "{#kbd}←{/kbd} and {#kbd}→{/kbd} step through the moves; {#kbd}Home{/kbd} and {#kbd}End{/kbd} go to the start and the end.",
+  "balance_label": "Balance of power",
+  "balance_about": "About this graph",
+  "balance_scrubber": "Balance of power, move by move",
+  "balance_note": "The engine's evaluation: above the line you're ahead, below it your opponent is. Not every change is a lesson: lessons are the changes we could explain.",
+  "balance_position": "{move}: {balance}",
+  "balance_even": "About even",
+  "balance_ahead": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countValue = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "You're about a pawn ahead",
+        "countPlural=other": "You're about {countValue} pawns ahead"
+      }
+    }
+  ],
+  "balance_behind": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countValue = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "You're about a pawn behind",
+        "countPlural=other": "You're about {countValue} pawns behind"
+      }
+    }
+  ],
+  "balance_mate_for": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countValue = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "You can force checkmate in {countValue} move",
+        "countPlural=other": "You can force checkmate in {countValue} moves"
+      }
+    }
+  ],
+  "balance_mate_against": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countValue = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Your opponent can force checkmate in {countValue} move",
+        "countPlural=other": "Your opponent can force checkmate in {countValue} moves"
+      }
+    }
+  ],
+  "balance_checkmate_won": "Checkmate: you won",
+  "balance_checkmate_lost": "Checkmate: you lost",
+  "balance_unknown": "Not analysed",
   "outcome_fixed": "You fixed it in time",
   "outcome_deferred": "Happened at the same time as another lesson",
   "outcome_found": "Found it yourself",

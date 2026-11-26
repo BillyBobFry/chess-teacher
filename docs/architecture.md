@@ -122,7 +122,8 @@ interface SessionState {
   lessons: Lesson[]; // pending ones included, with their trigger conditions
   opponentModes: ("normal" | "levelled")[];
   line: number; // the id of the line being played; each lesson records its line
-  branches: { id: number; moves: string[] }[]; // lines left behind by going back past a revealed lesson
+  scores: (number | null)[]; // the engine's evaluation after each move, from the player's side
+  branches: { id: number; moves: string[]; scores: (number | null)[] }[]; // lines left behind by going back past a revealed lesson
 }
 
 function step(

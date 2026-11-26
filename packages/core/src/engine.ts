@@ -2,6 +2,22 @@
 
 export const MATE_SCORE = 10_000;
 
+/** A score at least this close to `MATE_SCORE` is a forced mate, not a material count. */
+const MATE_BAND = 300;
+
+/**
+ * A score as a player would read it, from the side it's scored for: a forced mate in so many of
+ * the mating side's moves (0: checkmate on the board), or how many pawns ahead (negative:
+ * behind). What to say about it is the app's choice.
+ */
+export type Balance = { kind: "mate"; moves: number; winning: boolean } | { kind: "pawns"; pawns: number };
+
+export function balanceOf(score: number): Balance {
+  if (Math.abs(score) < MATE_SCORE - MATE_BAND) return { kind: "pawns", pawns: score / 100 };
+  const plies = MATE_SCORE - Math.abs(score);
+  return { kind: "mate", moves: Math.ceil(plies / 2), winning: score > 0 };
+}
+
 export interface Candidate {
   /** First move, in UCI notation (e.g. "e2e4", "e7e8q"). */
   move: string;

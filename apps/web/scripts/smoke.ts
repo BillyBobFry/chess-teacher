@@ -6,7 +6,7 @@
  *   the new-game dialog → reload and resume →
  *   a recorded game at a reveal (wrong guess → hint → answer → AI explanation → futures →
  *   rewind) → resign and see the earlier try in the review → resign a game and review it →
- *   replay it, step by step and from a lesson →
+ *   replay it, step by step, along the balance of power and from a lesson →
  *   a principle's lessons from the progress page, and on into a game's review →
  *   past games, with the coach's explanation kept → a past game's URL survives a reload, and
  *   back and forward move between pages → sign out and back in → licences → phone layout.
@@ -381,6 +381,15 @@ try {
       // Focus is on the stepper, not the board or a field, so the keys step the replay.
       await page.keyboard.press("ArrowRight");
       await replay.getByText(`1. ${played[0]!.san}`, { exact: true }).waitFor();
+      await page.keyboard.press("End");
+      await replay.getByText(finalMove, { exact: true }).waitFor();
+      // The balance of power moves the replay too, and reads where it is in words.
+      const balance = page.getByRole("slider", { name: "Balance of power, move by move" });
+      await balance.focus();
+      await page.keyboard.press("Home");
+      await replay.getByText("Start", { exact: true }).waitFor();
+      const said = await balance.getAttribute("aria-valuetext");
+      if (said !== "Start: About even") throw new Error(`balance of power reads ${said}`);
       await page.keyboard.press("End");
       await replay.getByText(finalMove, { exact: true }).waitFor();
       // Opening a lesson puts the board just before its mistake, and says so under it.
