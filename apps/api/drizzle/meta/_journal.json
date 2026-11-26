@@ -36,6 +36,13 @@
       "when": 1795726866707,
       "tag": "0004_coached_games",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795731395718,
+      "tag": "0005_explanation_attempts",
+      "breakpoints": true
     }
   ]
 }

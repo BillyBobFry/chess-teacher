@@ -1000,5 +1000,7 @@
   ],
   "ai_rejected": "Your coach's explanation isn't shown: it named a square the analysis doesn't mention. It doesn't count towards your allowance.",
   "ai_failed": "Your coach couldn't write an explanation this time. It doesn't count towards your allowance.",
-  "ai_slow": "Your coach's explanation is taking too long. Here's what the analysis found."
+  "ai_error": "Your coach couldn't write an explanation for this lesson. Failed attempts don't count towards your allowance.",
+  "ai_retry": "Ask your coach again",
+  "ai_show_facts": "Show what the analysis found"
 }

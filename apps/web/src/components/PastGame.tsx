@@ -1,6 +1,7 @@
 import { gameOf } from "@chess-teacher/core";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { loadGame, type SavedGame } from "../game/storage.ts";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { savedGameQuery } from "../game/storage.ts";
 import { principleCopy } from "../lib/principles.ts";
 import { resultText } from "../lib/result.ts";
 import { goBackTo, usePreviousRoute, type Route } from "../lib/router.ts";
@@ -38,27 +39,14 @@ export function PastGame({
   onBackToGame: (() => void) | null;
   onProgress: () => void;
 }) {
-  const [game, setGame] = useState<SavedGame | null>(null);
+  const { data: game, isError, isFetching, refetch } = useQuery(savedGameQuery(id));
   const back = useBack();
   const goBack = () => goBackTo(back.route);
-  const [error, setError] = useState(false);
+  // A retry in flight shows as loading, not as the error it is retrying.
+  const error = isError && !isFetching;
+  const retry = () => void refetch();
   // The review is what the player came for, so on a phone its drawer starts open.
   const [expanded, setExpanded] = useState(true);
-
-  const fetchGame = useCallback(
-    () =>
-      loadGame(id)
-        .then(setGame)
-        .catch(() => setError(true)),
-    [id],
-  );
-  useEffect(() => {
-    void fetchGame();
-  }, [fetchGame]);
-  const retry = () => {
-    setError(false);
-    void fetchGame();
-  };
 
   const board = useMemo(() => (game ? { game: gameOf(game.state) } : null), [game]);
 

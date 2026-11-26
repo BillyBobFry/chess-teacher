@@ -3,9 +3,11 @@
  * gets saved, one request at a time, each based on the version the previous save returned.
  */
 
-import type { RevealState } from "@chess-teacher/contract";
+import type { RevealState, SaveGameBody } from "@chess-teacher/contract";
 import { upgradeSession, type SavedSessionState, type SessionState } from "@chess-teacher/core";
+import { queryOptions } from "@tanstack/react-query";
 import { api, HttpError } from "../api/client.ts";
+import { activeGamesQuery, queryClient, runMutation } from "../api/queries.ts";
 import { m } from "../paraglide/messages.js";
 
 export type { RevealState };
@@ -22,31 +24,43 @@ export interface SavedGame {
   finished: boolean;
 }
 
+/** A game from the player's account, brought up to date. */
+export const savedGameQuery = (id: string) =>
+  queryOptions({
+    queryKey: ["games", id],
+    queryFn: async (): Promise<SavedGame> => {
+      const g = await api.game(id);
+      return {
+        version: 1,
+        id: g.id,
+        stateVersion: g.stateVersion,
+        // Games saved by an older version are brought up to date here, once, on load.
+        state: upgradeSession(g.state as unknown as SavedSessionState),
+        opponentRating: g.opponentRating,
+        reveal: g.reveal,
+        finished: g.finished,
+      };
+    },
+  });
+
+/** The game in progress, as the server has it now. */
 export async function loadActiveGame(): Promise<SavedGame | null> {
-  const [latest] = await api.activeGames();
-  return latest ? loadGame(latest.id) : null;
+  const [latest] = await queryClient.fetchQuery({ ...activeGamesQuery, staleTime: 0 });
+  return latest ? queryClient.fetchQuery({ ...savedGameQuery(latest.id), staleTime: 0 }) : null;
 }
 
-export async function loadGame(id: string): Promise<SavedGame> {
-  const g = await api.game(id);
-  return {
-    version: 1,
-    id: g.id,
-    stateVersion: g.stateVersion,
-    // Games saved by an older version are brought up to date here, once, on load.
-    state: upgradeSession(g.state as unknown as SavedSessionState),
-    opponentRating: g.opponentRating,
-    reveal: g.reveal,
-    finished: g.finished,
-  };
-}
+type NewGame = Omit<SavedGame, "id" | "stateVersion" | "version">;
 
-export async function createGame(
-  game: Omit<SavedGame, "id" | "stateVersion" | "version">,
-): Promise<SavedGame> {
-  const g = await api.createGame({ ...game, state: game.state as never });
-  return { ...game, version: 1, id: g.id, stateVersion: g.stateVersion };
-}
+const createGameMutation = {
+  mutationFn: async (game: NewGame): Promise<SavedGame> => {
+    const g = await api.createGame({ ...game, state: game.state as never });
+    return { ...game, version: 1, id: g.id, stateVersion: g.stateVersion };
+  },
+};
+
+export const createGame = (game: NewGame) => runMutation(createGameMutation, game);
+
+const saveGame = { mutationFn: ({ id, body }: { id: string; body: SaveGameBody }) => api.saveGame(id, body) };
 
 export class ConflictError extends Error {}
 
@@ -77,12 +91,15 @@ export class Saver {
       const g = this.latest;
       this.latest = null;
       try {
-        const r = await api.saveGame(g.id, {
-          state: g.state as never,
-          opponentRating: g.opponentRating,
-          reveal: g.reveal,
-          finished: g.finished,
-          expectedVersion: this.version,
+        const r = await runMutation(saveGame, {
+          id: g.id,
+          body: {
+            state: g.state as never,
+            opponentRating: g.opponentRating,
+            reveal: g.reveal,
+            finished: g.finished,
+            expectedVersion: this.version,
+          },
         });
         this.version = r.stateVersion;
         this.onSaved({ ...g, stateVersion: r.stateVersion });

@@ -1,6 +1,6 @@
-import type { PrincipleProgress, ProgressResponse } from "@chess-teacher/contract";
-import { useEffect, useState } from "react";
-import { api } from "../api/client.ts";
+import type { PrincipleProgress } from "@chess-teacher/contract";
+import { useQuery } from "@tanstack/react-query";
+import { progressQuery } from "../api/queries.ts";
 import { principleCopy } from "../lib/principles.ts";
 import { hrefOf } from "../lib/router.ts";
 import { m } from "../paraglide/messages.js";
@@ -11,8 +11,7 @@ import { Button } from "../ui/Button.tsx";
 
 /** Which principles keep coming up, and how you're doing with them. Each opens its lessons. */
 export function Progress({ onBack }: { onBack: () => void }) {
-  const [data, setData] = useState<ProgressResponse | null>(null);
-  const [error, setError] = useState(false);
+  const { data, isError: error } = useQuery(progressQuery);
   const locale = getLocale();
   const list = new Intl.ListFormat(locale, { style: "narrow", type: "unit" });
   // Ids from the server that this version of the core doesn't know are left out.
@@ -21,13 +20,6 @@ export function Progress({ onBack }: { onBack: () => void }) {
     return copy ? [{ ...p, ...copy, key: `${p.kind}:${p.id}` }] : [];
   });
   const focus = principles[0];
-
-  useEffect(() => {
-    api
-      .progress()
-      .then(setData)
-      .catch(() => setError(true));
-  }, []);
 
   return (
     <section className="progress">

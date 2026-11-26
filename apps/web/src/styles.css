@@ -320,28 +320,6 @@ main.page {
   margin-top: 1.25rem;
 }
 
-/* ---------- AI explanation */
-
-.ai {
-  border: 1px solid var(--color-primary);
-  border-radius: 8px;
-  padding: 0.7rem 0.85rem;
-  margin-bottom: 0.75rem;
-  background: var(--color-success-subtle);
-}
-.ai p {
-  margin: 0.2rem 0 0.4rem;
-}
-.ai-label {
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--color-success);
-}
-.ai-foot,
-.ai-note {
-  font-size: 0.8rem;
-}
-
 /* ---------- lesson feedback */
 
 .feedback {
@@ -392,23 +370,6 @@ main.page {
   margin: 0.5rem 0 0.4rem;
 }
 
-.ai-headline {
-  font-weight: 700;
-  font-size: 1.05rem;
-  margin: 0.25rem 0 0.5rem;
-}
-.ai-parts {
-  margin: 0 0 0.5rem;
-}
-.ai-parts dt {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--color-fg-muted);
-  margin-top: 0.5rem;
-}
-.ai-parts dd {
-  margin: 0.1rem 0 0;
-}
 .move {
   font-weight: 600;
   white-space: nowrap;

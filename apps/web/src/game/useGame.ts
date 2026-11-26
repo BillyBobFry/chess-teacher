@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ExplanationResponse, MeResponse } from "@chess-teacher/contract";
+import { useQuery } from "@tanstack/react-query";
 import {
   finish,
   gameOf,
@@ -29,8 +29,8 @@ import {
   type SessionState,
 } from "@chess-teacher/core";
 import { hintText, moveText } from "@chess-teacher/lesson-text";
-import { api } from "../api/client.ts";
 import { errorText } from "../api/errors.ts";
+import { meQuery, queryClient, revealExplanationQuery } from "../api/queries.ts";
 import { getEngines, startEngines } from "../engine/engines.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -50,7 +50,6 @@ let toastId = 0;
 /** Undo and redo wait while a lesson is open, after the game, and while a move is checked. */
 const canStep = (g: SavedGame | null, checking: boolean): g is SavedGame =>
   !!g && !g.reveal && !g.finished && !checking;
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export function useGame(opts: { llmEnabled: boolean }) {
   const [game, setGame] = useState<SavedGame | null>(null);
@@ -60,13 +59,11 @@ export function useGame(opts: { llmEnabled: boolean }) {
   const [pendingMove, setPendingMove] = useState<string | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [me, setMe] = useState<MeResponse | null>(null);
   const running = useRef(false);
   const enginesReady = useRef(false);
   const saver = useRef<Saver | null>(null);
   /** Lessons just revealed: ask for their explanation once the game is saved. */
   const wantExplanation = useRef(new Set<number>());
-  const explanations = useRef(new Map<string, Promise<ExplanationResponse>>());
   const llmEnabled = opts.llmEnabled;
   /** The user's move is being checked: too late to undo the move before it. */
   const checking = useRef(false);
@@ -78,27 +75,15 @@ export function useGame(opts: { llmEnabled: boolean }) {
     setRedoStatesState(states);
   }, []);
 
-  const refreshMe = useCallback(() => {
-    api
-      .me()
-      .then(setMe)
-      .catch(() => {});
-  }, []);
+  const me = useQuery(meQuery).data ?? null;
 
-  const requestExplanation = useCallback(
-    (gameId: string, lessonId: number) => {
-      const key = `${gameId}/${lessonId}`;
-      if (!explanations.current.has(key)) {
-        const p = api
-          // Written in the player's language (UX-41).
-          .requestExplanation(gameId, lessonId, { locale: getLocale() })
-          .catch((): ExplanationResponse => ({ status: "error", coachedGamesRemaining: 0 }));
-        explanations.current.set(key, p);
-        void p.then(refreshMe);
-      }
-      return explanations.current.get(key)!;
-    },
-    [refreshMe],
+  /** A lesson's AI explanation, once the moves since are saved (D5). */
+  const explanationQuery = useCallback(
+    (gameId: string, lessonId: number) =>
+      revealExplanationQuery(gameId, lessonId, async () => {
+        await saver.current?.flush();
+      }),
+    [],
   );
 
   const onSaved = useCallback(
@@ -112,10 +97,10 @@ export function useGame(opts: { llmEnabled: boolean }) {
         if (!lesson) continue;
         wantExplanation.current.delete(lessonId);
         // Its move was undone, so it will never be shown: don't spend the player's allowance.
-        if (lesson.status !== "rewound") void requestExplanation(saved.id, lessonId);
+        if (lesson.status !== "rewound") void queryClient.prefetchQuery(explanationQuery(saved.id, lessonId));
       }
     },
-    [llmEnabled, requestExplanation],
+    [llmEnabled, explanationQuery],
   );
 
   const attachSaver = useCallback(
@@ -225,7 +210,6 @@ export function useGame(opts: { llmEnabled: boolean }) {
   useEffect(() => {
     let cancelled = false;
     startEngines();
-    refreshMe();
     loadActiveGame()
       .then((g) => {
         if (cancelled) return;
@@ -245,7 +229,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
     return () => {
       cancelled = true;
     };
-  }, [advance, attachSaver, refreshMe]);
+  }, [advance, attachSaver]);
 
   /** The user plays a move (UCI). Returns false if it can't be played now. */
   const move = useCallback(
@@ -393,27 +377,6 @@ export function useGame(opts: { llmEnabled: boolean }) {
     commit({ ...g, state: resignGame(g.state), reveal: null, finished: true });
   }, [commit]);
 
-  /**
-   * The AI explanation for a lesson: the request made when it was revealed, or a new one
-   * (which returns the stored explanation if there is one). Polls while it's pending.
-   */
-  const explanation = useCallback(
-    async (lessonId: number, signal: AbortSignal): Promise<ExplanationResponse | null> => {
-      const g = gameRef.current;
-      if (!g || !llmEnabled) return null;
-      await saver.current?.flush();
-      let r = await requestExplanation(g.id, lessonId);
-      for (let i = 0; r.status === "pending" && i < 15 && !signal.aborted; i++) {
-        await sleep(1500);
-        r = await api
-          .explanation(g.id, lessonId)
-          .catch((): ExplanationResponse => ({ status: "error", coachedGamesRemaining: 0 }));
-      }
-      return signal.aborted ? null : r;
-    },
-    [llmEnabled, requestExplanation],
-  );
-
   const currentHint = (() => {
     const g = game;
     if (!g?.reveal || g.reveal.attempts === 0) return null;
@@ -442,7 +405,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
     canUndo: canStep(game, !!pendingMove) && canTakeBack(game.state),
     canRedo: canStep(game, !!pendingMove) && redoStates.length > 0,
     resign,
-    explanation,
+    explanationQuery,
     dismissError: () => setError(null),
   };
 }

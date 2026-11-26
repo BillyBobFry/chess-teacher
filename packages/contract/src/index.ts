@@ -129,6 +129,11 @@ export interface ExplanationResponse {
   text?: string;
   /** Coached games left this month (D13). */
   coachedGamesRemaining: number;
+  /**
+   * On a failed explanation ("error" or "rejected"): whether asking again (POST) writes it
+   * again. False once it has failed too many times; the facts then stand alone.
+   */
+  canRetry?: boolean;
 }
 
 export interface MeResponse {

@@ -1,3 +1,5 @@
+import type { FeedbackBody } from "@chess-teacher/contract";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "../api/client.ts";
 import { m } from "../paraglide/messages.js";
@@ -10,10 +12,12 @@ export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId:
   const [rating, setRating] = useState<1 | -1 | null>(null);
   const [comment, setComment] = useState("");
   const [sent, setSent] = useState(false);
+  const feedback = useMutation({ mutationFn: (body: FeedbackBody) => api.feedback(gameId, lessonId, body) });
 
   const send = (r: 1 | -1, text?: string) => {
     setRating(r);
-    void api.feedback(gameId, lessonId, { rating: r, ...(text ? { comment: text } : {}) }).catch(() => {});
+    // Feedback is best effort: a lost rating isn't worth interrupting the lesson for.
+    feedback.mutate({ rating: r, ...(text ? { comment: text } : {}) });
     if (r === 1 || text !== undefined) setSent(true);
   };
 
