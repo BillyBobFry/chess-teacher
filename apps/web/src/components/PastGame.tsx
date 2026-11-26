@@ -1,30 +1,48 @@
 import { gameOf } from "@chess-teacher/core";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { loadGame, type SavedGame } from "../game/storage.ts";
+import { principleCopy } from "../lib/principles.ts";
 import { resultText } from "../lib/result.ts";
-import { goBackTo } from "../lib/router.ts";
+import { goBackTo, usePreviousRoute, type Route } from "../lib/router.ts";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import { Alert } from "../ui/Alert.tsx";
 import { Button } from "../ui/Button.tsx";
 import { Board, orientationOf } from "./Board.tsx";
 import { GameLayout } from "./GameLayout.tsx";
 import { Review } from "./Review.tsx";
 
+/**
+ * Where a past game's Back button leads: the principle page it was opened from, or else the
+ * list of games.
+ */
+function useBack(): { route: Route; label: string } {
+  const previous = usePreviousRoute();
+  const copy = previous?.page === "principle" ? principleCopy(previous.kind, previous.id, getLocale()) : null;
+  return previous?.page === "principle" && copy
+    ? { route: previous, label: m.principle_back({ name: copy.title }) }
+    : { route: { page: "games" }, label: m.games_back() };
+}
+
 /** A finished game from the player's account: its final position and its review. */
 export function PastGame({
   id,
+  openLesson,
   onNewGame,
   onBackToGame,
   onProgress,
 }: {
   id: string;
+  /** A lesson to start open in the review, or null. */
+  openLesson: number | null;
   onNewGame: () => void;
   /** Returns to the game in progress; null when there isn't one. */
   onBackToGame: (() => void) | null;
   onProgress: () => void;
 }) {
   const [game, setGame] = useState<SavedGame | null>(null);
-  const backToGames = () => goBackTo({ page: "games" });
+  const back = useBack();
+  const goBack = () => goBackTo(back.route);
   const [error, setError] = useState(false);
   // The review is what the player came for, so on a phone its drawer starts open.
   const [expanded, setExpanded] = useState(true);
@@ -67,7 +85,7 @@ export function PastGame({
         ) : (
           <p className="muted">{m.loading()}</p>
         )}
-        <Button onPress={backToGames}>{m.games_back()}</Button>
+        <Button onPress={goBack}>{back.label}</Button>
       </main>
     );
   }
@@ -89,13 +107,14 @@ export function PastGame({
       }
       panel={
         <>
-          <Button variant="link" className="mb-3 self-start" onPress={backToGames}>
-            {m.games_back()}
+          <Button variant="link" className="mb-3 self-start" onPress={goBack}>
+            {back.label}
           </Button>
           <Review
             gameId={game.id}
             state={game.state}
             result={resultText(board.game, game.state)}
+            openLesson={openLesson}
             onNewGame={onNewGame}
             onBackToGame={onBackToGame}
             onProgress={onProgress}

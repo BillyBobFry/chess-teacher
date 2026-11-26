@@ -1,19 +1,13 @@
-import type { GameOutcome, GameSummary } from "@chess-teacher/contract";
+import type { GameSummary } from "@chess-teacher/contract";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../api/client.ts";
+import { outcomeText } from "../lib/result.ts";
 import { hrefOf } from "../lib/router.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import { ActionList, ActionListItem } from "../ui/ActionList.tsx";
 import { Alert } from "../ui/Alert.tsx";
 import { Button } from "../ui/Button.tsx";
-
-const OUTCOME: Record<GameOutcome, () => string> = {
-  won: m.games_won,
-  lost: m.games_lost,
-  drawn: m.games_drawn,
-  ended: m.games_ended,
-};
 
 /** The player's finished games, newest first; each opens its review. */
 export function Games({
@@ -75,7 +69,7 @@ export function Games({
             const when = date.format(new Date(g.updatedAt));
             const facts = [
               g.userColour === "w" ? m.games_as_white() : m.games_as_black(),
-              g.outcome ? OUTCOME[g.outcome]() : null,
+              g.outcome ? outcomeText(g.outcome) : null,
               m.games_lessons({ count: g.lessons }),
             ].filter((f) => f !== null);
             return (

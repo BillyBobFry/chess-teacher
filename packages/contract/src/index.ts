@@ -167,9 +167,11 @@ export const FeedbackBody = z.object({
 });
 export type FeedbackBody = z.infer<typeof FeedbackBody>;
 
+/** What a progress id names: a principle (older lessons) or a concept (diagnosed lessons). */
+export type PrincipleKind = "principle" | "concept";
+
 export interface PrincipleProgress {
-  /** What `id` names: a principle (older lessons) or a concept (diagnosed lessons). */
-  kind: "principle" | "concept";
+  kind: PrincipleKind;
   /** A principle or concept id from the core; the client shows its title in the player's locale. */
   id: string;
   /** Lessons about this principle across the recent games. */
@@ -189,4 +191,34 @@ export interface ProgressResponse {
   games: number;
   lessons: number;
   principles: PrincipleProgress[];
+}
+
+/** One lesson on a principle's page. */
+export interface PrincipleLesson {
+  /**
+   * The core's `Lesson`, brought up to date by the server. The contract doesn't depend on the
+   * core, so only its id is typed here; the client reads it as a `Lesson`, as it reads a
+   * saved game's state.
+   */
+  lesson: { id: number };
+  /** The moves really played from the mistake on (core's `playedLine`), for its futures. */
+  played: string[];
+  /** False for a lesson in an earlier try: a line the player went back from. */
+  onGameLine: boolean;
+}
+
+/** A game with lessons on a principle, and those lessons in the order its review lists them. */
+export interface PrincipleGame {
+  game: GameSummary;
+  lessons: PrincipleLesson[];
+}
+
+/** One principle or concept across the user's recent games, for its own page. */
+export interface PrincipleDetailResponse {
+  /** Games counted (the most recent ones), as on the progress page. */
+  games: number;
+  /** Its counts, as on the progress page; null when none of the games counted has a lesson on it. */
+  progress: PrincipleProgress | null;
+  /** The games with a lesson on it, newest first. */
+  occurrences: PrincipleGame[];
 }
