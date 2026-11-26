@@ -6,7 +6,8 @@
  *   the new-game dialog → reload and resume →
  *   a recorded game at a reveal (wrong guess → hint → answer → AI explanation → futures →
  *   rewind) → resign and see the earlier try in the review → resign a game and review it →
- *   past games, with the coach's explanation kept → sign out and back in → phone layout.
+ *   past games, with the coach's explanation kept → a past game's URL survives a reload, and
+ *   back and forward move between pages → sign out and back in → licences → phone layout.
  * Fails on any console error. Screenshots go to the directory given.
  *
  * Usage: node scripts/build-vercel.mjs && pnpm --filter @chess-teacher/web smoke <dir> [--scale 2]
@@ -366,6 +367,44 @@ try {
     await page.getByRole("button", { name: "Back", exact: true }).click();
   });
 
+  // The game page; the finished game it shows has a review too, so tell them apart by the board.
+  const gamePage = () => page.locator("#main-square-e1").waitFor({ timeout: 30_000 });
+  const pastGamePage = () => page.locator("#past-square-e1").waitFor({ timeout: 30_000 });
+
+  await step("a past game has its own URL: reload, back and forward", async () => {
+    await page.waitForURL(`${BASE}/app/`);
+    await gamePage();
+    await page.getByRole("button", { name: "Account" }).click();
+    await page.getByRole("menuitem", { name: "Your games" }).click();
+    await page.getByRole("heading", { name: "Your games" }).waitFor();
+    await page.waitForURL(`${BASE}/app/games`);
+    await page.getByRole("grid", { name: "Finished games" }).getByRole("row").first().click();
+    await page.waitForURL(/\/app\/games\/[^/]+$/);
+    await pastGamePage();
+    // A refresh, or a link someone opens later, shows the same game.
+    await page.reload();
+    await pastGamePage();
+    await page.getByRole("heading", { name: "Game review" }).waitFor();
+    await page.getByText("You resigned.").first().waitFor();
+    if ((await page.title()) !== "Game review | Chess Teacher")
+      throw new Error(`title: ${await page.title()}`);
+    // The browser's own buttons move between the app's pages.
+    await page.goBack();
+    await page.getByRole("heading", { name: "Your games" }).waitFor();
+    await page.goBack();
+    await gamePage();
+    await page.goForward();
+    await page.getByRole("heading", { name: "Your games" }).waitFor();
+    await page.goForward();
+    await pastGamePage();
+    // In-app Back from a deep link, with no page of the app before it, goes to the game.
+    await page.goto(`${BASE}/app/progress`);
+    await page.getByRole("heading", { name: "Your progress" }).waitFor();
+    await page.getByRole("button", { name: "Back", exact: true }).click();
+    await page.waitForURL(`${BASE}/app/`);
+    await gamePage();
+  });
+
   await step("sign out and back in", async () => {
     await page.getByRole("button", { name: "Account" }).click();
     await page.getByRole("menuitem", { name: "Sign out" }).click();
@@ -381,8 +420,9 @@ try {
   });
 
   await step("licences", async () => {
-    await page.getByRole("button", { name: "Licences" }).click();
+    await page.getByRole("link", { name: "Licences" }).click();
     await page.getByRole("heading", { name: "Licences" }).waitFor();
+    await page.waitForURL(`${BASE}/app/licences`);
   });
 
   // A failed sign-in is expected to log a 401 in the console; nothing else should.
@@ -408,7 +448,7 @@ try {
     await mobile.getByText("The better move, then…").first().waitFor({ timeout: 30_000 });
     await mobile.getByText("Your coach", { exact: true }).waitFor({ timeout: 30_000 });
     // The browser asks for en-US, so the app speaks it (UX-39).
-    await mobile.getByRole("button", { name: "Licenses" }).waitFor();
+    await mobile.getByRole("link", { name: "Licenses" }).waitFor();
     if ((await mobile.evaluate(() => document.documentElement.lang)) !== "en-US") {
       throw new Error("<html lang> doesn't follow the locale");
     }

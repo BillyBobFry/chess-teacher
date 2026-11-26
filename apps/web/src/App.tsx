@@ -1,7 +1,7 @@
 import type { ConfigResponse } from "@chess-teacher/contract";
 import { gameOf, isUserTurn } from "@chess-teacher/core";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { api, authClient } from "./api/client.ts";
 import { Board, orientationOf } from "./components/Board.tsx";
 import { Games } from "./components/Games.tsx";
@@ -15,12 +15,14 @@ import { Alert } from "./ui/Alert.tsx";
 import { Button } from "./ui/Button.tsx";
 import { ConfirmDialog } from "./ui/Dialog.tsx";
 import { Kbd } from "./ui/Kbd.tsx";
+import { Link } from "./ui/Link.tsx";
 import { Menu, MenuItem, MenuSection, MenuTrigger } from "./ui/Menu.tsx";
 import { Toasts } from "./ui/Toast.tsx";
 import { Review } from "./components/Review.tsx";
 import { SignIn } from "./components/SignIn.tsx";
 import { useGame, type Busy } from "./game/useGame.ts";
 import { resultText } from "./lib/result.ts";
+import { goBack, hrefOf, navigate, routeOf, usePathname, type Route } from "./lib/router.ts";
 import { m } from "./paraglide/messages.js";
 
 const BUSY_TEXT: Record<Exclude<Busy, null>, () => string> = {
@@ -52,15 +54,7 @@ function stepKey(e: KeyboardEvent): "undo" | "redo" | null {
   return null;
 }
 
-function Shell({
-  nav,
-  children,
-  onLicences,
-}: {
-  nav?: ReactNode;
-  children: ReactNode;
-  onLicences: () => void;
-}) {
+function Shell({ nav, children }: { nav?: ReactNode; children: ReactNode }) {
   return (
     <div className="app">
       {/* Wraps rather than scrolls: on a narrow phone the nav takes a second line (UX-40). */}
@@ -75,23 +69,51 @@ function Shell({
       </header>
       {children}
       <footer className="bottom">
-        <Button variant="link" onPress={onLicences}>
+        <Link variant="link" href={hrefOf({ page: "licences" })}>
           {m.footer_licences()}
-        </Button>
+        </Link>
       </footer>
     </div>
   );
 }
 
-/** What the signed-in player is looking at: the game (or choosing a new one), or a page from the account menu. */
-type Page = { kind: "play" } | { kind: "progress" } | { kind: "games" } | { kind: "pastGame"; id: string };
-const PLAY: Page = { kind: "play" };
+/** The game (or choosing a new one); every other page leads back to it. */
+const PLAY: Route = { page: "play" };
 
-/** Signed out → sign-in screen; signed in → the game. */
+/** A page's name for the browser tab and history list; the game page is the app itself. */
+const PAGE_TITLE: Record<Route["page"], (() => string) | null> = {
+  play: null,
+  games: m.games_title,
+  pastGame: m.review_title,
+  progress: m.progress_title,
+  licences: m.licences_title,
+};
+
+/**
+ * After an in-app navigation, focus moves to the new page's heading (or the page itself), so
+ * keyboard and screen reader users start there rather than on a control that has gone.
+ */
+function useFocusOnNavigate(pathname: string) {
+  const shown = useRef(pathname);
+  useEffect(() => {
+    if (shown.current === pathname) return;
+    shown.current = pathname;
+    const target = document.querySelector<HTMLElement>("main h1") ?? document.querySelector("main");
+    if (!target) return;
+    if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+    target.focus({ preventScroll: true });
+  }, [pathname]);
+}
+
+/** Signed out → sign-in screen; signed in → the page the URL names. */
 export function App() {
   const session = authClient.useSession();
   const [config, setConfig] = useState<ConfigResponse | null>(null);
-  const [licences, setLicences] = useState(false);
+  const pathname = usePathname();
+  const known = routeOf(pathname);
+  const isPage = known !== null;
+  const route = known ?? PLAY;
+  const signedIn = !!session.data;
 
   useEffect(() => {
     api
@@ -100,25 +122,38 @@ export function App() {
       .catch(() => setConfig({ googleEnabled: false, llmEnabled: false }));
   }, []);
 
-  if (licences) {
+  // A path that isn't a page (a typo, an old link) shows the game, so say so in the address bar.
+  useEffect(() => {
+    if (!isPage) navigate(PLAY, { replace: true });
+  }, [isPage]);
+
+  useEffect(() => {
+    const page = signedIn || route.page === "licences" ? PAGE_TITLE[route.page] : null;
+    document.title = page ? m.document_title({ page: page() }) : m.app_name();
+  }, [route.page, signedIn]);
+
+  useFocusOnNavigate(pathname);
+
+  if (route.page === "licences") {
     return (
-      <Shell onLicences={() => setLicences(true)}>
+      <Shell>
         <main className="page">
-          <Licences onBack={() => setLicences(false)} />
+          <Licences onBack={() => goBack(PLAY)} />
         </main>
       </Shell>
     );
   }
   if (session.isPending || !config) {
     return (
-      <Shell onLicences={() => setLicences(true)}>
+      <Shell>
         <main className="page muted">{m.loading()}</main>
       </Shell>
     );
   }
+  // Signed out on any page: signing in shows the page the URL names.
   if (!session.data) {
     return (
-      <Shell onLicences={() => setLicences(true)}>
+      <Shell>
         <main className="page">
           <SignIn googleEnabled={config.googleEnabled} />
         </main>
@@ -128,30 +163,29 @@ export function App() {
   return (
     <GameApp
       key={session.data.user.id}
+      route={route}
       userName={session.data.user.name}
       llmEnabled={config.llmEnabled}
-      onLicences={() => setLicences(true)}
     />
   );
 }
 
 function GameApp({
+  route,
   userName,
   llmEnabled,
-  onLicences,
 }: {
+  route: Exclude<Route, { page: "licences" }>;
   userName: string;
   llmEnabled: boolean;
-  onLicences: () => void;
 }) {
   const g = useGame({ llmEnabled });
   const [choosing, setChoosing] = useState(false);
-  const [page, setPage] = useState<Page>(PLAY);
   const [confirmingNewGame, setConfirmingNewGame] = useState(false);
   const [confirmingResign, setConfirmingResign] = useState(false);
   const saved = g.game;
   const chooseNewGame = () => {
-    setPage(PLAY);
+    if (route.page !== "play") navigate(PLAY);
     setChoosing(true);
   };
   // Starting a new game resigns one in progress, so that asks first (UX-15).
@@ -240,9 +274,12 @@ function GameApp({
               </>
             }
           >
-            <MenuItem onAction={() => setPage({ kind: "games" })}>{m.account_games()}</MenuItem>
-            <MenuItem onAction={() => setPage({ kind: "progress" })}>{m.account_progress()}</MenuItem>
-            <MenuItem onAction={() => void authClient.signOut().then(() => window.location.reload())}>
+            <MenuItem href={hrefOf({ page: "games" })}>{m.account_games()}</MenuItem>
+            <MenuItem href={hrefOf({ page: "progress" })}>{m.account_progress()}</MenuItem>
+            {/* A full load of the app's home: nothing of this account's state stays behind. */}
+            <MenuItem
+              onAction={() => void authClient.signOut().then(() => window.location.assign(hrefOf(PLAY)))}
+            >
               {m.account_sign_out()}
             </MenuItem>
           </MenuSection>
@@ -253,45 +290,40 @@ function GameApp({
 
   if (!g.loaded) {
     return (
-      <Shell nav={nav} onLicences={onLicences}>
+      <Shell nav={nav}>
         <main className="page muted">{BUSY_TEXT.loading()}</main>
       </Shell>
     );
   }
 
-  if (page.kind === "progress") {
+  if (route.page === "progress") {
     return (
-      <Shell nav={nav} onLicences={onLicences}>
+      <Shell nav={nav}>
         <main className="page">
-          <Progress onBack={() => setPage(PLAY)} />
+          <Progress onBack={() => goBack(PLAY)} />
         </main>
       </Shell>
     );
   }
 
-  if (page.kind === "games") {
+  if (route.page === "games") {
     return (
-      <Shell nav={nav} onLicences={onLicences}>
+      <Shell nav={nav}>
         <main className="page">
-          <Games
-            onOpen={(id) => setPage({ kind: "pastGame", id })}
-            onNewGame={requestNewGame}
-            onBack={() => setPage(PLAY)}
-          />
+          <Games onNewGame={requestNewGame} onBack={() => goBack(PLAY)} />
         </main>
       </Shell>
     );
   }
 
-  if (page.kind === "pastGame") {
+  if (route.page === "pastGame") {
     return (
-      <Shell nav={nav} onLicences={onLicences}>
+      <Shell nav={nav}>
         <PastGame
-          key={page.id}
-          id={page.id}
-          onBack={() => setPage({ kind: "games" })}
+          key={route.id}
+          id={route.id}
           onNewGame={requestNewGame}
-          onProgress={() => setPage({ kind: "progress" })}
+          onProgress={() => navigate({ page: "progress" })}
         />
       </Shell>
     );
@@ -299,7 +331,7 @@ function GameApp({
 
   if (choosing || !saved || !board) {
     return (
-      <Shell nav={nav} onLicences={onLicences}>
+      <Shell nav={nav}>
         <main className="page">
           {g.error && <Alert className="mb-4">{g.error}</Alert>}
           <NewGame
@@ -334,7 +366,7 @@ function GameApp({
           : "…";
 
   return (
-    <Shell nav={nav} onLicences={onLicences}>
+    <Shell nav={nav}>
       <main className="game">
         <div className="board-col">
           <div className={`status ${canMove ? "your-move" : ""}`} role="status" aria-live="polite">
@@ -364,7 +396,7 @@ function GameApp({
               state={state}
               result={resultText(board.game, state)}
               onNewGame={() => setChoosing(true)}
-              onProgress={() => setPage({ kind: "progress" })}
+              onProgress={() => navigate({ page: "progress" })}
             />
           ) : revealLesson && saved.reveal ? (
             <Reveal

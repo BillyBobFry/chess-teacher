@@ -216,6 +216,9 @@ example.com/app/...   the SPA: sign-in screen, games, progress
 example.com/api/...   the Hono API
 ```
 
+Each page of the app has its own URL (`/app/`, `/app/games`, `/app/games/:id`,
+`/app/progress`, `/app/licences`; `apps/web/src/lib/router.ts`), so a refresh stays put and
+the browser's back and forward work; the build rewrites every `/app/*` path to the SPA.
 Visiting `/app` signed out redirects to `/app/sign-in`; the marketing pages' "Sign in" and
 "Start learning" buttons link there. Mobile apps call the same API with token-based
 sessions. If marketing grows (blog, SEO content), an Astro site can take over `/` through
