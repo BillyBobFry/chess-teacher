@@ -92,7 +92,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
         const p = api
           // Written in the player's language (UX-41).
           .requestExplanation(gameId, lessonId, { locale: getLocale() })
-          .catch((): ExplanationResponse => ({ status: "error", remaining: 0 }));
+          .catch((): ExplanationResponse => ({ status: "error", coachedGamesRemaining: 0 }));
         explanations.current.set(key, p);
         void p.then(refreshMe);
       }
@@ -407,7 +407,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
         await sleep(1500);
         r = await api
           .explanation(g.id, lessonId)
-          .catch((): ExplanationResponse => ({ status: "error", remaining: 0 }));
+          .catch((): ExplanationResponse => ({ status: "error", coachedGamesRemaining: 0 }));
       }
       return signal.aborted ? null : r;
     },

@@ -68,7 +68,7 @@ export function AiExplanation({
   if (result.status !== "ready") return null;
 
   const text = (t: string) => <MoveText text={t} known={known} orientation={orientation} />;
-  const foot = <div className="ai-foot muted">{m.ai_foot({ remaining: result.remaining })}</div>;
+  const foot = <div className="ai-foot muted">{m.ai_foot({ remaining: result.coachedGamesRemaining })}</div>;
   if (!result.parts) {
     // Explanations stored before they were structured: one paragraph.
     return (

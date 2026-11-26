@@ -72,7 +72,7 @@ pnpm --filter @chess-teacher/sim exec tsx src/validate-lessons.ts --games 24 --o
    | `ANTHROPIC_API_KEY`                        | for AI explanations | from console.anthropic.com → API Keys                                                        |
    | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | for Google sign-in  | see below                                                                                    |
    | `LLM_MODEL`                                | no                  | default `claude-opus-5-5`                                                                    |
-   | `FREE_EXPLANATIONS_PER_MONTH`              | no                  | default `30`                                                                                 |
+   | `FREE_COACHED_GAMES_PER_MONTH`             | no                  | default `30`: games a player can have AI explanations in each month                          |
 
 4. **Google sign-in:** in Google Cloud Console → APIs & Services → Credentials, create an
    OAuth client ID (Web application) with the authorised redirect URI

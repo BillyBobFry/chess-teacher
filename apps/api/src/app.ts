@@ -31,13 +31,13 @@ import {
 } from "@chess-teacher/core";
 import { baseLocale, isLocale } from "@chess-teacher/lesson-text";
 import { zValidator as validator } from "@hono/zod-validator";
-import { and, desc, eq, lt, sql } from "drizzle-orm";
+import { and, count, desc, eq, lt, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { createMiddleware } from "hono/factory";
 import type { Auth } from "./auth.ts";
 import type { Db } from "./db/client.ts";
-import { explanations, games, lessonFeedback, usage } from "./db/schema.ts";
+import { coachedGames, explanations, games, lessonFeedback } from "./db/schema.ts";
 import type { Env } from "./env.ts";
 import { PROMPT_VERSION, explainDiagnosis, explainLesson, parseParts, type LlmClient } from "./explain.ts";
 
@@ -97,15 +97,30 @@ export function createApp(deps: AppDeps) {
 
   // ------------------------------------------------------------------ helpers
 
+  /** Coached games this month. */
   async function usedThisMonth(userId: string): Promise<number> {
     const [row] = await db
-      .select({ used: usage.explanationsUsed })
-      .from(usage)
-      .where(and(eq(usage.userId, userId), eq(usage.period, period())));
+      .select({ used: count() })
+      .from(coachedGames)
+      .where(and(eq(coachedGames.userId, userId), eq(coachedGames.period, period())));
     return row?.used ?? 0;
   }
 
-  const remaining = (used: number) => Math.max(0, env.explanationsPerMonth - used);
+  async function coachedThisMonth(userId: string, gameId: string): Promise<boolean> {
+    const [row] = await db
+      .select({ gameId: coachedGames.gameId })
+      .from(coachedGames)
+      .where(
+        and(
+          eq(coachedGames.userId, userId),
+          eq(coachedGames.period, period()),
+          eq(coachedGames.gameId, gameId),
+        ),
+      );
+    return !!row;
+  }
+
+  const remaining = (used: number) => Math.max(0, env.coachedGamesPerMonth - used);
 
   /**
    * Moves must be legal from the start position, on every line; the server can check that much.
@@ -151,10 +166,10 @@ export function createApp(deps: AppDeps) {
     const used = await usedThisMonth(c.get("userId"));
     return c.json<MeResponse>({
       user: c.get("user"),
-      explanations: {
+      coachedGames: {
         enabled: !!llm,
         used,
-        limit: env.explanationsPerMonth,
+        limit: env.coachedGamesPerMonth,
         remaining: remaining(used),
       },
     });
@@ -317,14 +332,14 @@ export function createApp(deps: AppDeps) {
   }
 
   const respond = (row: typeof explanations.$inferSelect | null, used: number): ExplanationResponse => {
-    if (!row) return { status: llm ? "pending" : "unavailable", remaining: remaining(used) };
+    if (!row) return { status: llm ? "pending" : "unavailable", coachedGamesRemaining: remaining(used) };
     if (row.status === "ready") {
       const parts = parseParts(row.text);
       return parts
-        ? { status: "ready", parts, remaining: remaining(used) }
-        : { status: "ready", text: row.text ?? "", remaining: remaining(used) };
+        ? { status: "ready", parts, coachedGamesRemaining: remaining(used) }
+        : { status: "ready", text: row.text ?? "", coachedGamesRemaining: remaining(used) };
     }
-    return { status: row.status as ExplanationResponse["status"], remaining: remaining(used) };
+    return { status: row.status as ExplanationResponse["status"], coachedGamesRemaining: remaining(used) };
   };
 
   app.get("/games/:id/lessons/:lessonId/explanation", async (c) => {
@@ -376,13 +391,17 @@ export function createApp(deps: AppDeps) {
     if (!found) return c.json(failure("not_found"), 404);
     const { game, state, lesson } = found;
     let used = await usedThisMonth(userId);
-    if (!llm) return c.json<ExplanationResponse>({ status: "unavailable", remaining: remaining(used) });
+    if (!llm)
+      return c.json<ExplanationResponse>({ status: "unavailable", coachedGamesRemaining: remaining(used) });
 
     const current = await existing(game.id, lesson.id);
     const stale =
       current?.status === "pending" && now().getTime() - current.updatedAt.getTime() > PENDING_TIMEOUT_MS;
     if (current && !stale) return c.json(respond(current, used));
-    if (remaining(used) <= 0) return c.json<ExplanationResponse>({ status: "quota", remaining: 0 });
+    // A game already coached this month has paid for the rest of its explanations.
+    if (remaining(used) <= 0 && !(await coachedThisMonth(userId, game.id))) {
+      return c.json<ExplanationResponse>({ status: "quota", coachedGamesRemaining: 0 });
+    }
 
     let lessonFacts;
     let soFar;
@@ -445,22 +464,21 @@ export function createApp(deps: AppDeps) {
       .where(eq(explanations.id, rowId));
 
     if (result.status === "ready") {
-      // Only successful explanations count towards the user's allowance.
-      await db
-        .insert(usage)
-        .values({ userId, period: period(), explanationsUsed: 1 })
-        .onConflictDoUpdate({
-          target: [usage.userId, usage.period],
-          set: { explanationsUsed: sql`${usage.explanationsUsed} + 1` },
-        });
-      used += 1;
+      // Only a successful explanation makes the game coached, and only its first one this
+      // month uses up the allowance.
+      const counted = await db
+        .insert(coachedGames)
+        .values({ userId, period: period(), gameId: game.id })
+        .onConflictDoNothing()
+        .returning({ gameId: coachedGames.gameId });
+      used += counted.length;
       return c.json<ExplanationResponse>({
         status: "ready",
         parts: result.parts!,
-        remaining: remaining(used),
+        coachedGamesRemaining: remaining(used),
       });
     }
-    return c.json<ExplanationResponse>({ status: result.status, remaining: remaining(used) });
+    return c.json<ExplanationResponse>({ status: result.status, coachedGamesRemaining: remaining(used) });
   });
 
   return app;

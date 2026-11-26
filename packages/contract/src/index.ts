@@ -120,13 +120,14 @@ export interface ExplanationResponse {
   parts?: ExplanationParts;
   /** Plain-text explanation (stored before structured explanations). */
   text?: string;
-  /** AI explanations left this month. */
-  remaining: number;
+  /** Coached games left this month (D13). */
+  coachedGamesRemaining: number;
 }
 
 export interface MeResponse {
   user: { id: string; name: string; email: string };
-  explanations: { enabled: boolean; used: number; limit: number; remaining: number };
+  /** The monthly allowance of coached games: games with an AI explanation (D13). */
+  coachedGames: { enabled: boolean; used: number; limit: number; remaining: number };
 }
 
 export interface ConfigResponse {

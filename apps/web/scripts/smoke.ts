@@ -334,7 +334,7 @@ try {
 
   await step("account menu shows the AI allowance", async () => {
     await page.getByRole("button", { name: "Account" }).click();
-    await page.getByText(/AI explanations left this month/).waitFor();
+    await page.getByText(/coached games left this month/).waitFor();
     await shot("6-account");
   });
 
