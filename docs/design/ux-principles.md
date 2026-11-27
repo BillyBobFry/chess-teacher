@@ -127,7 +127,9 @@ semantic HTML and ARIA where HTML is not enough. Focus styles use keyboard focus
 **UX-24 Repeated actions are icons.** When the same action appears on every row, use an icon-only
 button with a specific accessible label ("Show lesson on move 12", not "Show"). A single action
 that appears once keeps its text label. A lone icon is fine only for convention glyphs with one
-plausible reading (close, previous/next, first/last, settings).
+plausible reading (close, previous/next, first/last, undo/redo, settings). Its label also shows as
+a tooltip on hover and keyboard focus, but touch has no tooltip, so the icon alone must be enough
+(UX-23).
 
 **UX-58 Looks alike, works alike.** Things that look the same behave the same, and things that
 behave differently look different. Nothing that cannot be pressed is styled like a button.
@@ -332,8 +334,8 @@ figurines (♘f3) in that formatter. A move's accessible name reads it in words 
 Parts of the current UI don't meet these rules yet. Fix them when you touch that code, not as
 drive-by changes in an unrelated PR:
 
-- UX-31: emoji and symbol glyphs as icons (👍 👎 ⚠ ⏳ ✓ and the stepper's ⏮ ◀ ▶ ⏭); there is no icon
-  set yet.
+- UX-31: symbol glyphs as icons outside buttons (⚠ ⏳ in the reveal's headline, ✓ in the reveal
+  and the review's lesson rows). Replace them with Lucide icons (components.md).
 - UX-32: the landing page (`apps/web/landing/`) is static English HTML. The sample explanation
   that the fake LLM writes in development (`FAKE_LLM=1`) is English whatever the locale. When a
   piece is dragged with the pointer, react-chessboard's drag library (dnd-kit) announces it to

@@ -45,6 +45,21 @@ on react-chessboard (UX-100), not a primitive.
   different look, add a variant. Classes are merged with `tailwind-merge` (through `tv()`), so a
   caller's class wins over the primitive's on the same property.
 
+## Icons
+
+Icons come from [Lucide](https://lucide.dev), through `lucide-react`. Import each one by name
+(`import { Undo2 } from "lucide-react"`), so only the icons used are bundled. No other icon set,
+no hand-drawn SVG, and no emoji or symbol glyphs standing in for icons (UX-31).
+
+- **An icon-only button is an `IconButton`** (`icon`, `label`, optional `shortcut`). The label is
+  its accessible name and its tooltip, shown on hover and keyboard focus. Use one only where
+  UX-24 allows; otherwise use a `Button` with text.
+- **A toggle with an icon** is a `ToggleButton` with the icon as its child and an `aria-label`.
+- **Icons are decorative:** `aria-hidden`, with the name on the control (UX-36). They draw in the
+  text colour (`currentColor`), so they follow the tokens and dark mode with no colour of their
+  own.
+- **Size:** `size-5` (20px) inside a control, with `shrink-0` so a long label never squeezes it.
+
 ## Tokens
 
 The theme lives in `apps/web/src/theme.css`, in Tailwind's `@theme` block. Each token is
