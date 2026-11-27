@@ -4,8 +4,8 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 
 ## 2026-11-27: survey
 
-- **Base:** origin/main 7f729e3; branch `claude/gardener-survey-2026-11-27`; PR not opened yet
-  when written
+- **Base:** origin/main 7f729e3; branch `claude/gardener-survey-2026-11-27`; PR #24
+
 - **Frozen list:** changed since the skill's reference (`0c2a6da`):
   - `packages/core/src/diagnose.ts:58`: `isMate` now calls `balanceOf` in
     `packages/core/src/engine.ts:15` (7b12c99), which uses `MATE_BAND` (`engine.ts:6`). Same
