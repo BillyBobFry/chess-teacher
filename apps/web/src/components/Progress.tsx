@@ -16,8 +16,8 @@ export function Progress({ onBack }: { onBack: () => void }) {
   const list = new Intl.ListFormat(locale, { style: "narrow", type: "unit" });
   // Ids from the server that this version of the core doesn't know are left out.
   const principles = (data?.principles ?? []).flatMap((p) => {
-    const copy = principleCopy(p.kind, p.id, locale);
-    return copy ? [{ ...p, ...copy, key: `${p.kind}:${p.id}` }] : [];
+    const copy = principleCopy(p.source, p.id, locale);
+    return copy ? [{ ...p, ...copy, key: `${p.source}:${p.id}` }] : [];
   });
   const focus = principles[0];
 
@@ -44,7 +44,7 @@ export function Progress({ onBack }: { onBack: () => void }) {
                 <ActionListItem
                   key={p.key}
                   id={p.key}
-                  href={hrefOf({ page: "principle", kind: p.kind, id: p.id })}
+                  href={hrefOf({ page: "principle", source: p.source, id: p.id })}
                   textValue={list.format([p.title, count])}
                 >
                   <span className="flex justify-between gap-4">

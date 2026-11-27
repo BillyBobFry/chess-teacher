@@ -1,4 +1,4 @@
-import type { PrincipleKind } from "@chess-teacher/contract";
+import type { PrincipleSource } from "@chess-teacher/contract";
 import { isConceptId, isPrincipleId } from "@chess-teacher/core";
 import { useSyncExternalStore } from "react";
 
@@ -13,9 +13,15 @@ export type Route =
   /** A finished game's review; with `lesson`, that lesson starts open. */
   | { page: "pastGame"; id: string; lesson?: number }
   | { page: "progress" }
-  /** One principle or concept from the progress page, and the lessons behind it. */
-  | { page: "principle"; kind: PrincipleKind; id: string }
+  /** One principle from the progress page, and the lessons behind it. */
+  | { page: "principle"; source: PrincipleSource; id: string }
   | { page: "licences" };
+
+/**
+ * A principle page's path names the kind of id the player knows it by: a feature lesson's
+ * principle or a diagnosed lesson's concept.
+ */
+const PRINCIPLE_SEGMENT: Record<PrincipleSource, string> = { features: "principle", diagnosis: "concept" };
 
 /** The base without its trailing slash: "/app", or "" when served from the root. */
 const base = () => import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -34,7 +40,7 @@ export function hrefOf(route: Route): string {
     case "progress":
       return `${base()}/progress`;
     case "principle":
-      return `${base()}/progress/${route.kind}/${encodeURIComponent(route.id)}`;
+      return `${base()}/progress/${PRINCIPLE_SEGMENT[route.source]}/${encodeURIComponent(route.id)}`;
     case "licences":
       return `${base()}/licences`;
   }
@@ -67,8 +73,10 @@ export function routeOf(pathname: string): Route | null {
     if (parts.length === 3 && parts[0] === "progress" && parts[2]) {
       // Only ids this version of the core knows: anything else isn't a page.
       const id = decodeURIComponent(parts[2]);
-      if (parts[1] === "principle" && isPrincipleId(id)) return { page: "principle", kind: "principle", id };
-      if (parts[1] === "concept" && isConceptId(id)) return { page: "principle", kind: "concept", id };
+      if (parts[1] === PRINCIPLE_SEGMENT.features && isPrincipleId(id))
+        return { page: "principle", source: "features", id };
+      if (parts[1] === PRINCIPLE_SEGMENT.diagnosis && isConceptId(id))
+        return { page: "principle", source: "diagnosis", id };
     }
   } catch {
     // A malformed escape, from a hand-edited URL.

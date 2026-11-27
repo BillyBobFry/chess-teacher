@@ -66,3 +66,31 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 - **Left deliberately:** the `free_material` id shared by a principle and a concept (noted in
   the ADR as open).
 - **Bugs seen:** none
+
+## 2026-11-27: tend ARCH-001
+
+- **Base:** origin/main 6e1427c; branch `claude/gardener-arch-001-principle`; PR (number added
+  below once opened)
+- **Frozen list:** unchanged from the survey entry: no commits to `packages`, `apps` or `tools`
+  since 7f729e3. This item touches no frozen file.
+- **Skipped (open PRs):** none
+- **Did:** "principle" is the umbrella for what progress counts (ADR 0001). The contract's
+  `PrincipleKind = "principle" | "concept"` became `PrincipleSource = "features" | "diagnosis"`, and
+  `PrincipleProgress.kind` became `source`. The API's `ideaOf`, `isIdea` and `byIdea` became
+  `principleOf`, `isPrinciple` and `byPrinciple`, and its route became
+  `/api/me/progress/:source/:id`. The web router's principle route carries `source`, and maps it to
+  the unchanged page URLs (`/app/progress/principle/:id`, `/app/progress/concept/:id`). 74 non-test
+  lines added and 58 removed, across 11 files; no moves. `App.tsx` and `PastGame.tsx` were call
+  sites the survey hadn't listed.
+- **Proven:** `pnpm check` passes, before (on 6e1427c) and after: 15 test files, 150 tests, none
+  skipped. `pnpm exec prettier --check .` passes. `pnpm smoke` passes, including the progress page
+  and a principle's lessons, whose URL it checks. In the browser pane against the production
+  build, with a test account and a replayed recorded game: the progress page and a principle page
+  in light and dark, the principle page's URL unchanged and reloadable, no console errors; the API
+  returns `source` and 404s the old `concept` segment. Recordings untouched (`git diff --name-only`
+  over `tools/sim/fixtures`, `tools/sim/games` and `packages/engine/test/fixtures` prints nothing).
+  No frozen file touched, so no declaration proof was needed. The test changes are the renamed
+  field and the API's new path segments (`features`, `diagnosis`), with the same assertions.
+- **Left deliberately:** the coach prompt's use of "idea" (`apps/api/src/explain.ts:224`), which is
+  content; the `free_material` id shared by a principle and a concept (open in ADR 0001).
+- **Bugs seen:** none new.

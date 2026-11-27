@@ -9,8 +9,8 @@ describe("routes", () => {
     { page: "pastGame", id: "a/b c" },
     { page: "pastGame", id: "3f2c9a10-7d4e-4b8a-9c1e-2a6f5b8d0e47", lesson: 12 },
     { page: "progress" },
-    { page: "principle", kind: "principle", id: "hanging" },
-    { page: "principle", kind: "concept", id: "lost_time" },
+    { page: "principle", source: "features", id: "hanging" },
+    { page: "principle", source: "diagnosis", id: "lost_time" },
     { page: "licences" },
   ];
 

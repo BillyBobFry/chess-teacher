@@ -17,7 +17,8 @@ import { GameReview } from "./GameReview.tsx";
  */
 function useBack(): { route: Route; label: string } {
   const previous = usePreviousRoute();
-  const copy = previous?.page === "principle" ? principleCopy(previous.kind, previous.id, getLocale()) : null;
+  const copy =
+    previous?.page === "principle" ? principleCopy(previous.source, previous.id, getLocale()) : null;
   return previous?.page === "principle" && copy
     ? { route: previous, label: m.principle_back({ name: copy.title }) }
     : { route: { page: "games" }, label: m.games_back() };

@@ -11,7 +11,7 @@ import type {
   GameSummary,
   MeResponse,
   PrincipleDetailResponse,
-  PrincipleKind,
+  PrincipleSource,
   ProgressResponse,
   SaveGameBody,
   SaveGameResponse,
@@ -47,8 +47,8 @@ export const api = {
   config: () => request<ConfigResponse>("/config"),
   me: () => request<MeResponse>("/me"),
   progress: () => request<ProgressResponse>("/me/progress"),
-  principle: (kind: PrincipleKind, id: string) =>
-    request<PrincipleDetailResponse>(`/me/progress/${kind}/${encodeURIComponent(id)}`),
+  principle: (source: PrincipleSource, id: string) =>
+    request<PrincipleDetailResponse>(`/me/progress/${source}/${encodeURIComponent(id)}`),
   activeGames: () => request<GameSummary[]>("/games?status=active"),
   finishedGames: () => request<GameSummary[]>("/games?status=finished"),
   game: (id: string) => request<GameRecord>(`/games/${id}`),

@@ -349,7 +349,7 @@ function GameApp({
     return (
       <Shell nav={nav} layout="page">
         <main className="page">
-          <Principle key={`${route.kind}:${route.id}`} kind={route.kind} id={route.id} />
+          <Principle key={`${route.source}:${route.id}`} source={route.source} id={route.id} />
         </main>
       </Shell>
     );

@@ -14,7 +14,8 @@ skill's `references/tiers.md`).
   `apps/api/src/app.ts:196` to `:200`, `packages/contract/src/index.ts:182` to `:198`
   (`PrincipleKind`, `PrincipleProgress.kind`), `apps/web/src/lib/router.ts:17`, `:70`, `:71`,
   `apps/web/src/components/Principle.tsx`, `apps/web/src/components/Progress.tsx`,
-  `apps/web/src/api/client.ts`, `apps/web/src/api/queries.ts`
+  `apps/web/src/api/client.ts`, `apps/web/src/api/queries.ts`; also `apps/web/src/App.tsx` and
+  `apps/web/src/components/PastGame.tsx`, which the survey missed (the typecheck found them)
 - **Why it matters:** "Principle" named both the umbrella and one of its two members
   (`PrincipleKind = "principle" | "concept"`), and the API called the same umbrella an "idea".
   Code that reads `principle` couldn't tell whether it meant a curriculum principle only, and the
@@ -33,11 +34,11 @@ skill's `references/tiers.md`).
     named (it holds a principle in the umbrella sense).
 - **Tier:** T0 (typecheck across contract, API and web; `apps/api/test/api.test.ts` progress
   tests; `apps/web/test/router.test.ts`)
-- **Status:** proposed
+- **Status:** shipped (approved by William in session, 2026-11-27)
 - **Needs:** none (the word is decided: ADR 0001)
 - **Evidence:** read on origin/main 7f729e3, 2026-11-27. Drift check 6. The contract's own
   comment says "What a progress id names: a principle (older lessons) or a concept". Decision
-  recorded 2026-11-27 (ADR 0001).
+  recorded 2026-11-27 (ADR 0001). Shipped on branch `claude/gardener-arch-001-principle`.
 
 ## ARCH-002: Feedback on a diagnosed lesson with no concept stores the text "null"
 

@@ -34,7 +34,7 @@ import { createMiddleware } from "hono/factory";
 import type { Auth } from "./auth.ts";
 import type { Db } from "./db/client.ts";
 import { coachedGames, explanations, games, lessonFeedback } from "./db/schema.ts";
-import { isIdea, principleDetailOf, progressOf, PROGRESS_GAMES, summaryOf } from "./progress.ts";
+import { isPrinciple, principleDetailOf, progressOf, PROGRESS_GAMES, summaryOf } from "./progress.ts";
 import type { Env } from "./env.ts";
 import { PROMPT_VERSION, explainDiagnosis, explainLesson, parseParts, type LlmClient } from "./explain.ts";
 
@@ -193,11 +193,11 @@ export function createApp(deps: AppDeps) {
     c.json<ProgressResponse>(progressOf(await recentGames(c.get("userId")))),
   );
 
-  /** One principle (`/principle/:id`) or concept (`/concept/:id`): its counts and the lessons behind them. */
-  app.get("/me/progress/:kind/:id", async (c) => {
-    const { kind, id } = c.req.param();
-    if (!isIdea(kind, id)) return c.json(failure("not_found"), 404);
-    return c.json<PrincipleDetailResponse>(principleDetailOf(await recentGames(c.get("userId")), kind, id));
+  /** One principle (`/features/:id` or `/diagnosis/:id`): its counts and the lessons behind them. */
+  app.get("/me/progress/:source/:id", async (c) => {
+    const { source, id } = c.req.param();
+    if (!isPrinciple(source, id)) return c.json(failure("not_found"), 404);
+    return c.json<PrincipleDetailResponse>(principleDetailOf(await recentGames(c.get("userId")), source, id));
   });
 
   // ------------------------------------------------------------------ games
