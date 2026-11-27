@@ -69,8 +69,7 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 
 ## 2026-11-27: tend ARCH-001
 
-- **Base:** origin/main 6e1427c; branch `claude/gardener-arch-001-principle`; PR (number added
-  below once opened)
+- **Base:** origin/main 6e1427c; branch `claude/gardener-arch-001-principle`; PR #25
 - **Frozen list:** unchanged from the survey entry: no commits to `packages`, `apps` or `tools`
   since 7f729e3. This item touches no frozen file.
 - **Skipped (open PRs):** none
