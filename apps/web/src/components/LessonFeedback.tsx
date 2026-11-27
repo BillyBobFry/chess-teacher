@@ -1,5 +1,6 @@
 import type { FeedbackBody } from "@chess-teacher/contract";
 import { useMutation } from "@tanstack/react-query";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { useState } from "react";
 import { api } from "../api/client.ts";
 import { m } from "../paraglide/messages.js";
@@ -26,10 +27,10 @@ export function LessonFeedback({ gameId, lessonId }: { gameId: string; lessonId:
     <div className="feedback">
       <span className="small">{m.feedback_question()}</span>
       <ToggleButton isSelected={rating === 1} aria-label={m.feedback_yes()} onChange={() => send(1)}>
-        👍
+        <ThumbsUp aria-hidden className="size-5 shrink-0" />
       </ToggleButton>
       <ToggleButton isSelected={rating === -1} aria-label={m.feedback_no()} onChange={() => send(-1)}>
-        👎
+        <ThumbsDown aria-hidden className="size-5 shrink-0" />
       </ToggleButton>
       {rating === -1 && (
         <form

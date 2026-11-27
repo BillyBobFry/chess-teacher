@@ -1,3 +1,4 @@
+import { ChevronUp } from "lucide-react";
 import { useId, useRef, type ReactNode } from "react";
 import { Button } from "react-aria-components";
 import { pressable } from "./Button.tsx";
@@ -83,21 +84,13 @@ export function Drawer({
               "data-hovered:text-fg data-pressed:text-fg data-focus-visible:-outline-offset-2",
             ].join(" ")}
           >
-            <svg
+            <ChevronUp
               aria-hidden
-              viewBox="0 0 20 20"
               className={[
                 "size-5 transition-transform duration-150 ease-settle motion-reduce:transition-none",
                 expanded ? "rotate-180" : "",
               ].join(" ")}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M5 12.5 10 7.5l5 5" />
-            </svg>
+            />
           </Button>
         </div>
         {/* A flex column, so content that scrolls a part of itself (a list) can fill it.

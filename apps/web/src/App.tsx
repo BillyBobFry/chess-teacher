@@ -2,6 +2,7 @@ import { OPPONENT_RATING, type ConfigResponse } from "@chess-teacher/contract";
 import { gameOf, isUserTurn } from "@chess-teacher/core";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { useQuery } from "@tanstack/react-query";
+import { Redo2, Undo2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { authClient } from "./api/client.ts";
 import { configQuery } from "./api/queries.ts";
@@ -19,6 +20,7 @@ import { Reveal } from "./components/Reveal.tsx";
 import { Alert } from "./ui/Alert.tsx";
 import { Button } from "./ui/Button.tsx";
 import { ConfirmDialog } from "./ui/Dialog.tsx";
+import { IconButton } from "./ui/IconButton.tsx";
 import { Kbd } from "./ui/Kbd.tsx";
 import { Link } from "./ui/Link.tsx";
 import { Menu, MenuItem, MenuSection, MenuTrigger } from "./ui/Menu.tsx";
@@ -499,18 +501,22 @@ function GameApp({
             <div className="flex min-h-0 flex-1 flex-col gap-2">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="m-0 me-auto text-base">{m.panel_moves()}</h2>
-                <Button onPress={undo} isDisabled={!g.canUndo} aria-keyshortcuts="Control+Z Meta+Z">
-                  {m.moves_undo()}{" "}
-                  <Kbd aria-hidden>{APPLE ? m.shortcut_undo_apple() : m.shortcut_undo()}</Kbd>
-                </Button>
-                <Button
+                <IconButton
+                  icon={Undo2}
+                  label={m.moves_undo()}
+                  shortcut={APPLE ? m.shortcut_undo_apple() : m.shortcut_undo()}
+                  aria-keyshortcuts="Control+Z Meta+Z"
+                  onPress={undo}
+                  isDisabled={!g.canUndo}
+                />
+                <IconButton
+                  icon={Redo2}
+                  label={m.moves_redo()}
+                  shortcut={APPLE ? m.shortcut_redo_apple() : m.shortcut_redo()}
+                  aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
                   onPress={redo}
                   isDisabled={!g.canRedo}
-                  aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z Control+Y"
-                >
-                  {m.moves_redo()}{" "}
-                  <Kbd aria-hidden>{APPLE ? m.shortcut_redo_apple() : m.shortcut_redo()}</Kbd>
-                </Button>
+                />
               </div>
               <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
                 <MoveList

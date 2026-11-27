@@ -65,8 +65,11 @@ export const button = tv({
       ],
     },
     size: { medium: "", large: "" },
-    /** `circle` is for a single glyph or initial, like the account menu's. */
-    shape: { rectangle: "", circle: "rounded-full" },
+    /**
+     * `circle` is for a single glyph or initial, like the account menu's. `square` is for a
+     * single icon: use `IconButton`, which sets it and names the button.
+     */
+    shape: { rectangle: "", circle: "rounded-full", square: "" },
   },
   compoundVariants: [
     // UX-23: 44px targets. A link is text; its target is the line it sits on.
@@ -84,6 +87,7 @@ export const button = tv({
       class: "px-6 py-3 text-lg",
     },
     { shape: "circle", class: "size-11 rounded-full p-0" },
+    { shape: "square", class: "size-11 p-0" },
   ],
   defaultVariants: { variant: "secondary", size: "medium", shape: "rectangle" },
 });
