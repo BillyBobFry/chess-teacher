@@ -1,6 +1,7 @@
+import { ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react";
 import { useLayoutEffect, useRef } from "react";
 import { m } from "../paraglide/messages.js";
-import { Button } from "../ui/Button.tsx";
+import { IconButton } from "../ui/IconButton.tsx";
 
 type Target = "start" | "back" | "forward" | "end";
 
@@ -44,29 +45,28 @@ export function Stepper({
       group.current?.querySelector<HTMLElement>(`[data-target="${backwards ? "forward" : "back"}"]`)?.focus();
   }, [step, total]);
 
-  const button = (target: Target, to: number, glyph: string, name: string, keys: string) => (
-    <Button
+  const button = (target: Target, to: number, icon: LucideIcon, name: string, keys: string) => (
+    <IconButton
       data-target={target}
+      icon={icon}
+      label={name}
       onPress={() => {
         pressed.current = target;
         onStep(to);
       }}
       isDisabled={target === "start" || target === "back" ? step === 0 : step === total}
-      aria-label={name}
       aria-keyshortcuts={shortcuts ? keys : undefined}
-    >
-      {glyph}
-    </Button>
+    />
   );
 
   return (
-    <div ref={group} className="flex items-center justify-center gap-1" role="group" aria-label={label}>
-      {button("start", 0, "⏮", m.stepper_start(), "Home")}
-      {button("back", Math.max(0, step - 1), "◀", m.stepper_back(), "ArrowLeft")}
+    <div ref={group} className="flex items-center justify-center gap-2" role="group" aria-label={label}>
+      {button("start", 0, ChevronFirst, m.stepper_start(), "Home")}
+      {button("back", Math.max(0, step - 1), ChevronLeft, m.stepper_back(), "ArrowLeft")}
       {/* A fixed width, so the buttons hold still as the label changes (UX-52). */}
       <span className="min-w-28 text-center text-sm text-fg-muted tabular-nums">{position}</span>
-      {button("forward", Math.min(total, step + 1), "▶", m.stepper_forward(), "ArrowRight")}
-      {button("end", total, "⏭", m.stepper_end(), "End")}
+      {button("forward", Math.min(total, step + 1), ChevronRight, m.stepper_forward(), "ArrowRight")}
+      {button("end", total, ChevronLast, m.stepper_end(), "End")}
     </div>
   );
 }
