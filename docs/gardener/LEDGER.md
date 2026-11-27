@@ -52,3 +52,17 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 - **Bugs seen:** ARCH-002 (feedback stores "null" for a lesson with no concept), ARCH-025 (the
   progress page has no retry). ARCH-014 also notes that `near-miss.ts` and `audit-real-games.ts`
   always report 0 unverified lessons and `validate-lessons.ts` reports nothing for current games.
+
+## 2026-11-27: decision ARCH-001
+
+- **Base:** origin/main 7f729e3; branch `claude/gardener-survey-2026-11-27`; PR #24
+- **Frozen list:** unchanged from the survey entry above
+- **Skipped (open PRs):** none
+- **Did:** William decided the word for ARCH-001 in session: "principle" is the umbrella, and the
+  two kinds of id are told apart by source (`"features"`, `"diagnosis"`). Recorded as ADR 0001;
+  ARCH-001's proposed move and the glossary's principle rows updated. ARCH-001 stays `proposed`:
+  the word is decided, shipping it is not yet approved.
+- **Proven:** docs only; `pnpm exec prettier --check .` passes.
+- **Left deliberately:** the `free_material` id shared by a principle and a concept (noted in
+  the ADR as open).
+- **Bugs seen:** none

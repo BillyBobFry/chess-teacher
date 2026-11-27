@@ -6,33 +6,38 @@ approves an item: he says so in a session, or sets its status to `approved` here
 Statuses: proposed, approved, shipped, rejected, deferred. Tiers: T0, T1, FROZEN (see the
 skill's `references/tiers.md`).
 
-## ARCH-001: One name for what progress counts (a principle or a concept)
+## ARCH-001: One name for what progress counts: "principle"
 
-- **Concept:** principle-or-concept
+- **Concept:** principle
 - **Kind:** refactor
-- **Files:** `packages/contract/src/index.ts:183` to `:240` (`PrincipleKind`, `PrincipleProgress`,
-  `ProgressResponse.principles`, `PrincipleLesson`, `PrincipleGame`, `PrincipleDetailResponse`),
-  `apps/api/src/progress.ts:39`, `:47`, `:70` (`ideaOf`, `isIdea`, `byIdea`), `apps/api/src/app.ts:196`,
-  `apps/web/src/lib/router.ts:17`, `:70`, `apps/web/src/components/Principle.tsx`,
-  `apps/web/src/api/client.ts`, `apps/web/src/api/queries.ts`, the `principle_*` page keys in
-  `apps/web/messages/*.json` (`principle_back`, `principle_empty`, `principle_error`...)
-- **Why it matters:** "Principle" names both the umbrella and one of its two members
-  (`PrincipleKind = "principle" | "concept"`), and the API calls the same umbrella an "idea".
-  Code that reads `principle` can't tell whether it means a curriculum principle only, and the
-  drill-down page (04be4af) spread the ambiguity to routes, queries and catalogue keys.
-- **Proposed move:** William pins one umbrella word (the API's "idea", or another; an ADR
-  records it). Then rename the umbrella through contract, API, web and the page's catalogue
-  keys, leaving `PrincipleId`, `principleTitle`, the `principle_<id>_title` keys and the
-  `"principle"` member as they are. URLs (`/app/progress/principle/:id`, `/api/me/progress/:kind/:id`)
-  and saved JSON don't change. The `lesson_feedback.principle` column (which also holds concept
-  ids) is left out: renaming it is a schema change (T1 plus the migration guard), a separate item
-  if wanted.
+- **Files:** `apps/api/src/progress.ts:39`, `:47`, `:70` (`ideaOf`, `isIdea`, `byIdea`),
+  `apps/api/src/app.ts:196` to `:200`, `packages/contract/src/index.ts:182` to `:198`
+  (`PrincipleKind`, `PrincipleProgress.kind`), `apps/web/src/lib/router.ts:17`, `:70`, `:71`,
+  `apps/web/src/components/Principle.tsx`, `apps/web/src/components/Progress.tsx`,
+  `apps/web/src/api/client.ts`, `apps/web/src/api/queries.ts`
+- **Why it matters:** "Principle" named both the umbrella and one of its two members
+  (`PrincipleKind = "principle" | "concept"`), and the API called the same umbrella an "idea".
+  Code that reads `principle` couldn't tell whether it meant a curriculum principle only, and the
+  drill-down page (04be4af) spread the ambiguity to routes and queries.
+- **Proposed move:** As decided in ADR 0001: "principle" is the umbrella everywhere.
+  - API: `ideaOf`, `isIdea` and `byIdea` become `principleOf`, `isPrinciple` and `byPrinciple`.
+  - The discriminator says where the id comes from, with the values `Lesson.source` already has:
+    `PrincipleKind = "principle" | "concept"` becomes `PrincipleSource = "features" | "diagnosis"`
+    (declared in the contract, which doesn't depend on the core), and `PrincipleProgress.kind`
+    becomes `source`. The API route's segment follows (`/api/me/progress/:source/:id`).
+  - Web: the router's `{ page: "principle"; kind }` becomes `{ page: "principle"; source }`. The
+    page's URLs stay `/app/progress/principle/:id` and `/app/progress/concept/:id`; the router maps
+    each segment to its source.
+  - Unchanged: the core's `PrincipleId` and `ConceptId`, `principleTitle` and `conceptTitle`, every
+    catalogue key, saved JSON, and the `lesson_feedback.principle` column, which is now correctly
+    named (it holds a principle in the umbrella sense).
 - **Tier:** T0 (typecheck across contract, API and web; `apps/api/test/api.test.ts` progress
-  tests; `apps/web/test/messages.test.ts` for the keys; `apps/web/test/router.test.ts`)
+  tests; `apps/web/test/router.test.ts`)
 - **Status:** proposed
-- **Needs:** William's choice of word
+- **Needs:** none (the word is decided: ADR 0001)
 - **Evidence:** read on origin/main 7f729e3, 2026-11-27. Drift check 6. The contract's own
-  comment says "What a progress id names: a principle (older lessons) or a concept".
+  comment says "What a progress id names: a principle (older lessons) or a concept". Decision
+  recorded 2026-11-27 (ADR 0001).
 
 ## ARCH-002: Feedback on a diagnosed lesson with no concept stores the text "null"
 
