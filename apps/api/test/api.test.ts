@@ -546,7 +546,7 @@ describe("progress", () => {
     ).length;
     expect(progress.lessons).toBe(2 * counted);
     const first = progress.principles.find(
-      (p: { kind: string; id: string }) => p.kind === "concept" && p.id === concept,
+      (p: { source: string; id: string }) => p.source === "diagnosis" && p.id === concept,
     );
     expect(first.foundYourself).toBeGreaterThanOrEqual(1);
     expect(first.recentGames).toBe(2);
@@ -568,11 +568,13 @@ describe("a principle's lessons", () => {
     const finished = { ...newGameBody({ ...recorded, resigned: true }), finished: true };
     const game = await (await call("/api/games", { method: "POST", cookie, json: finished })).json();
 
-    const detail = await (await call(`/api/me/progress/concept/${concept}`, { cookie })).json();
+    const detail = await (await call(`/api/me/progress/diagnosis/${concept}`, { cookie })).json();
     const progress = await (await call("/api/me/progress", { cookie })).json();
     expect(detail.games).toBe(1);
     expect(detail.progress).toEqual(
-      progress.principles.find((p: { kind: string; id: string }) => p.kind === "concept" && p.id === concept),
+      progress.principles.find(
+        (p: { source: string; id: string }) => p.source === "diagnosis" && p.id === concept,
+      ),
     );
     expect(detail.occurrences).toHaveLength(1);
     expect(detail.occurrences[0].game).toMatchObject({ id: game.id, finished: true, outcome: "lost" });
@@ -602,7 +604,7 @@ describe("a principle's lessons", () => {
     await call("/api/games", { method: "POST", cookie, json: newGameBody(branched) });
 
     const flags = async (c: string | null) => {
-      const detail = await (await call(`/api/me/progress/concept/${c}`, { cookie })).json();
+      const detail = await (await call(`/api/me/progress/diagnosis/${c}`, { cookie })).json();
       const lessons: { lesson: { id: number }; onGameLine: boolean }[] = detail.occurrences[0].lessons;
       return lessons.map((l) => [l.lesson.id, l.onGameLine]);
     };
@@ -616,9 +618,9 @@ describe("a principle's lessons", () => {
   it("is only there for a principle or concept the core knows, and only signed in", async () => {
     const { call, signUp } = await setup({ llm: null });
     const cookie = await signUp("kit@example.com");
-    expect((await call("/api/me/progress/concept/not_a_concept", { cookie })).status).toBe(404);
-    expect((await call(`/api/me/progress/principle/${concept}`, { cookie })).status).toBe(404);
-    expect((await call(`/api/me/progress/concept/${concept}`)).status).toBe(401);
+    expect((await call("/api/me/progress/diagnosis/not_a_concept", { cookie })).status).toBe(404);
+    expect((await call(`/api/me/progress/features/${concept}`, { cookie })).status).toBe(404);
+    expect((await call(`/api/me/progress/diagnosis/${concept}`)).status).toBe(401);
   });
 });
 

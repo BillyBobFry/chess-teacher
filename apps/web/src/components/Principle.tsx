@@ -1,4 +1,4 @@
-import type { PrincipleGame, PrincipleKind } from "@chess-teacher/contract";
+import type { PrincipleGame, PrincipleSource } from "@chess-teacher/contract";
 import type { Lesson } from "@chess-teacher/core";
 import { useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
@@ -19,14 +19,14 @@ import { PrincipleStats } from "./Progress.tsx";
 const keyOf = (gameId: string, lessonId: number) => `${gameId}:${lessonId}`;
 
 /**
- * One principle (or concept) from the progress page: how the player is doing with it, and every
+ * One principle from the progress page: how the player is doing with it, and every
  * lesson on it across their recent games, newest game first, each opening in place as in a
  * review, so they can be read side by side.
  */
-export function Principle({ kind, id }: { kind: PrincipleKind; id: string }) {
+export function Principle({ source, id }: { source: PrincipleSource; id: string }) {
   const locale = getLocale();
-  const copy = principleCopy(kind, id, locale);
-  const { data, isError, isFetching, refetch } = useQuery(principleQuery(kind, id));
+  const copy = principleCopy(source, id, locale);
+  const { data, isError, isFetching, refetch } = useQuery(principleQuery(source, id));
   // A retry in flight shows as loading, not as the error it is retrying.
   const error = isError && !isFetching;
   const [open, setOpen] = useState<Key | null>(null);

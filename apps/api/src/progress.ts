@@ -8,9 +8,9 @@ import type {
   GameSummary,
   PrincipleDetailResponse,
   PrincipleGame,
-  PrincipleKind,
   PrincipleLesson,
   PrincipleProgress,
+  PrincipleSource,
   ProgressResponse,
 } from "@chess-teacher/contract";
 import {
@@ -35,17 +35,17 @@ export const PROGRESS_GAMES = 50;
 /** The lessons a saved game has, as any version saved them. */
 const savedLessons = (row: GameRow): Lesson[] => (row.state as { lessons?: Lesson[] }).lessons ?? [];
 
-/** What a lesson teaches, or null when this version of the core doesn't know it. */
-function ideaOf(l: Lesson): { kind: PrincipleKind; id: string } | null {
+/** The principle a lesson teaches, or null when this version of the core doesn't know it. */
+function principleOf(l: Lesson): { source: PrincipleSource; id: string } | null {
   // A lesson saved before diagnosis has no `source`: it's a feature lesson.
   if (l.source === "diagnosis")
-    return l.concept && isConceptId(l.concept) ? { kind: "concept", id: l.concept } : null;
-  return isPrincipleId(l.principle) ? { kind: "principle", id: l.principle } : null;
+    return l.concept && isConceptId(l.concept) ? { source: "diagnosis", id: l.concept } : null;
+  return isPrincipleId(l.principle) ? { source: "features", id: l.principle } : null;
 }
 
-/** Whether a principle page can show this kind and id: one the core knows. */
-export const isIdea = (kind: string, id: string): kind is PrincipleKind =>
-  (kind === "concept" && isConceptId(id)) || (kind === "principle" && isPrincipleId(id));
+/** Whether a principle page can show this source and id: one the core knows. */
+export const isPrinciple = (source: string, id: string): source is PrincipleSource =>
+  (source === "diagnosis" && isConceptId(id)) || (source === "features" && isPrincipleId(id));
 
 /** A game for a list: the same in every saved version, so it's read as saved. */
 export function summaryOf(row: GameRow): GameSummary {
@@ -67,19 +67,19 @@ export function summaryOf(row: GameRow): GameSummary {
  * `rows` are the player's games, newest first.
  */
 export function progressOf(rows: GameRow[]): ProgressResponse {
-  const byIdea = new Map<string, PrincipleProgress>();
+  const byPrinciple = new Map<string, PrincipleProgress>();
   let lessons = 0;
   rows.forEach((row, gameIndex) => {
     const seenInGame = new Set<string>();
     for (const l of reviewLessons({ lessons: savedLessons(row) })) {
-      const idea = ideaOf(l);
-      if (!idea) continue;
-      const key = `${idea.kind}:${idea.id}`;
+      const principle = principleOf(l);
+      if (!principle) continue;
+      const key = `${principle.source}:${principle.id}`;
       lessons += 1;
       const p =
-        byIdea.get(key) ??
+        byPrinciple.get(key) ??
         ({
-          ...idea,
+          ...principle,
           lessons: 0,
           foundYourself: 0,
           revealed: 0,
@@ -94,13 +94,13 @@ export function progressOf(rows: GameRow[]): ProgressResponse {
         p.recentGames += 1;
         seenInGame.add(key);
       }
-      byIdea.set(key, p);
+      byPrinciple.set(key, p);
     }
   });
   return {
     games: rows.length,
     lessons,
-    principles: [...byIdea.values()].sort((a, b) => b.lessons - a.lessons),
+    principles: [...byPrinciple.values()].sort((a, b) => b.lessons - a.lessons),
   };
 }
 
@@ -119,10 +119,14 @@ function* treeLessons(
  * One principle or concept: its counts, as on the progress page, and every lesson behind
  * them, grouped by game (newest first) in the order the game's review lists them.
  */
-export function principleDetailOf(rows: GameRow[], kind: PrincipleKind, id: string): PrincipleDetailResponse {
+export function principleDetailOf(
+  rows: GameRow[],
+  source: PrincipleSource,
+  id: string,
+): PrincipleDetailResponse {
   const matches = (l: Lesson) => {
-    const idea = ideaOf(l);
-    return idea?.kind === kind && idea.id === id;
+    const principle = principleOf(l);
+    return principle?.source === source && principle.id === id;
   };
   const occurrences: PrincipleGame[] = [];
   for (const row of rows) {
@@ -136,7 +140,7 @@ export function principleDetailOf(rows: GameRow[], kind: PrincipleKind, id: stri
   }
   return {
     games: rows.length,
-    progress: progressOf(rows).principles.find((p) => p.kind === kind && p.id === id) ?? null,
+    progress: progressOf(rows).principles.find((p) => p.source === source && p.id === id) ?? null,
     occurrences,
   };
 }

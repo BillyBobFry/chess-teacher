@@ -179,11 +179,14 @@ export const FeedbackBody = z.object({
 });
 export type FeedbackBody = z.infer<typeof FeedbackBody>;
 
-/** What a progress id names: a principle (older lessons) or a concept (diagnosed lessons). */
-export type PrincipleKind = "principle" | "concept";
+/**
+ * Where a principle's id comes from, as `Lesson.source` says: a feature lesson's principle
+ * (core `PrincipleId`) or a diagnosed lesson's concept (core `ConceptId`).
+ */
+export type PrincipleSource = "features" | "diagnosis";
 
 export interface PrincipleProgress {
-  kind: PrincipleKind;
+  source: PrincipleSource;
   /** A principle or concept id from the core; the client shows its title in the player's locale. */
   id: string;
   /** Lessons about this principle across the recent games. */

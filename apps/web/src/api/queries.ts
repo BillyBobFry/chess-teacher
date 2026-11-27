@@ -3,7 +3,7 @@
  * with `useQuery` and `useMutation` in components, or through `queryClient` in the game loop.
  */
 
-import type { ExplanationResponse, PrincipleKind } from "@chess-teacher/contract";
+import type { ExplanationResponse, PrincipleSource } from "@chess-teacher/contract";
 import {
   MutationObserver,
   QueryClient,
@@ -49,9 +49,9 @@ export const meQuery = queryOptions({ queryKey: ["me"], queryFn: api.me });
 
 export const progressQuery = queryOptions({ queryKey: ["progress"], queryFn: api.progress });
 
-/** One principle (or concept) and its lessons across the recent games. */
-export const principleQuery = (kind: PrincipleKind, id: string) =>
-  queryOptions({ queryKey: ["progress", kind, id], queryFn: () => api.principle(kind, id) });
+/** One principle and its lessons across the recent games. */
+export const principleQuery = (source: PrincipleSource, id: string) =>
+  queryOptions({ queryKey: ["progress", source, id], queryFn: () => api.principle(source, id) });
 
 export const finishedGamesQuery = queryOptions({
   queryKey: ["games", { status: "finished" }],
