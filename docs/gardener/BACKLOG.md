@@ -38,7 +38,7 @@ skill's `references/tiers.md`).
 - **Needs:** none (the word is decided: ADR 0001)
 - **Evidence:** read on origin/main 7f729e3, 2026-11-27. Drift check 6. The contract's own
   comment says "What a progress id names: a principle (older lessons) or a concept". Decision
-  recorded 2026-11-27 (ADR 0001). Shipped on branch `claude/gardener-arch-001-principle`.
+  recorded 2026-11-27 (ADR 0001). Shipped on branch `claude/gardener-arch-001-principle`, PR #25.
 
 ## ARCH-002: Feedback on a diagnosed lesson with no concept stores the text "null"
 
