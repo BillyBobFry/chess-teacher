@@ -22,9 +22,19 @@ export function PopoverTrigger(props: DialogTriggerProps) {
  * Extra detail next to what opened it: Esc or a click outside closes it, and focus returns to
  * the trigger. Its content only exists while it is open.
  */
-export function Popover({ label, children }: { label: string; children: ReactNode }) {
+export function Popover({
+  label,
+  size = "small",
+  children,
+}: {
+  label: string;
+  /** `large` fits a board with a full stepper under it. */
+  size?: "small" | "large";
+  children: ReactNode;
+}) {
+  const width = size === "large" ? "w-84" : "w-64";
   return (
-    <AriaPopover placement="bottom start" offset={4} className={`${floatingPanel} w-64 p-3`}>
+    <AriaPopover placement="bottom start" offset={4} className={`${floatingPanel} ${width} p-3`}>
       <Dialog aria-label={label} className="outline-none">
         {children}
       </Dialog>

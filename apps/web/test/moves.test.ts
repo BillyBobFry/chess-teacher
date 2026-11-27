@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findMove, lineMoves, splitMoves } from "../src/lib/moves.ts";
+import { findMove, lineMoves, placeMoves, splitMoves } from "../src/lib/moves.ts";
 
 const moves = (text: string) =>
   splitMoves(text)
@@ -60,5 +60,51 @@ describe("findMove", () => {
     expect(found("2. Nf3")).toBeNull(); // the same move from two different positions
     expect(found("1. e5")).toBeNull(); // the wrong colour
     expect(found("Nc3")).toBeNull(); // in neither line
+  });
+});
+
+describe("placeMoves", () => {
+  const start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+  const lines = [
+    ...lineMoves(start, ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5"]),
+    ...lineMoves(start, ["d2d4", "d7d5"]),
+  ];
+  /** Each part as the text it covers, with a line's moves in long notation. */
+  const parts = (text: string) =>
+    placeMoves(text, lines, []).map((p) =>
+      p.kind === "moves"
+        ? { text: p.segments.map((s) => s.text).join(""), moves: p.moves.map((mv) => mv.lan) }
+        : { [p.kind]: p.text },
+    );
+
+  it("joins moves written one after another into one line", () => {
+    expect(parts("The engine expects 1...e5 2. Nf3 Nc6 3. Bb5, pinning nothing.")).toEqual([
+      { text: "The engine expects " },
+      { text: "1...e5 2. Nf3 Nc6 3. Bb5", moves: ["e7e5", "g1f3", "b8c6", "f1b5"] },
+      { text: ", pinning nothing." },
+    ]);
+  });
+
+  it("places a move that only its line makes certain", () => {
+    // On its own a bare "d5" is taken as a square; straight after 1. d4 in a line it is 1...d5.
+    expect(parts("1. d4 d5")).toEqual([{ text: "1. d4 d5", moves: ["d2d4", "d7d5"] }]);
+  });
+
+  it("keeps moves apart when something other than spaces is between them", () => {
+    expect(parts("1...e5, then 2. Nf3")).toEqual([
+      { text: "1...e5", moves: ["e7e5"] },
+      { text: ", then " },
+      { text: "2. Nf3", moves: ["g1f3"] },
+    ]);
+  });
+
+  it("ends a line at a move that doesn't follow on from it", () => {
+    expect(parts("1. e4 1. d4 Qh5")).toEqual([
+      { text: "1. e4", moves: ["e2e4"] },
+      { text: " " },
+      { text: "1. d4", moves: ["d2d4"] },
+      { text: " " },
+      { unplaced: "Qh5" },
+    ]);
   });
 });

@@ -95,6 +95,19 @@ export function lessonMoves(lesson: Lesson): { yours: Move | undefined; better: 
 
 const withoutCheck = (san: string) => san.replace(/[+#]$/, "");
 
+/** A token from `splitMoves` in parts: "12...Nf6" is move 12, Black, "Nf6". */
+function parseToken(token: string): { number?: number; black: boolean; san: string } | null {
+  const parts = /^(?:(\d+)\.(\.\.)?\s?)?(.+)$/.exec(token);
+  if (!parts?.[3]) return null;
+  const [, number, dots, san] = parts;
+  return { number: number === undefined ? undefined : Number(number), black: !!dots, san };
+}
+
+const fitsToken = (mv: Move, token: NonNullable<ReturnType<typeof parseToken>>) =>
+  withoutCheck(mv.san) === withoutCheck(token.san) &&
+  (token.number === undefined ||
+    (fullmoveOf(mv.before) === token.number && mv.color === (token.black ? "b" : "w")));
+
 /**
  * The move a token from `splitMoves` names, if exactly one of `candidates` fits it ("12. Bc7"
  * by number, colour and move; "Nxg3" by move alone). Null when it is ambiguous, or a bare
@@ -102,19 +115,69 @@ const withoutCheck = (san: string) => san.replace(/[+#]$/, "");
  * of the `named` moves the text is about (a lesson's mistake and better move).
  */
 export function findMove(token: string, candidates: Move[], named: Move[]): Move | null {
-  const parts = /^(?:(\d+)\.(\.\.)?\s?)?(.+)$/.exec(token);
-  if (!parts?.[3]) return null;
-  const [, number, dots, san] = parts;
-  if (number === undefined && /^[a-h][1-8][+#]?$/.test(san)) {
-    return named.find((mv) => withoutCheck(mv.san) === withoutCheck(san)) ?? null;
+  const parsed = parseToken(token);
+  if (!parsed) return null;
+  if (parsed.number === undefined && /^[a-h][1-8][+#]?$/.test(parsed.san)) {
+    return named.find((mv) => withoutCheck(mv.san) === withoutCheck(parsed.san)) ?? null;
   }
-  const fits = candidates.filter(
-    (mv) =>
-      withoutCheck(mv.san) === withoutCheck(san) &&
-      (number === undefined || (fullmoveOf(mv.before) === Number(number) && mv.color === (dots ? "b" : "w"))),
-  );
+  const fits = candidates.filter((mv) => fitsToken(mv, parsed));
   // Two lines can share a move from the same position: that's still one move.
   const distinct = new Map(fits.map((mv) => [`${mv.before} ${mv.lan}`, mv]));
   const [only, ...others] = distinct.values();
   return only && others.length === 0 ? only : null;
+}
+
+/**
+ * Text with its chess moves placed. `moves` is one move, or a line written out in full
+ * ("9...Bxg3 10. dxc6 Bxf2+"): moves with only spaces between them, each played from where the
+ * one before it left the board. `segments` is how the text wrote them, spaces included.
+ */
+export type MovePart =
+  | { kind: "text"; text: string }
+  /** Looks like a move, but no candidate surely fits it. */
+  | { kind: "unplaced"; text: string }
+  | { kind: "moves"; segments: Segment[]; moves: [Move, ...Move[]] };
+
+/** Split text into plain text and moves, as `findMove` places them, joining lines. */
+export function placeMoves(text: string, candidates: Move[], named: Move[]): MovePart[] {
+  const parts: MovePart[] = [];
+  let run: Extract<MovePart, { kind: "moves" }> | null = null;
+  // The spaces after the run's latest move, until the next segment says whether it goes on.
+  let gap: Segment | null = null;
+  const close = () => {
+    if (run) parts.push(run);
+    if (gap) parts.push({ kind: "text", text: gap.text });
+    run = null;
+    gap = null;
+  };
+  for (const seg of splitMoves(text)) {
+    if (!seg.move) {
+      if (run && !gap && /^\s+$/.test(seg.text)) {
+        gap = seg;
+        continue;
+      }
+      close();
+      parts.push({ kind: "text", text: seg.text });
+      continue;
+    }
+    const last: Move | undefined = run?.moves.at(-1);
+    const parsed = parseToken(seg.text);
+    // From one known position the notation fits at most one move, so no ambiguity here.
+    const next =
+      run && gap && last && parsed
+        ? candidates.find((mv) => mv.before === last.after && fitsToken(mv, parsed))
+        : undefined;
+    if (run && gap && next) {
+      run.segments.push(gap, seg);
+      run.moves.push(next);
+      gap = null;
+      continue;
+    }
+    close();
+    const move = findMove(seg.text, candidates, named);
+    if (move) run = { kind: "moves", segments: [seg], moves: [move] };
+    else parts.push({ kind: "unplaced", text: seg.text });
+  }
+  close();
+  return parts;
 }

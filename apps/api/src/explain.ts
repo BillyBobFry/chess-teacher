@@ -386,13 +386,17 @@ export function createFakeLlmClient(): LlmClient {
             Partial<ReturnType<typeof diagnosisPromptFacts>>;
           const better = f.better_was ?? f.better_move ?? "";
           const factor = f.key_factor ?? f.mistake_type ?? "";
+          // Quoting the line lets the browser test step through it in one popover.
+          const line = f.predicted_continuation_after_your_move
+            ? ` The engine expects ${f.predicted_continuation_after_your_move}.`
+            : "";
           return {
             content: [
               {
                 type: "text",
                 text: JSON.stringify({
                   headline: `(Sample) ${f.move_played ?? ""} missed something`,
-                  what_it_allowed: `This sample explanation was written without an AI model. The difference is ${factor}.`,
+                  what_it_allowed: `This sample explanation was written without an AI model.${line} The difference is ${factor}.`,
                   why_better: `${better} was better.`,
                 } satisfies ExplanationParts),
               },

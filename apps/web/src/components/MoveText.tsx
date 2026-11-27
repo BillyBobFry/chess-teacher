@@ -1,9 +1,9 @@
 import type { Lesson } from "@chess-teacher/core";
 import type { Move } from "chess.js";
 import { Fragment } from "react";
-import { findMove, lessonMoves, lineMoves, splitMoves } from "../lib/moves.ts";
+import { lessonMoves, lineMoves, placeMoves } from "../lib/moves.ts";
 import type { Orientation } from "./Board.tsx";
-import { MoveButton } from "./MoveButton.tsx";
+import { LineButton, MoveButton } from "./MoveButton.tsx";
 
 /** The moves a lesson's text can mention. */
 export interface KnownMoves {
@@ -24,7 +24,8 @@ export function knownMoves(lesson: Lesson, extra: string[][]): KnownMoves {
 
 /**
  * Text with chess moves picked out so they're easy to spot. A move that is surely one of
- * `known` previews its board; one we can't place stays text, rather than show a wrong board.
+ * `known` previews its board, and a line written out in full previews as one, step by step;
+ * a move we can't place stays text, rather than show a wrong board.
  */
 export function MoveText({
   text,
@@ -37,17 +38,35 @@ export function MoveText({
 }) {
   return (
     <>
-      {splitMoves(text).map((seg, i) => {
-        if (!seg.move) return <Fragment key={i}>{seg.text}</Fragment>;
-        const move = findMove(seg.text, known.lines, known.named);
-        return move ? (
-          <MoveButton key={i} move={move} orientation={orientation}>
-            {seg.text}
-          </MoveButton>
-        ) : (
-          <span key={i} className="move">
-            {seg.text}
-          </span>
+      {placeMoves(text, known.lines, known.named).map((part, i) => {
+        if (part.kind === "text") return <Fragment key={i}>{part.text}</Fragment>;
+        if (part.kind === "unplaced") {
+          return (
+            <span key={i} className="move">
+              {part.text}
+            </span>
+          );
+        }
+        const [move, ...rest] = part.moves;
+        if (rest.length === 0) {
+          return (
+            <MoveButton key={i} move={move} orientation={orientation}>
+              {part.segments.map((seg) => seg.text).join("")}
+            </MoveButton>
+          );
+        }
+        return (
+          <LineButton key={i} moves={part.moves} orientation={orientation}>
+            {part.segments.map((seg, j) =>
+              seg.move ? (
+                <span key={j} className="move">
+                  {seg.text}
+                </span>
+              ) : (
+                seg.text
+              ),
+            )}
+          </LineButton>
         );
       })}
     </>

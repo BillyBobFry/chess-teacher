@@ -1,13 +1,14 @@
 import { fullmoveOf } from "@chess-teacher/core";
 import { moveText } from "@chess-teacher/lesson-text";
 import type { Move } from "chess.js";
-import { useId, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { spokenMove } from "../lib/moves.ts";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import { Board, type Orientation } from "./Board.tsx";
 import { Button } from "../ui/Button.tsx";
 import { Popover, PopoverTrigger } from "../ui/Popover.tsx";
+import { Stepper } from "./Stepper.tsx";
 
 // SVG attributes, so a literal colour rather than a CSS variable.
 export const MOVE_ARROW = "#3f6fb0";
@@ -59,6 +60,80 @@ export function MoveButton({
         />
       </Popover>
     </PopoverTrigger>
+  );
+}
+
+/**
+ * A line of moves written out in full ("9...Bxg3 10. dxc6 Bxf2+") as one button. Its popover
+ * starts like a single move's, then steps through the line like the futures do. `children` is
+ * the line as the text around it writes it.
+ */
+export function LineButton({
+  moves,
+  orientation,
+  children,
+}: {
+  moves: [Move, ...Move[]];
+  orientation: Orientation;
+  children: ReactNode;
+}) {
+  const first = moves[0];
+  const last = moves.at(-1) ?? first;
+  // Read after the visible text, so the name still starts with what's on screen (WCAG 2.5.3).
+  const spoken = moves
+    .map((mv) =>
+      (mv.color === "w" ? m.moves_spoken_white : m.moves_spoken_black)({
+        moveNumber: fullmoveOf(mv.before),
+        move: spokenMove(mv),
+      }),
+    )
+    .join(" ");
+  return (
+    <PopoverTrigger>
+      {/* One flex item, so a long line wraps inside the button rather than overflowing it. */}
+      <Button variant="inline">
+        <span className="text-start">{children}</span> <span className="sr-only">{spoken}</span>
+      </Button>
+      <Popover label={m.moves_line({ first: moveTitle(first), last: moveTitle(last) })} size="large">
+        <LineSteps moves={moves} orientation={orientation} />
+      </Popover>
+    </PopoverTrigger>
+  );
+}
+
+/** Inside the popover, so each opening starts again from before the first move. */
+function LineSteps({ moves, orientation }: { moves: [Move, ...Move[]]; orientation: Orientation }) {
+  const id = useId();
+  const boardId = id.replace(/[^\w-]/g, "");
+  // 0 is before the first move; n is after the nth.
+  const [step, setStep] = useState(0);
+  const first = moves[0];
+  const shown = moves[step - 1] ?? first;
+  const title = moveTitle(shown);
+  return (
+    <>
+      <p className="m-0 mb-2 font-semibold">{title}</p>
+      <Board
+        id={boardId}
+        label={step === 0 ? m.moves_board_before({ move: title }) : m.moves_board_after({ move: title })}
+        fen={step === 0 ? first.before : shown.after}
+        orientation={orientation}
+        focusable={false}
+        lastMove={step === 0 ? null : shown}
+        arrows={step === 0 ? [{ from: first.from, to: first.to, color: MOVE_ARROW }] : []}
+        showNotation={false}
+      />
+      <div className="mt-2">
+        <Stepper
+          label={m.moves_line_stepper()}
+          step={step}
+          total={moves.length}
+          position={step === 0 ? m.futures_before() : m.futures_step({ step, total: moves.length })}
+          onStep={setStep}
+          shortcuts={false}
+        />
+      </div>
+    </>
   );
 }
 

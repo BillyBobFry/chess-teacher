@@ -302,6 +302,18 @@ try {
     await page.getByText("Your coach", { exact: true }).waitFor({ timeout: 30_000 });
     await page.getByText(/^\(Sample\)/).waitFor();
     await page.getByText(/What it (allowed|missed)/).waitFor();
+    // The sample quotes the engine's line: one button for all of it, stepped through in one popover.
+    await page
+      .getByRole("button", { name: /'s move .*'s move / })
+      .first()
+      .click();
+    const line = page.getByRole("dialog", { name: /^Moves .+ to .+$/ });
+    await line.getByText("Before the move").waitFor();
+    await line.getByRole("button", { name: "Forward" }).click();
+    await line.getByText(/^Move 1 of \d+$/).waitFor();
+    await shot("4a-reveal-line");
+    await page.keyboard.press("Escape");
+    await line.waitFor({ state: "hidden" });
     await page.locator("figcaption").filter({ hasText: "What happened" }).waitFor();
     await expectTabbableBoards(page, ["main"]);
     await page.getByRole("button", { name: "Forward" }).click();
