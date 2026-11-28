@@ -233,7 +233,7 @@ skill's `references/tiers.md`).
   site)
 - **Needs:** none
 - **Evidence:** drift check 3 on origin/main 7f729e3, 2026-11-27. Every site re-read on
-  origin/main ea03d9c, 2026-11-28, unchanged. Shipped on `claude/gardener-arch-11-lesson-kinds`.
+  origin/main ea03d9c, 2026-11-28, unchanged. Shipped on `claude/gardener-arch-11-lesson-kinds`, PR #28.
 
 ## ARCH-012: The docs still describe the classical check as what gates lessons
 

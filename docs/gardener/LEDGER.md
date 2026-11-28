@@ -96,7 +96,7 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 
 ## 2026-11-28: tend ARCH-011
 
-- **Base:** origin/main ea03d9c; branch `claude/gardener-arch-11-lesson-kinds`; PR not yet opened
+- **Base:** origin/main ea03d9c; branch `claude/gardener-arch-11-lesson-kinds`; PR #28
 - **Frozen list:** unchanged from the 2026-11-27 survey entry: no commits to
   `packages/core/src` or `packages/engine/src/eval-trace.ts` since 7f729e3, and every frozen
   symbol is where that entry puts it. This item touches no frozen file; it imports the core's
