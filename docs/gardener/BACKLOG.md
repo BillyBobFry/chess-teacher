@@ -177,9 +177,11 @@ skill's `references/tiers.md`).
   `balanceOf` instead (which changes benchmark numbers) is a question for William, not part of
   this move.
 - **Tier:** T0 (a duplicated helper; typecheck)
-- **Status:** proposed
+- **Status:** shipped (approved by William in session, 2026-11-28)
 - **Needs:** none
-- **Evidence:** both copies read on origin/main 7f729e3, 2026-11-27; drift check 8.
+- **Evidence:** both copies read on origin/main 7f729e3, 2026-11-27; drift check 8. Re-read on
+  origin/main fd8ec57, 2026-11-28: unchanged, now at `audit-real-games.ts:71`, `:76` and
+  `bench/build-items.ts:39`, `:120`. Shipped on `claude/gardener-arch-8-sim-win-pct`.
 
 ## ARCH-009: `Engines.weak` is Maia now, not a weakened engine
 
