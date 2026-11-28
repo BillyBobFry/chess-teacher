@@ -55,6 +55,7 @@ skill's `references/tiers.md`).
 - **Status:** proposed
 - **Needs:** none
 - **Evidence:** read on origin/main 7f729e3, 2026-11-27, while tracing "concept" through the API.
+  Still true on ea03d9c, 2026-11-28: `apps/api/src/app.ts:332` unchanged by ARCH-001.
 
 ## ARCH-003: The coach's explanation parts: one schema in the contract, used to parse the LLM's output
 
@@ -463,7 +464,9 @@ skill's `references/tiers.md`).
 - **Tier:** T1 (smoke test only)
 - **Status:** proposed
 - **Needs:** none for pure moves; the smoke test and a look in light and dark for each PR
-- **Evidence:** read on origin/main 7f729e3, 2026-11-27; drift check 12.
+- **Evidence:** read on origin/main 7f729e3, 2026-11-27; drift check 12. On ea03d9c, 2026-11-28,
+  `App.tsx` is 544 lines and everything below the imports sits 2 lines lower (`Shell` :63, the
+  account menu from :297, the moves panel from :501, now with two `IconButton`s, 5d6b186).
 
 ## ARCH-024: Small helpers written twice in the web app
 
@@ -482,8 +485,11 @@ skill's `references/tiers.md`).
 - **Status:** proposed
 - **Needs:** none
 - **Evidence:** read on origin/main 7f729e3, 2026-11-27, in a read-only pass over `apps/web/src`.
-
-## ARCH-025: The progress page offers no retry when it fails to load
+  New on ea03d9c, 2026-11-28: e617b12 added a third copy of the spoken move label, in
+  `LineButton` (`apps/web/src/components/MoveButton.tsx:83`), beside `MoveButton.tsx:41` and
+  `MoveList.tsx:79`; and the board id made from `useId` is written twice in the same file
+  (`MoveButton.tsx:38`, `:107`). One `spokenMoveLabel(move)` helper in `lib/moves.ts` covers all
+  three.: The progress page offers no retry when it fails to load
 
 - **Concept:** (requests)
 - **Kind:** bug
@@ -511,3 +517,63 @@ skill's `references/tiers.md`).
 - **Status:** proposed
 - **Needs:** none
 - **Evidence:** `git grep 'marked='` on origin/main 7f729e3, 2026-11-27 finds no caller.
+
+## ARCH-027: Stepping a board through a line is written twice: the futures and the line popover
+
+- **Concept:** engine line
+- **Kind:** refactor
+- **Files:** `apps/web/src/components/Futures.tsx:24` to `:35` (`view`), `:83` to `:89`;
+  `apps/web/src/components/MoveButton.tsx:105` to `:138` (`LineSteps`)
+- **Why it matters:** Both work out the board at step n of a line the same way: the position
+  before the first move with its arrow at step 0, then the position after move n with it as the
+  last move. e617b12 copied the rule into `LineSteps` rather than sharing it, so a change to how a
+  line is shown (say, an arrow for the next move at every step) reaches one stepper and not the
+  other, though UX-58 asks for every line to step alike (`Stepper.tsx:10`).
+- **Proposed move:** One plain-TS helper in `apps/web/src/lib/moves.ts` (for example
+  `boardAtStep(fenBefore, line, step)` returning `fen`, `lastMove` and the first move for the
+  arrow), with a test in `apps/web/test/moves.test.ts`; `Futures` and `LineSteps` call it and keep
+  their own arrow colours and labels. Same boards at every step.
+- **Tier:** T1 (web components; the smoke test already steps both, the futures and the line
+  popover's "Before the move" and "Move 1 of n" since e617b12, so it needs no separate
+  tests-first item; the lift brings its own unit test)
+- **Status:** proposed
+- **Needs:** none
+- **Evidence:** both read on origin/main ea03d9c, 2026-11-28, while following e617b12.
+
+## ARCH-028: The line popover borrows the futures' messages for where it is
+
+- **Concept:** engine line
+- **Kind:** refactor
+- **Files:** `apps/web/src/components/MoveButton.tsx:131`, `apps/web/src/components/Futures.tsx:87`;
+  `futures_before`, `futures_step` in `apps/web/messages/en-GB.json:240`, `:241` and `en-US.json`
+- **Why it matters:** Every `Stepper` shows its position as "Before the move" or "Move n of m",
+  but the keys are named for the futures. Someone rewording `futures_before` for the futures
+  ("Before your move") also changes the coach's line popover without knowing it, and a
+  translator can't tell the key is shared.
+- **Proposed move:** Rename the two keys to `stepper_before` and `stepper_step`, beside
+  `stepper_start` and the other stepper keys, in every locale and at both call sites. Same text;
+  keys only.
+- **Tier:** T0 (`apps/web/test/messages.test.ts` checks keys and placeholders; typecheck finds
+  every `m.` call)
+- **Status:** proposed
+- **Needs:** none
+- **Evidence:** `git grep futures_before` on origin/main ea03d9c, 2026-11-28: the two call sites
+  above, nowhere else.
+
+## ARCH-029: The checkbox's tick is hand-drawn SVG, where the icon guidance says Lucide
+
+- **Concept:** (controls)
+- **Kind:** refactor
+- **Files:** `apps/web/src/ui/Checkbox.tsx:36` to `:41`; `docs/design/components.md` (Icons)
+- **Why it matters:** ea03d9c says icons come from Lucide, with no hand-drawn SVG, and 5d6b186
+  replaced the drawer's hand-drawn chevron (`apps/web/src/ui/Drawer.tsx:87`). The checkbox's tick
+  is the one hand-drawn icon left in `ui/` (the balance graph's SVG at `BalanceGraph.tsx:93` is a
+  chart, not an icon), so the next person can't tell which rule holds.
+- **Proposed move:** For William first: whether a primitive's own mark counts as an icon. If it
+  does, draw it with Lucide's `Check` at the same size and in `on-primary`, shown only when
+  selected, and look at it in light and dark. If not, reject this item.
+- **Tier:** T1 (`ui/` is covered only by the smoke test; a visual check in light and dark)
+- **Status:** proposed
+- **Needs:** none
+- **Evidence:** `git grep '<svg' apps/web/src` on origin/main ea03d9c, 2026-11-28 lists
+  `Checkbox.tsx:36` and `BalanceGraph.tsx:93` only.
