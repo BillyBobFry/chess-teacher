@@ -372,7 +372,7 @@ skill's `references/tiers.md`).
 - **Evidence:** the three loops read on origin/main 7f729e3, 2026-11-27; drift check 11.
   Re-read on origin/main 3297113, 2026-11-28, unchanged apart from line numbers (`games.ts:27`
   to `:44`, `api.test.ts:39` to `:60`, `smoke.ts:56` to `:83`). Shipped on
-  `claude/gardener-arch-17-replay-loop`.
+  `claude/gardener-arch-17-replay-loop`, PR #33.
 
 ## ARCH-018: Move saved-game upgrades out of `session.ts`
 

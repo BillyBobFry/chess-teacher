@@ -263,7 +263,7 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 
 ## 2026-11-28: tend ARCH-017
 
-- **Base:** origin/main 3297113; branch `claude/gardener-arch-17-replay-loop`
+- **Base:** origin/main 3297113; branch `claude/gardener-arch-17-replay-loop`; PR #33
 - **Frozen list:** unchanged from ARCH-009's entry; no commits to `packages/core/src` or
   `packages/engine/src/eval-trace.ts` since it. This item touches no frozen file: only a
   `tools/sim` test helper, the API test and the web smoke script.
