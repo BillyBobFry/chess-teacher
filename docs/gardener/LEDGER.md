@@ -126,3 +126,32 @@ One entry per gardener run, newest last. Never rewrite an old entry.
   `apps/web/src/lib/balance.ts` is the balance-of-power kind, a different concept. Feature names
   compared as literals (`"material"` at `Reveal.tsx:59`) are not lesson kinds.
 - **Bugs seen:** none.
+
+## 2026-11-28: tend ARCH-010
+
+- **Base:** origin/main 4c373f8; branch `claude/gardener-arch-10-reveal-state`; PR not yet opened
+- **Frozen list:** unchanged from the 2026-11-27 survey entry: no commits to
+  `packages/core/src` or `packages/engine/src` since 7f729e3. This item touches no frozen file.
+- **Skipped (open PRs):** none: the only open PR, #27 (survey 2026-11-28), touches
+  `docs/gardener/` only and leaves ARCH-010's entry as it is. Both append to this ledger, so
+  whichever merges second needs a rebase.
+- **Did:** William approved ARCH-010 in session. `Reveal.tsx` imports `RevealState` from
+  `@chess-teacher/contract`, and `apps/web/src/game/storage.ts` no longer re-exports it (it still
+  imports it for `SavedGame.reveal`). Nothing else imported it through storage. 1 non-test line
+  added and 3 removed, across 2 files; no moves; no test changes.
+- **Proven:** `pnpm check` passes, before (on 4c373f8) and after: 14 test files passed and 1
+  skipped, 153 tests passed and 1 skipped, both times (the skip is
+  `packages/engine/test/node.test.ts`, which needs a native Stockfish). Prettier's check passes.
+  The change is type-only (`import type`, `export type`), erased at build, so the bundle and what
+  the player sees are unchanged. `pnpm smoke` passes, all 25 steps; the same run with the browser
+  in dark mode (a temporary copy of the script, deleted after) also passes all 25, and the reveal
+  looks the same in light and dark. Recordings untouched
+  (`git diff --name-only` over `tools/sim/fixtures`, `tools/sim/games` and
+  `packages/engine/test/fixtures` prints nothing). No frozen file touched, so no declaration
+  proof was needed.
+- **Left deliberately:** two more re-exports of an imported name, not in the backlog, for the
+  next survey to judge: `export type { Key }` from React Aria in `apps/web/src/ui/Disclosure.tsx:11`
+  (imported through it by five components; the `ui/` wrapper may be meant to own it) and
+  `export { schema }` in `apps/api/src/db/client.ts:57`.
+- **Bugs seen:** ARCH-030: in the reveal's smoke screenshot, light and dark, the full stop after
+  a wrapped line of moves sits on a line of its own. Already on main; not fixed here.
