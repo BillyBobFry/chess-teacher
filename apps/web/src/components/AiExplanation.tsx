@@ -1,5 +1,5 @@
 import type { ExplanationResponse } from "@chess-teacher/contract";
-import { isConceptId, lessonBestSan, type ConceptId, type Lesson } from "@chess-teacher/core";
+import { isConceptId, lessonBestSan, MISSED_CHANCE, type ConceptId, type Lesson } from "@chess-teacher/core";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
@@ -123,7 +123,7 @@ function AiExplanation({
   const { better } = lessonMoves(lesson);
   // The coach writes about the two lines it was given; the real moves may come up too.
   const known = knownMoves(lesson, [played]);
-  const missedChance = lesson.kind === "missed_chance";
+  const missedChance = lesson.kind === MISSED_CHANCE;
 
   if (!result) return null;
   if (result.status === "quota") return <Note>{m.ai_quota()}</Note>;

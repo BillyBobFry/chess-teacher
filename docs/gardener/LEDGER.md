@@ -93,3 +93,36 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 - **Left deliberately:** the coach prompt's use of "idea" (`apps/api/src/explain.ts:224`), which is
   content; the `free_material` id shared by a principle and a concept (open in ADR 0001).
 - **Bugs seen:** none new.
+
+## 2026-11-28: tend ARCH-011
+
+- **Base:** origin/main ea03d9c; branch `claude/gardener-arch-11-lesson-kinds`; PR not yet opened
+- **Frozen list:** unchanged from the 2026-11-27 survey entry: no commits to
+  `packages/core/src` or `packages/engine/src/eval-trace.ts` since 7f729e3, and every frozen
+  symbol is where that entry puts it. This item touches no frozen file; it imports the core's
+  `CONSEQUENCE`, `MISSED_CHANCE` and `MATE_FEATURE` (`packages/core/src/lessons.ts:21` to `:24`)
+  without changing them.
+- **Skipped (open PRs):** none: the only open PR, #27 (survey 2026-11-28), touches
+  `docs/gardener/` only and leaves ARCH-011's entry as it is. Both append to this ledger, so
+  whichever merges second needs a rebase.
+- **Did:** William approved ARCH-011 in session and chose no alternative, so it took the proposed
+  move: the web app names a lesson kind with the core's constants. `"consequence"` became
+  `CONSEQUENCE` in `Reveal.tsx` (three sites), `Explanation.tsx`, `LessonRow.tsx` and
+  `useGame.ts`; `"missed_chance"` became `MISSED_CHANCE` in `LessonRow.tsx` and
+  `AiExplanation.tsx`; `"mate"` became `MATE_FEATURE` in `Explanation.tsx`. 15 non-test lines
+  added and 11 removed, across 5 files; no moves; no test changes.
+- **Proven:** `pnpm check` passes, before (on ea03d9c) and after: 14 test files passed and 1
+  skipped, 153 tests passed and 1 skipped, both times (the skip is
+  `packages/engine/test/node.test.ts`, which needs a native Stockfish). Prettier's check passes.
+  `pnpm smoke` passes, all 25 steps, including the consequence reveal, its explanation, and the
+  review's lesson rows. The same smoke run with the browser in dark mode (a temporary copy of the
+  script, deleted after) also passes all 25; the reveal and the review look the same in light and
+  dark. No `"consequence"`, `"missed_chance"` or `feature === "mate"` literal is left in
+  `apps/web/src`. Recordings untouched (`git diff --name-only` over `tools/sim/fixtures`,
+  `tools/sim/games` and `packages/engine/test/fixtures` prints nothing). No frozen file touched,
+  so no declaration proof was needed.
+- **Left deliberately:** the kind used as a CSS class on the reveal's headline (`Reveal.tsx:86`),
+  matched in `styles.css`, as the item says. `balance.kind === "mate"` in
+  `apps/web/src/lib/balance.ts` is the balance-of-power kind, a different concept. Feature names
+  compared as literals (`"material"` at `Reveal.tsx:59`) are not lesson kinds.
+- **Bugs seen:** none.
