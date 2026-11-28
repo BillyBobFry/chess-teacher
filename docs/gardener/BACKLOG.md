@@ -155,9 +155,10 @@ skill's `references/tiers.md`).
 - **Proposed move:** Call `turnOf` / `fullmoveOf` at each site. Same results for every valid FEN.
   `packages/engine/src/maia.ts` already imports from the core. Recordings untouched.
 - **Tier:** T0 (mechanical; `maia.test.ts` pins Maia's encoding)
-- **Status:** proposed
+- **Status:** approved (by William in session, 2026-11-28)
 - **Needs:** none
-- **Evidence:** drift check 3 on origin/main 7f729e3, 2026-11-27.
+- **Evidence:** drift check 3 on origin/main 7f729e3, 2026-11-27. Re-read on origin/main
+  8c8e3bc, 2026-11-28: all seven sites unchanged.
 
 ## ARCH-008: `tools/sim` writes `sanToUci` and `winPct` twice, with its own mate band
 

@@ -15,6 +15,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import {
   DEFAULT_CONFIG,
+  fullmoveOf,
   gameOf,
   newSession,
   opponentMove,
@@ -70,7 +71,7 @@ async function recordGame(n: number, analystEngine: Engine, weakEngine: Engine, 
   let state: SessionState = newSession({ userColour, config });
   for (;;) {
     const game = gameOf(state);
-    if (game.isGameOver() || Number(game.fen.split(" ")[5]) > Number(args["max-moves"])) break;
+    if (game.isGameOver() || fullmoveOf(game.fen) > Number(args["max-moves"])) break;
     if (game.turn === userColour) {
       state = (await startUserTurn(state, engines)).state;
       steps.push({ type: "startUserTurn" });

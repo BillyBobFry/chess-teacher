@@ -9,7 +9,7 @@
  * against fixtures recorded from that code (tools/maia).
  */
 
-import { Game, type Candidate, type Engine } from "@chess-teacher/core";
+import { Game, turnOf, type Candidate, type Engine } from "@chess-teacher/core";
 
 /** Positions the network sees: the current one and up to seven before it. */
 export const MAIA_HISTORY = 8;
@@ -97,7 +97,7 @@ export function chooseMaiaMove(
   temperature: number,
   random: () => number = Math.random,
 ): string {
-  const blackToMove = fen.split(" ")[1] === "b";
+  const blackToMove = turnOf(fen) === "b";
   const moves = new Game(fen).chess.moves({ verbose: true }).map((m) => m.lan);
   const scored = moves.map((move) => ({
     move,

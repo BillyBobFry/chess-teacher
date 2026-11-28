@@ -18,7 +18,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { readFileSync } from "node:fs";
 import { Chess } from "chess.js";
-import { MATE_SCORE, type Candidate } from "@chess-teacher/core";
+import { MATE_SCORE, turnOf, type Candidate } from "@chess-teacher/core";
 import { UciEngine } from "@chess-teacher/engine";
 import { NodeUciEngine, findStockfish, processTransport } from "@chess-teacher/engine/node";
 
@@ -178,7 +178,7 @@ async function main() {
 
       const fen = fens[i] ?? "";
       const move = moves[i] ?? "";
-      const mover = fen.split(" ")[1] === "w" ? "w" : "b";
+      const mover = turnOf(fen);
       const cands = await deep.analyse(fen, { depth, multipv: 5 });
       const best = cands[0];
       if (!best) continue;

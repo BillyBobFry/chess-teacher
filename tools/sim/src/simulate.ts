@@ -15,6 +15,7 @@ import {
   CONSEQUENCE,
   MISSED_CHANCE,
   finish,
+  fullmoveOf,
   gameOf,
   lessonGap,
   lessonMove,
@@ -94,7 +95,7 @@ async function playGame(
   let userMoves = 0;
   for (;;) {
     const game = gameOf(state);
-    if (game.isGameOver() || Number(game.fen.split(" ")[5]) > Number(args["max-moves"])) break;
+    if (game.isGameOver() || fullmoveOf(game.fen) > Number(args["max-moves"])) break;
     if (game.turn === userColour) {
       const t = performance.now();
       state = (await startUserTurn(state, engines)).state;
