@@ -1,3 +1,4 @@
+import type { RevealState } from "@chess-teacher/contract";
 import {
   CONSEQUENCE,
   Game,
@@ -13,7 +14,6 @@ import { moveText, triggerText } from "@chess-teacher/lesson-text";
 import { ParaglideMessage } from "@inlang/paraglide-js-react";
 import { useState } from "react";
 import type { ExplanationQuery } from "../api/queries.ts";
-import type { RevealState } from "../game/storage.ts";
 import { lessonMoves, lineMoves } from "../lib/moves.ts";
 import { LessonExplanation } from "./AiExplanation.tsx";
 import { Futures } from "./Futures.tsx";

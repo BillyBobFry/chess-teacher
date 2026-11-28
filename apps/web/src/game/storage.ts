@@ -10,8 +10,6 @@ import { api, HttpError } from "../api/client.ts";
 import { activeGamesQuery, queryClient, runMutation } from "../api/queries.ts";
 import { m } from "../paraglide/messages.js";
 
-export type { RevealState };
-
 export interface SavedGame {
   version: 1;
   /** Server id (assigned when the game is created). */

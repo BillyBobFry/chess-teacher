@@ -209,9 +209,11 @@ skill's `references/tiers.md`).
 - **Proposed move:** `Reveal.tsx` imports `RevealState` from `@chess-teacher/contract`; drop the
   re-export.
 - **Tier:** T0 (typecheck)
-- **Status:** proposed
+- **Status:** shipped (approved by William in session, 2026-11-28)
 - **Needs:** none
-- **Evidence:** read on origin/main 7f729e3, 2026-11-27; drift check 8.
+- **Evidence:** read on origin/main 7f729e3, 2026-11-27; drift check 8. Re-read on origin/main
+  4c373f8, 2026-11-28: the re-export at `storage.ts:13`, the import at `Reveal.tsx:16`, its only
+  user. Shipped on `claude/gardener-arch-10-reveal-state`.
 
 ## ARCH-011: Lesson kinds compared as string literals in the web app, as a constant in one place
 
@@ -513,3 +515,21 @@ skill's `references/tiers.md`).
 - **Status:** proposed
 - **Needs:** none
 - **Evidence:** `git grep 'marked='` on origin/main 7f729e3, 2026-11-27 finds no caller.
+
+## ARCH-030: Text after a wrapped line of moves drops to a line of its own
+
+- **Concept:** move
+- **Kind:** bug
+- **Files:** `apps/web/src/components/MoveButton.tsx:93`, `apps/web/src/components/MoveText.tsx:59`
+- **Why it matters:** When a line of moves is long enough to wrap, `LineButton` wraps it inside
+  the button as one flex item, so the button fills the width and the text after it (the full
+  stop in "The engine expects {line}.") sits alone on the next line. Seen in the reveal's "What
+  the analysis found", in light and dark.
+- **Proposed move:** for William: a layout fix in `LineButton` so text after the line follows on
+  from it, checked against UX rules and the `modern-web-guidance` skill. Not a refactor.
+- **Tier:** T1 (only the smoke test covers `apps/web/src/components/`)
+- **Status:** proposed
+- **Needs:** none
+- **Evidence:** smoke screenshot `4-reveal-explain.png`, light and dark, on
+  `claude/gardener-arch-10-reveal-state` (type-only change on origin/main 4c373f8), 2026-11-28.
+  Numbered ARCH-030 because open PR #27 adds ARCH-027 to ARCH-029.
