@@ -260,3 +260,41 @@ One entry per gardener run, newest last. Never rewrite an old entry.
   Stockfish. `docs/architecture.md` §6 and §12 still say a weakened Stockfish plays the opponent;
   that is ARCH-015's (guidance) to fix, not a tend run's.
 - **Bugs seen:** none.
+
+## 2026-11-28: tend ARCH-017
+
+- **Base:** origin/main 3297113; branch `claude/gardener-arch-17-replay-loop`
+- **Frozen list:** unchanged from ARCH-009's entry; no commits to `packages/core/src` or
+  `packages/engine/src/eval-trace.ts` since it. This item touches no frozen file: only a
+  `tools/sim` test helper, the API test and the web smoke script.
+- **Skipped (open PRs):** none. PRs #28 to #32 are on origin/main; #27 (survey 2026-11-28)
+  touches `docs/gardener/` only. Both append to this ledger, so whichever merges second needs a
+  rebase.
+- **Did:** William approved ARCH-017 in session and left the item's open question to the tend
+  run. The API test's `stateWithLessons` and the smoke test's `recordedStates` now replay a
+  recorded game with `loadGame`, `enginesFor`, `startOf` and `step` from
+  `tools/sim/test/games.ts`, imported by relative path, and drop their own fixture types and
+  step loops. `games.ts` gains `loadGame(name)`, which `loadGames` now uses. The smoke test
+  keeps its one difference (it notes the first trigger after an opponent move) on top of the
+  shared `step`, imported as `replayStep` because the script already has a `step` of its own.
+  The relative import was chosen over a package export from `tools/sim` because it needs no new
+  workspace dependency or lockfile change; the API test and the smoke test already read the
+  recordings by path. Non-test lines: 14 added and 38 removed, all in `smoke.ts`; test code:
+  `games.ts` +9 -2, `api.test.ts` +5 -26. No moves.
+- **Proven:** `pnpm check` passes, before (on 3297113) and after: 14 test files passed and 1
+  skipped, 153 tests passed and 1 skipped, both times (the skip is
+  `packages/engine/test/node.test.ts`, which needs a native Stockfish). Prettier's check passes.
+  `smoke.ts` is outside every `tsconfig`, so it was typechecked on its own with `tsc` (strict):
+  clean, as it is on origin/main. `pnpm smoke` against a fresh production build passes all 25
+  steps, including the reveal, rewind and review steps that start from recorded game 7, with no
+  console errors. Recordings untouched (`git diff --name-only` over `tools/sim/fixtures`,
+  `tools/sim/games` and `packages/engine/test/fixtures` prints nothing). No frozen file touched,
+  so no declaration proof was needed. No app source changed, so there is nothing new to see in
+  light or dark beyond the smoke run's screenshots.
+- **Left deliberately:** making the replay helpers a module that `tools/sim` exports by name
+  (an `exports` entry and a `@chess-teacher/sim` dev dependency in the API and the web app)
+  instead of a relative import across workspaces; William may prefer it. `apps/api`'s dev
+  dependency on `@chess-teacher/engine` is now unused by its own code, but removing it touches
+  `package.json` and the lockfile, outside this item. The recordings' `engineCalls.weak` key
+  stays, as ARCH-009 left it.
+- **Bugs seen:** none.

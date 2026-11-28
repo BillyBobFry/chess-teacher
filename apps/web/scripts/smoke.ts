@@ -16,24 +16,13 @@
  */
 
 import { spawn, execSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import {
-  Game,
-  fullmoveOf,
-  lessonMove,
-  newSession,
-  opponentMove,
-  startUserTurn,
-  userMove,
-  type Engines,
-  type SessionState,
-  type TeachingConfig,
-} from "@chess-teacher/core";
-import { RecordedEngine, type RecordedCall } from "@chess-teacher/engine";
+import { Game, fullmoveOf, lessonMove, newSession, type SessionState } from "@chess-teacher/core";
 import { moveText } from "@chess-teacher/lesson-text";
+import { enginesFor, loadGame, startOf, step as replayStep } from "../../../tools/sim/test/games.ts";
 // Browsers: `pnpm --filter @chess-teacher/web exec playwright install chromium` once.
 import type { BrowserType, Page, devices as Devices } from "playwright";
 
@@ -53,32 +42,19 @@ const PASSWORD = "correct horse battery";
 
 // ---- recorded game states, from tools/sim/games
 
-interface Fixture {
-  userColour: "w" | "b";
-  config: TeachingConfig;
-  steps: { type: string; move?: string }[];
-  engineCalls: { analyst: RecordedCall[]; weak: RecordedCall[] };
-}
-
 async function recordedStates(file: string) {
-  const fx = JSON.parse(readFileSync(join(repo, "tools/sim/games", file), "utf8")) as Fixture;
-  const engines: Engines = {
-    analyst: new RecordedEngine(fx.engineCalls.analyst),
-    opponent: new RecordedEngine(fx.engineCalls.weak),
-  };
-  let state: SessionState = newSession({ userColour: fx.userColour, config: fx.config });
+  const game = loadGame(file);
+  const engines = enginesFor(game);
+  let state = startOf(game);
   let atTrigger: { state: SessionState; lessonId: number } | null = null;
-  for (const step of fx.steps) {
-    if (step.type === "startUserTurn") state = (await startUserTurn(state, engines)).state;
-    else if (step.type === "userMove") state = (await userMove(state, step.move!, engines)).state;
-    else {
-      const r = await opponentMove(state, engines);
-      state = r.state;
-      const t = r.events.find(
-        (e) => e.kind === "triggered" && !state.lessons.find((l) => l.id === e.lessonId)!.deferred,
-      );
-      if (t && !atTrigger) atTrigger = { state, lessonId: t.lessonId };
-    }
+  for (const s of game.steps) {
+    const r = await replayStep(state, s, engines);
+    state = r.state;
+    if (s.type !== "opponentMove") continue;
+    const t = r.events.find(
+      (e) => e.kind === "triggered" && !state.lessons.find((l) => l.id === e.lessonId)!.deferred,
+    );
+    if (t && !atTrigger) atTrigger = { state, lessonId: t.lessonId };
   }
   return { atTrigger: atTrigger!, end: state };
 }
