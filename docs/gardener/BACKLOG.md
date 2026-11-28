@@ -213,7 +213,7 @@ skill's `references/tiers.md`).
 - **Needs:** none
 - **Evidence:** read on origin/main 7f729e3, 2026-11-27; drift check 8. Re-read on origin/main
   4c373f8, 2026-11-28: the re-export at `storage.ts:13`, the import at `Reveal.tsx:16`, its only
-  user. Shipped on `claude/gardener-arch-10-reveal-state`.
+  user. Shipped on `claude/gardener-arch-10-reveal-state`, PR #29.
 
 ## ARCH-011: Lesson kinds compared as string literals in the web app, as a constant in one place
 

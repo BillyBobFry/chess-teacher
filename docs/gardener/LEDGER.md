@@ -129,7 +129,7 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 
 ## 2026-11-28: tend ARCH-010
 
-- **Base:** origin/main 4c373f8; branch `claude/gardener-arch-10-reveal-state`; PR not yet opened
+- **Base:** origin/main 4c373f8; branch `claude/gardener-arch-10-reveal-state`; PR #29
 - **Frozen list:** unchanged from the 2026-11-27 survey entry: no commits to
   `packages/core/src` or `packages/engine/src` since 7f729e3. This item touches no frozen file.
 - **Skipped (open PRs):** none: the only open PR, #27 (survey 2026-11-28), touches
