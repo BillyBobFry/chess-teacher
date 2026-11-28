@@ -21,6 +21,7 @@ import { Chess } from "chess.js";
 import { MATE_SCORE, turnOf, type Candidate } from "@chess-teacher/core";
 import { UciEngine } from "@chess-teacher/engine";
 import { NodeUciEngine, findStockfish, processTransport } from "@chess-teacher/engine/node";
+import { sanToUci, winPct } from "../lichess.ts";
 
 const { values: args } = parseArgs({
   options: {
@@ -35,11 +36,6 @@ const { values: args } = parseArgs({
 });
 
 const VALUE: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
-
-export const winPct = (cp: number): number => {
-  const c = Math.abs(cp) >= MATE_SCORE - 500 ? Math.sign(cp) * 1000 : Math.max(-1000, Math.min(1000, cp));
-  return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * c)) - 1);
-};
 
 const mateIn = (cp: number): number | null =>
   Math.abs(cp) >= MATE_SCORE - 500 ? Math.sign(cp) * Math.ceil((MATE_SCORE - Math.abs(cp)) / 2) : null;
@@ -115,16 +111,6 @@ interface PoolGame {
   time_control: string;
   opening: string;
   moves: string;
-}
-
-function sanToUci(movetext: string): string[] {
-  const chess = new Chess();
-  const out: string[] = [];
-  for (const tok of movetext.split(" ")) {
-    if (/^\d+\.$/.test(tok) || /^(1-0|0-1|1\/2-1\/2|\*)$/.test(tok) || tok === "") continue;
-    out.push(chess.move(tok).lan);
-  }
-  return out;
 }
 
 const pvOf = (c: Candidate | undefined): string[] => c?.pv ?? [];

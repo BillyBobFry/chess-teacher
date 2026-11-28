@@ -41,6 +41,7 @@ import {
 } from "@chess-teacher/core";
 import { NodeUciEngine, findStockfish } from "@chess-teacher/engine/node";
 import { lessonFeatureLabel, lessonIdeaLabel, templateExplanation, triggerText } from "./prototype-text.ts";
+import { sanToUci, winPct } from "./lichess.ts";
 
 const { values: args } = parseArgs({
   options: {
@@ -65,23 +66,6 @@ interface PoolGame {
   time_control: string;
   opening: string;
   moves: string;
-}
-
-/** Lichess's winning chances, 0–100, from centipawns for the side to move. */
-const winPct = (cp: number): number => {
-  const c = Math.max(-1000, Math.min(1000, Math.abs(cp) >= MATE_SCORE - 500 ? Math.sign(cp) * 1000 : cp));
-  return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * c)) - 1);
-};
-
-function sanToUci(movetext: string): string[] {
-  const chess = new Chess();
-  const out: string[] = [];
-  for (const tok of movetext.split(" ")) {
-    if (/^\d+\.$/.test(tok) || /^(1-0|0-1|1\/2-1\/2|\*)$/.test(tok) || tok === "") continue;
-    const m = chess.move(tok);
-    out.push(m.lan);
-  }
-  return out;
 }
 
 interface RefPly {

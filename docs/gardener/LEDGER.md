@@ -186,3 +186,34 @@ One entry per gardener run, newest last. Never rewrite an old entry.
   null-move FEN by editing fields, a twin of the core's frozen `nullMoveFen` (`claims.ts:517`),
   for the next survey to judge. The core's own parsers (`board.ts:72`, `claims.ts:520`) are frozen.
 - **Bugs seen:** none.
+
+## 2026-11-28: tend ARCH-008
+
+- **Base:** origin/main fd8ec57; branch `claude/gardener-arch-8-sim-win-pct`; PR to follow
+- **Frozen list:** unchanged from the skill's reference apart from line numbers in `session.ts`
+  (each three lines later, from ARCH-007's import). This item touches no frozen file:
+  `audit-real-games.ts` calls `detectMistake`, `verifyLesson`, `consequenceLanded` and
+  `awaitedHappened`, and those calls are untouched.
+- **Skipped (open PRs):** none: the only open PR, #27 (survey 2026-11-28), touches
+  `docs/gardener/` only and leaves ARCH-008's entry as it is. Both append to this ledger, so
+  whichever merges second needs a rebase.
+- **Did:** William approved ARCH-008 in session. `winPct` and `sanToUci` now live once, in the
+  new `tools/sim/src/lichess.ts`, lifted unchanged from `bench/build-items.ts`, and both
+  `audit-real-games.ts` and `bench/build-items.ts` import them. `build-items.ts` exported its
+  `winPct`, but nothing imported it. 23 non-test lines added and 32 removed, across 3 files; of
+  the 21 lines in `lichess.ts`, 13 are the two bodies moved verbatim; no test changes.
+- **Proven:** `pnpm check` passes, before (on fd8ec57) and after: 14 test files passed and 1
+  skipped, 153 tests passed and 1 skipped, both times (the skip is
+  `packages/engine/test/node.test.ts`, which needs a native Stockfish). Prettier's check passes.
+  The removed `audit-real-games.ts` copies are written differently (it clamps after the mate
+  test, and names the move before pushing it), so a throwaway script outside the repo compared
+  them with the shared copies: `winPct` gives the same result for every integer score from
+  -10000 to 10000, and `sanToUci` the same moves for a sample game. Recordings untouched
+  (`git diff --name-only` over `tools/sim/fixtures`, `tools/sim/games` and
+  `packages/engine/test/fixtures` prints nothing). No frozen file touched, so no declaration
+  proof was needed. No `apps/web` change, so no smoke run.
+- **Left deliberately:** the mate band. The shared `winPct` and `build-items.ts`'s `mateIn` still
+  treat a score within 500 of `MATE_SCORE` as mate, where the core's `balanceOf` uses
+  `MATE_BAND` (300); whether the tools should call the core's `winChance` and `balanceOf`
+  instead changes benchmark numbers and is William's question, as the item says.
+- **Bugs seen:** none.
