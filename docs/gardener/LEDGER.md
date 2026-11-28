@@ -220,7 +220,7 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 
 ## 2026-11-28: tend ARCH-009
 
-- **Base:** origin/main 5ccf1f7; branch `claude/gardener-arch-9-engines-weak`
+- **Base:** origin/main 5ccf1f7; branch `claude/gardener-arch-9-engines-weak`; PR #32
 - **Frozen list:** unchanged from the skill's reference apart from line numbers in `session.ts`
   (each three lines later, from ARCH-007's import); no commits to `packages/core/src` or
   `packages/engine/src/eval-trace.ts` since 0c2a6da beyond the review replay (7b12c99, 67b5f67),

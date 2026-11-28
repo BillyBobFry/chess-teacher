@@ -205,7 +205,7 @@ skill's `references/tiers.md`).
 - **Evidence:** drift check 6 on origin/main 7f729e3, 2026-11-27. Every site re-read on
   origin/main 5ccf1f7, 2026-11-28, unchanged; the field itself is used at five sites in
   `tools/sim/src` (the "86 uses" counted every `weak`, most of them skill-limited Stockfish
-  locals and the recording key). Shipped on `claude/gardener-arch-9-engines-weak`.
+  locals and the recording key). Shipped on `claude/gardener-arch-9-engines-weak`, PR #32.
 
 ## ARCH-010: `game/storage.ts` re-exports `RevealState`
 
