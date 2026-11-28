@@ -1,4 +1,5 @@
 import {
+  CONSEQUENCE,
   Game,
   lessonMove,
   playedLine,
@@ -57,7 +58,7 @@ export function Reveal({
   const missedMaterial =
     lesson.source === "features" ? lesson.feature === "material" : lesson.mistake === "misses_material";
   const headline =
-    lesson.kind === "consequence" && lesson.trigger
+    lesson.kind === CONSEQUENCE && lesson.trigger
       ? triggerText(lesson.trigger, locale)
       : ago === 1
         ? missedMaterial
@@ -68,7 +69,7 @@ export function Reveal({
           : m.reveal_chance_gone();
   const markup = { move: moveMarkup(lessonMoves(lesson).yours, orientationOf(lesson.userColour)) };
   const sub =
-    lesson.kind === "consequence" ? (
+    lesson.kind === CONSEQUENCE ? (
       ago === 1 ? (
         <ParaglideMessage message={m.reveal_cause_last} inputs={{ move }} markup={markup} />
       ) : (
@@ -84,7 +85,7 @@ export function Reveal({
     <section className="reveal" aria-live="polite">
       <div className={`reveal-headline ${lesson.kind}`}>
         <span className="reveal-icon" aria-hidden>
-          {lesson.kind === "consequence" ? "⚠" : "⏳"}
+          {lesson.kind === CONSEQUENCE ? "⚠" : "⏳"}
         </span>
         <div>
           <h2>{headline}</h2>

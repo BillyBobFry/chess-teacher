@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
+  CONSEQUENCE,
   finish,
   gameOf,
   hints,
@@ -156,7 +157,7 @@ export function useGame(opts: { llmEnabled: boolean }) {
           wantExplanation.current.add(lesson.id);
         } else if (e.kind === "fixed") {
           toast(
-            lesson.kind === "consequence"
+            lesson.kind === CONSEQUENCE
               ? m.toast_fixed({ move: moveText(lessonMove(lesson), getLocale()) })
               : m.toast_found_chance({ move: moveText(lessonMove(lesson), getLocale()) }),
             "success",

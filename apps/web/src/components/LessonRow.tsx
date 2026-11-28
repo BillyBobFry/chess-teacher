@@ -1,4 +1,4 @@
-import { lessonMove, type Lesson } from "@chess-teacher/core";
+import { CONSEQUENCE, lessonMove, MISSED_CHANCE, type Lesson } from "@chess-teacher/core";
 import { lessonTitle, moveText } from "@chess-teacher/lesson-text";
 import { useQuery } from "@tanstack/react-query";
 import { configQuery, reviewExplanationQuery } from "../api/queries.ts";
@@ -17,9 +17,9 @@ function outcome(l: Lesson): { text: string; tick: boolean } {
   if (l.status === "triggered" && l.foundCause === true) return { text: m.outcome_found(), tick: true };
   if (l.status === "triggered" && l.foundCause === false) return plain(m.outcome_revealed());
   if (l.status === "triggered")
-    return plain(l.kind === "missed_chance" ? m.outcome_shown() : m.outcome_not_shown());
+    return plain(l.kind === MISSED_CHANCE ? m.outcome_shown() : m.outcome_not_shown());
   if (l.status === "superseded") return plain(m.outcome_superseded());
-  if (l.kind === "consequence") return plain(m.outcome_got_away());
+  if (l.kind === CONSEQUENCE) return plain(m.outcome_got_away());
   return plain(m.outcome_missed());
 }
 

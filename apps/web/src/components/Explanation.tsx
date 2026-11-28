@@ -1,9 +1,11 @@
 import {
+  CONSEQUENCE,
   diagnosisFacts,
   facts,
   lessonBestSan,
   lessonMoveNumber,
   lessonUserSan,
+  MATE_FEATURE,
   type ConceptId,
   type DiagnosedLesson,
   type FeatureLesson,
@@ -96,7 +98,7 @@ function DiagnosisExplanation({ lesson, concept }: { lesson: DiagnosedLesson; co
 function FeatureExplanation({ lesson }: { lesson: FeatureLesson }) {
   const f = facts(lesson);
   const locale = getLocale();
-  const mate = lesson.feature === "mate";
+  const mate = lesson.feature === MATE_FEATURE;
   const orientation = orientationOf(lesson.userColour);
   const { better } = lessonMoves(lesson);
   return (
@@ -104,7 +106,7 @@ function FeatureExplanation({ lesson }: { lesson: FeatureLesson }) {
       <Lead lesson={lesson} />
       {mate ? (
         <p>{m.explanation_mate()}</p>
-      ) : lesson.kind === "consequence" ? (
+      ) : lesson.kind === CONSEQUENCE ? (
         <dl className="facts">
           <dt>{m.facts_before()}</dt>
           <dd>{detailText(f.before_your_move, locale)}</dd>

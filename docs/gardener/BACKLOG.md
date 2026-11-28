@@ -229,9 +229,11 @@ skill's `references/tiers.md`).
   `BalanceGraph.tsx`. Or, if William prefers literals, drop the constants' use in the web app
   instead; either way one spelling.
 - **Tier:** T0 (typecheck; mechanical)
-- **Status:** proposed
+- **Status:** shipped (approved by William in session, 2026-11-28; the core's constants at every
+  site)
 - **Needs:** none
-- **Evidence:** drift check 3 on origin/main 7f729e3, 2026-11-27.
+- **Evidence:** drift check 3 on origin/main 7f729e3, 2026-11-27. Every site re-read on
+  origin/main ea03d9c, 2026-11-28, unchanged. Shipped on `claude/gardener-arch-11-lesson-kinds`.
 
 ## ARCH-012: The docs still describe the classical check as what gates lessons
 
