@@ -72,7 +72,7 @@ async function main() {
   const weak = await NodeUciEngine.start(findStockfish(), { skill: 3 });
   const student = await NodeUciEngine.start(findStockfish(), { skill: 0 });
   const classical: UciEngine = await NodeUciEngine.start(SF11);
-  const engines: Engines = { analyst, weak };
+  const engines: Engines = { analyst, opponent: weak };
   const rows: Row[] = [];
 
   for (let g = 0; g < Number(args.games); g++) {

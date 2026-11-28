@@ -38,10 +38,10 @@ export interface Engine {
   play(fen: string, opts: { movetimeMs: number; history: readonly string[] }): Promise<string>;
 }
 
-/** The engines a game needs: full-strength analysis, and a weakened opponent. */
+/** The engines a game needs: full-strength analysis, and the opponent's normal moves. */
 export interface Engines {
   analyst: Engine;
-  weak: Engine;
+  opponent: Engine;
   /** Optional second opinion on strategic lessons (see validate.ts). */
   classical?: ClassicalEval;
 }

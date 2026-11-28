@@ -66,7 +66,7 @@ async function recordGame(n: number, analystEngine: Engine, weakEngine: Engine, 
   const config: TeachingConfig = { ...DEFAULT_CONFIG, analysisDepth: Number(args.depth) };
   const analyst = new RecordingEngine(analystEngine);
   const weak = new RecordingEngine(weakEngine);
-  const engines: Engines = { analyst, weak };
+  const engines: Engines = { analyst, opponent: weak };
   const steps: RecordedStep[] = [];
   let state: SessionState = newSession({ userColour, config });
   for (;;) {

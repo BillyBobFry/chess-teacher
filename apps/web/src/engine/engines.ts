@@ -82,6 +82,6 @@ export async function getEngines(opponentRating: number): Promise<{ engines: Eng
   const [{ engine, depth }, network] = await Promise.all([engines.analyst, engines.maia]);
   // Temperature 1: Maia samples its move as it was trained to, so it errs like a player of
   // that rating. It assumes the player is rated the same.
-  const weak = new MaiaEngine(network, opponentRating, 1);
-  return { engines: { analyst: engine, weak, classical }, depth };
+  const opponent = new MaiaEngine(network, opponentRating, 1);
+  return { engines: { analyst: engine, opponent, classical }, depth };
 }

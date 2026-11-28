@@ -217,3 +217,46 @@ One entry per gardener run, newest last. Never rewrite an old entry.
   `MATE_BAND` (300); whether the tools should call the core's `winChance` and `balanceOf`
   instead changes benchmark numbers and is William's question, as the item says.
 - **Bugs seen:** none.
+
+## 2026-11-28: tend ARCH-009
+
+- **Base:** origin/main 5ccf1f7; branch `claude/gardener-arch-9-engines-weak`
+- **Frozen list:** unchanged from the skill's reference apart from line numbers in `session.ts`
+  (each three lines later, from ARCH-007's import); no commits to `packages/core/src` or
+  `packages/engine/src/eval-trace.ts` since 0c2a6da beyond the review replay (7b12c99, 67b5f67),
+  which added no lesson path. This item touches one frozen symbol: `chooseOpponentMove`
+  (`packages/core/src/opponent.ts:12`, treated as frozen), where `engines.weak` becomes
+  `engines.opponent`. `towardsEvent` in the same file is untouched.
+- **Skipped (open PRs):** none: the only open PR, #27 (survey 2026-11-28), touches
+  `docs/gardener/` only and leaves ARCH-009's entry as it is. Both append to this ledger, so
+  whichever merges second needs a rebase.
+- **Did:** William approved ARCH-009 in session, with the item's suggested name. `Engines.weak` is
+  now `Engines.opponent`, and its comment says what it is ("the opponent's normal moves") rather
+  than "a weakened opponent". Every layer follows: the core type and `chooseOpponentMove`, the
+  web app's Maia engine (`engines.ts`, whose local is now `opponent` too), the five
+  `tools/sim/src` scripts that build `Engines`, and the replay set-ups in
+  `tools/sim/test/games.ts`, `apps/api/test/api.test.ts`, `apps/web/scripts/smoke.ts` and
+  `packages/core/test/core.test.ts`. The recordings keep their `engineCalls.weak` key (and
+  `RecordedGame`'s type and `record-games.ts`'s writer with it), so the replay set-ups map that
+  key to the new field. `GLOSSARY.md`'s opponent-mode row now names `Engines.opponent`. 14 non-test lines added and 11 removed, across 9 files (Prettier
+  re-wrapped the one changed line in `chooseOpponentMove` over four); no moves; tests changed
+  only in the field name and the replay engine's label in error messages.
+- **Proven:** `pnpm check` passes, before (on 5ccf1f7) and after: 14 test files passed and 1
+  skipped, 153 tests passed and 1 skipped, both times (the skip is
+  `packages/engine/test/node.test.ts`, which needs a native Stockfish). Prettier's check passes.
+  The declaration proof over `packages/core/src` and `packages/engine/src`, with
+  `--rename engines.weak=engines.opponent` on the `origin/main` side, differs only in the
+  `Engines` interface (the renamed field, not frozen); `chooseOpponentMove` is identical. Every
+  recorded-game replay passes, so the core asks the engines nothing new. Recordings untouched
+  (`git diff --name-only` over `tools/sim/fixtures`, `tools/sim/games` and
+  `packages/engine/test/fixtures` prints nothing). `pnpm smoke` passes all 25 steps, and its
+  game's opponent replies (1. e4 e5) through the browser's Maia engine; a throwaway script
+  outside the repo, against the same build in dark mode, played 1. d4 and got 1... d5 with no
+  page errors, and the game screen looks the same in light and dark.
+- **Left deliberately:** the recordings' `engineCalls.weak` key, `RecordedGame`'s matching type
+  and the writer in `record-games.ts`: renaming them means editing or re-recording the games,
+  which `AGENTS.md` forbids for this. The `weak` locals in `near-miss.ts`, `record-games.ts`,
+  `simulate.ts` and `validate-lessons.ts` stay: there the opponent really is a skill-limited
+  Stockfish. `docs/architecture.md` §6 and §12 still say a weakened Stockfish plays the opponent;
+  that is ARCH-015's (guidance) to fix, not a tend run's.
+- **Bugs seen:** none.

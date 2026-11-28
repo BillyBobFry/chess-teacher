@@ -64,7 +64,7 @@ async function recordedStates(file: string) {
   const fx = JSON.parse(readFileSync(join(repo, "tools/sim/games", file), "utf8")) as Fixture;
   const engines: Engines = {
     analyst: new RecordedEngine(fx.engineCalls.analyst),
-    weak: new RecordedEngine(fx.engineCalls.weak),
+    opponent: new RecordedEngine(fx.engineCalls.weak),
   };
   let state: SessionState = newSession({ userColour: fx.userColour, config: fx.config });
   let atTrigger: { state: SessionState; lessonId: number } | null = null;
