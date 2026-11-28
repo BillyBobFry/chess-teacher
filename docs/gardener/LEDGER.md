@@ -189,7 +189,7 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 
 ## 2026-11-28: tend ARCH-008
 
-- **Base:** origin/main fd8ec57; branch `claude/gardener-arch-8-sim-win-pct`; PR to follow
+- **Base:** origin/main fd8ec57; branch `claude/gardener-arch-8-sim-win-pct`; PR #31
 - **Frozen list:** unchanged from the skill's reference apart from line numbers in `session.ts`
   (each three lines later, from ARCH-007's import). This item touches no frozen file:
   `audit-real-games.ts` calls `detectMistake`, `verifyLesson`, `consequenceLanded` and

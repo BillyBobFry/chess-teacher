@@ -181,7 +181,8 @@ skill's `references/tiers.md`).
 - **Needs:** none
 - **Evidence:** both copies read on origin/main 7f729e3, 2026-11-27; drift check 8. Re-read on
   origin/main fd8ec57, 2026-11-28: unchanged, now at `audit-real-games.ts:71`, `:76` and
-  `bench/build-items.ts:39`, `:120`. Shipped on `claude/gardener-arch-8-sim-win-pct`.
+  `bench/build-items.ts:39`, `:120`. Shipped on `claude/gardener-arch-8-sim-win-pct`,
+  PR #31.
 
 ## ARCH-009: `Engines.weak` is Maia now, not a weakened engine
 
