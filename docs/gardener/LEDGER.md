@@ -93,3 +93,35 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 - **Left deliberately:** the coach prompt's use of "idea" (`apps/api/src/explain.ts:224`), which is
   content; the `free_material` id shared by a principle and a concept (open in ADR 0001).
 - **Bugs seen:** none new.
+
+## 2026-11-28: survey
+
+- **Base:** origin/main ea03d9c; branch `claude/gardener-survey-2026-11-28`; PR not yet opened
+- **Frozen list:** unchanged from the 2026-11-27 survey entry: `git log 7f729e3..origin/main`
+  touches nothing in `packages/core/src`, `packages/engine/src`, `packages/lesson-text` or `tools`,
+  and every frozen symbol re-derives to the line that entry gives. No new path creates or reveals
+  lessons. ARCH-013 (`balanceOf` in `isMate`) still stands.
+- **Skipped (open PRs):** none: the GitHub API lists no open PRs.
+- **Did:** started at `packages/core/src/session.ts` (unchanged since the last survey, so read for
+  the frozen entry points only), then followed the five commits since 7f729e3 (ARCH-001, the line
+  popover in e617b12, the Lucide icon buttons in 5d6b186 and their guidance in ea03d9c) and traced
+  the glossary terms they touch. Reran drift checks 3, 4, 5, 8 and 10 on `apps/web` and the API.
+  - Added ARCH-027 (refactor, T1), ARCH-028 (refactor, T0), ARCH-029 (refactor, T1).
+  - Updated the evidence of ARCH-002 (still true), ARCH-023 (line numbers moved) and ARCH-024 (a
+    third copy of the spoken move label).
+  - Glossary: the principle rows now say what ARCH-001 shipped (`PrincipleSource`, `principleOf`);
+    the move and engine line rows name `placeMoves`, `MovePart` and `LineButton`.
+- **Proven:** no source changes. The checkout had no `node_modules` and pnpm's corepack shim
+  failed to start, so prettier ran as `npx prettier@3.10.1` (the lockfile's version, with the
+  repo's `.prettierrc.json`): `--check .` passes. `git status` shows changes under
+  `docs/gardener/` only.
+- **Left deliberately:**
+  - The ⚠ ⏳ ✓ glyphs in the reveal and lesson rows: `docs/design/ux-principles.md` now lists them
+    as a known UX-31 gap.
+  - The fake LLM's English sample now quoting the engine's line (`apps/api/src/explain.ts:390`):
+    a known UX-32 gap, and development only.
+  - `MovePart` and `KnownMoves` show as exports no other file names (drift check 10), but they are
+    the return types of exported functions, so they stay exported.
+  - `Popover`'s new optional `size` defaults to `small`, which every caller but `LineButton`
+    wants: fine under UX-37.
+- **Bugs seen:** none new.
