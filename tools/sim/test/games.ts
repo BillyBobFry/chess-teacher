@@ -1,4 +1,7 @@
-/** Loading and replaying the games recorded by src/record-games.ts. */
+/**
+ * Loading and replaying the games recorded by src/record-games.ts. The API test and the web
+ * smoke test import it too, so a recorded game is replayed the same way everywhere.
+ */
 
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -16,11 +19,15 @@ import type { RecordedGame, RecordedStep } from "../src/recorded-game.ts";
 
 const GAMES = join(import.meta.dirname, "..", "games");
 
+/** One recorded game, by file name (`game-01.json`). */
+export const loadGame = (name: string): RecordedGame =>
+  JSON.parse(readFileSync(join(GAMES, name), "utf8")) as RecordedGame;
+
 export function loadGames(): { name: string; game: RecordedGame }[] {
   return readdirSync(GAMES)
     .filter((f) => f.startsWith("game-"))
     .sort()
-    .map((name) => ({ name, game: JSON.parse(readFileSync(join(GAMES, name), "utf8")) as RecordedGame }));
+    .map((name) => ({ name, game: loadGame(name) }));
 }
 
 /** Fresh replay engines: each recorded result is handed out once. */

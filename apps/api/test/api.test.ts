@@ -3,8 +3,6 @@
  * fake LLM client. Game states with real lessons come from a recorded game (tools/sim/games).
  */
 
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   DEFAULT_CONFIG,
@@ -14,20 +12,15 @@ import {
   detectMistake,
   diagnosisFacts,
   newSession,
-  opponentMove,
   playedLine,
   plyOf,
   squareName,
-  startUserTurn,
-  userMove,
   type DiagnosedLesson,
-  type Engines,
   type FeatureLesson,
   type Lesson,
   type SessionState,
-  type TeachingConfig,
 } from "@chess-teacher/core";
-import { RecordedEngine, type RecordedCall } from "@chess-teacher/engine";
+import { enginesFor, loadGame, startOf, step } from "../../../tools/sim/test/games.ts";
 import { readEnv } from "../src/env.ts";
 import type { LlmClient } from "../src/explain.ts";
 import { createServer } from "../src/server.ts";
@@ -37,24 +30,10 @@ const EN_GB = { locale: "en-GB" };
 
 /** A game state with several lessons, from a recorded game. */
 async function stateWithLessons(): Promise<SessionState> {
-  const fx = JSON.parse(
-    readFileSync(join(import.meta.dirname, "../../../tools/sim/games/game-01.json"), "utf8"),
-  ) as {
-    userColour: "w" | "b";
-    config: TeachingConfig;
-    steps: { type: string; move?: string }[];
-    engineCalls: { analyst: RecordedCall[]; weak: RecordedCall[] };
-  };
-  const engines: Engines = {
-    analyst: new RecordedEngine(fx.engineCalls.analyst),
-    opponent: new RecordedEngine(fx.engineCalls.weak),
-  };
-  let s = newSession({ userColour: fx.userColour, config: fx.config });
-  for (const step of fx.steps) {
-    if (step.type === "startUserTurn") s = (await startUserTurn(s, engines)).state;
-    else if (step.type === "userMove") s = (await userMove(s, step.move!, engines)).state;
-    else s = (await opponentMove(s, engines)).state;
-  }
+  const game = loadGame("game-01.json");
+  const engines = enginesFor(game);
+  let s = startOf(game);
+  for (const st of game.steps) s = (await step(s, st, engines)).state;
   return s;
 }
 const recorded = await stateWithLessons();

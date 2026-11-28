@@ -366,9 +366,13 @@ skill's `references/tiers.md`).
   one place. Where that place lives (`tools/sim/test/games.ts` imported across workspaces, or a
   small module `tools/sim` exports) is a question for William. Recordings untouched.
 - **Tier:** T0 (they are the tests; the smoke test runs in CI)
-- **Status:** proposed
+- **Status:** shipped (approved by William in session, 2026-11-28; the shared code stays in
+  `tools/sim/test/games.ts`, imported by relative path)
 - **Needs:** none
 - **Evidence:** the three loops read on origin/main 7f729e3, 2026-11-27; drift check 11.
+  Re-read on origin/main 3297113, 2026-11-28, unchanged apart from line numbers (`games.ts:27`
+  to `:44`, `api.test.ts:39` to `:60`, `smoke.ts:56` to `:83`). Shipped on
+  `claude/gardener-arch-17-replay-loop`.
 
 ## ARCH-018: Move saved-game upgrades out of `session.ts`
 
