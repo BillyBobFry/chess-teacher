@@ -112,7 +112,7 @@ async function main() {
   const student = await NodeUciEngine.start(command, { skill: Number(args["student-skill"]) });
   const require = createRequire(import.meta.url);
   const classical = await NodeUciEngine.start(`node ${require.resolve("stockfish11/src/stockfish.asm.js")}`);
-  const engines: Engines = { analyst, weak, classical };
+  const engines: Engines = { analyst, opponent: weak, classical };
 
   const nearMisses: NearMiss[] = [];
   const taught: Taught[] = [];

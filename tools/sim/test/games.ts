@@ -26,7 +26,7 @@ export function loadGames(): { name: string; game: RecordedGame }[] {
 /** Fresh replay engines: each recorded result is handed out once. */
 export const enginesFor = (g: RecordedGame): Engines => ({
   analyst: new RecordedEngine(g.engineCalls.analyst, "analyst"),
-  weak: new RecordedEngine(g.engineCalls.weak, "weak"),
+  opponent: new RecordedEngine(g.engineCalls.weak, "opponent"),
 });
 
 export const startOf = (g: RecordedGame): SessionState =>

@@ -200,9 +200,12 @@ skill's `references/tiers.md`).
   `chooseOpponentMove`, which is treated as frozen: the rename is the only change in its body;
   run the declaration proof with `--rename`.
 - **Tier:** T0 (typecheck; every recorded-game replay)
-- **Status:** proposed
+- **Status:** shipped (approved by William in session, 2026-11-28; named `opponent`)
 - **Needs:** none
-- **Evidence:** drift check 6 on origin/main 7f729e3, 2026-11-27.
+- **Evidence:** drift check 6 on origin/main 7f729e3, 2026-11-27. Every site re-read on
+  origin/main 5ccf1f7, 2026-11-28, unchanged; the field itself is used at five sites in
+  `tools/sim/src` (the "86 uses" counted every `weak`, most of them skill-limited Stockfish
+  locals and the recording key). Shipped on `claude/gardener-arch-9-engines-weak`.
 
 ## ARCH-010: `game/storage.ts` re-exports `RevealState`
 

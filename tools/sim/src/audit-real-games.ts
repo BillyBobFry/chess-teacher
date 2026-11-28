@@ -243,7 +243,7 @@ async function main() {
   const refEngine = await NodeUciEngine.start(findStockfish(), { threads: 5, hashMb: 256 });
   const analyst = await NodeUciEngine.start(findStockfish());
   const classical = await NodeUciEngine.start(SF11);
-  const engines = { analyst, weak: analyst, classical, analystEngine: analyst };
+  const engines = { analyst, opponent: analyst, classical, analystEngine: analyst };
 
   mkdirSync(args.out ?? "reports/audit", { recursive: true });
   const all: { game: PoolGame; index: number; side: Colour; rows: MoveRow[] }[] = [];

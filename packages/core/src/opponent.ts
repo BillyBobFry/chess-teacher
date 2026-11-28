@@ -17,7 +17,10 @@ export async function chooseOpponentMove(
 ): Promise<{ move: string; mode: OpponentMode }> {
   const fen = game.fen;
   const playNormally = async (): Promise<{ move: string; mode: OpponentMode }> => ({
-    move: await engines.weak.play(fen, { movetimeMs: cfg.opponentMovetimeMs, history: game.previousFens() }),
+    move: await engines.opponent.play(fen, {
+      movetimeMs: cfg.opponentMovetimeMs,
+      history: game.previousFens(),
+    }),
     mode: "normal",
   });
   if (!lesson) return playNormally();

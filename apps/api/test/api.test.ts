@@ -47,7 +47,7 @@ async function stateWithLessons(): Promise<SessionState> {
   };
   const engines: Engines = {
     analyst: new RecordedEngine(fx.engineCalls.analyst),
-    weak: new RecordedEngine(fx.engineCalls.weak),
+    opponent: new RecordedEngine(fx.engineCalls.weak),
   };
   let s = newSession({ userColour: fx.userColour, config: fx.config });
   for (const step of fx.steps) {

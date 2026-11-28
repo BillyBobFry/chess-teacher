@@ -153,7 +153,7 @@ describe("opponentMove", () => {
       play: () => Promise.resolve("d8h4"),
     };
     const s = { ...newSession({ userColour: "w" }), moves: FOOLS_MATE.slice(0, 3) };
-    const r = await opponentMove(s, { analyst: engine, weak: engine });
+    const r = await opponentMove(s, { analyst: engine, opponent: engine });
     expect(r.state.scores[3]).toBe(-MATE_SCORE);
   });
 });
@@ -308,7 +308,7 @@ describe("credit for material lessons", () => {
       analyse: (fen: string) => Promise.resolve(lines.get(fen) ?? []),
       play: () => Promise.resolve("b8c6"),
     };
-    const engines: Engines = { analyst: engine, weak: engine };
+    const engines: Engines = { analyst: engine, opponent: engine };
 
     let s = newSession({ userColour: "w", startFen: game.startFen, config: { levelUp: false } });
     s = (await userMove(s, "f3g5", engines)).state;
@@ -433,7 +433,7 @@ describe("one lesson at a time", () => {
     const s = { ...newSession({ userColour: "w", startFen: fen }), moves: ["h2h3", "g5g6"] };
     const r = await startUserTurn(
       { ...s, lessons: [missed, ...lessons] },
-      { analyst: quietEngine, weak: quietEngine },
+      { analyst: quietEngine, opponent: quietEngine },
     );
     return r.state.lessons;
   };
@@ -463,7 +463,7 @@ describe("one lesson at a time", () => {
       moves: ["f3g5"],
       lessons: [punished, tooRecent],
     };
-    const r = await opponentMove(s, { analyst: engine, weak: engine });
+    const r = await opponentMove(s, { analyst: engine, opponent: engine });
     expect(r.state.lessons).toMatchObject([
       { status: "triggered", deferred: false },
       { status: "expired", resolvedPly: plyOf(start) + 2 },

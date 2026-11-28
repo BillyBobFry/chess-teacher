@@ -180,7 +180,7 @@ async function main() {
         `node ${createRequire(import.meta.url).resolve("stockfish11/src/stockfish.asm.js")}`,
       )
     : undefined;
-  const engines: Engines = classical ? { analyst, weak, classical } : { analyst, weak };
+  const engines: Engines = classical ? { analyst, opponent: weak, classical } : { analyst, opponent: weak };
   const configs: [string, boolean][] = [["teaching opponent", true]];
   if (args.compare) configs.push(["no level-up (control)", false]);
 
