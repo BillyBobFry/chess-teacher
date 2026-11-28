@@ -96,7 +96,7 @@ One entry per gardener run, newest last. Never rewrite an old entry.
 
 ## 2026-11-28: survey
 
-- **Base:** origin/main ea03d9c; branch `claude/gardener-survey-2026-11-28`; PR not yet opened
+- **Base:** origin/main ea03d9c; branch `claude/gardener-survey-2026-11-28`; PR #27
 - **Frozen list:** unchanged from the 2026-11-27 survey entry: `git log 7f729e3..origin/main`
   touches nothing in `packages/core/src`, `packages/engine/src`, `packages/lesson-text` or `tools`,
   and every frozen symbol re-derives to the line that entry gives. No new path creates or reveals
