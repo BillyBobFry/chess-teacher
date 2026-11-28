@@ -155,3 +155,34 @@ One entry per gardener run, newest last. Never rewrite an old entry.
   `export { schema }` in `apps/api/src/db/client.ts:57`.
 - **Bugs seen:** ARCH-030: in the reveal's smoke screenshot, light and dark, the full stop after
   a wrapped line of moves sits on a line of its own. Already on main; not fixed here.
+
+## 2026-11-28: tend ARCH-007
+
+- **Base:** origin/main 8c8e3bc; branch `claude/gardener-arch-7-fen-fields`; PR #30
+- **Frozen list:** unchanged from the 2026-11-27 survey entry: no commits to
+  `packages/core/src` or `packages/engine/src` since 7f729e3. This item touches no frozen file.
+- **Skipped (open PRs):** none: the only open PR, #27 (survey 2026-11-28), touches
+  `docs/gardener/` only and leaves ARCH-007's entry as it is. Both append to this ledger, so
+  whichever merges second needs a rebase.
+- **Did:** William approved ARCH-007 in session. Seven sites that split a FEN by hand now call the
+  core's `turnOf` or `fullmoveOf`: `MoveList.tsx:37`, `maia.ts:100`, the max-moves stop in
+  `record-games.ts`, `simulate.ts` and `validate-lessons.ts` (as `near-miss.ts` already did),
+  `audit-real-games.ts:213` and `bench/build-items.ts:181`. Same result for every valid FEN; they
+  differ only on a FEN missing its move number or with a side to move other than `w` or `b`,
+  which chess.js and the recorded positions never produce. 14 non-test lines added and 10
+  removed, across 7 files; no moves; no test changes.
+- **Proven:** `pnpm check` passes, before (on 8c8e3bc) and after: 14 test files passed and 1
+  skipped, 153 tests passed and 1 skipped, both times (the skip is
+  `packages/engine/test/node.test.ts`, which needs a native Stockfish). Prettier's check passes.
+  `pnpm smoke` passes all 25 steps; the same run in dark mode (a temporary copy of the script,
+  deleted after) also passes all 25, and the move list looks the same in light and dark. The
+  smoke game starts from the initial position, so it covers only `MoveList`'s white-to-move
+  branch. Recordings untouched (`git diff --name-only` over `tools/sim/fixtures`,
+  `tools/sim/games` and `packages/engine/test/fixtures` prints nothing); `record-games.ts`
+  changed only in its stopping test, which stops at the same move, and nothing was re-recorded.
+  No frozen file touched, so no declaration proof was needed.
+- **Left deliberately:** `maia.ts:41` also reads the side to move by hand, but it takes the
+  placement from the same split and is not in the item. `bench/build-items.ts:97` builds a
+  null-move FEN by editing fields, a twin of the core's frozen `nullMoveFen` (`claims.ts:517`),
+  for the next survey to judge. The core's own parsers (`board.ts:72`, `claims.ts:520`) are frozen.
+- **Bugs seen:** none.
