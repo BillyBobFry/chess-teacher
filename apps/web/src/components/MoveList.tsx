@@ -1,4 +1,4 @@
-import { Game, fullmoveOf, MISSED_CHANCE, type LessonKind } from "@chess-teacher/core";
+import { Game, fullmoveOf, MISSED_CHANCE, turnOf, type LessonKind } from "@chess-teacher/core";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { spokenMove } from "../lib/moves.ts";
 import { m } from "../paraglide/messages.js";
@@ -34,7 +34,7 @@ export function MoveList({
     const game = new Game(startFen);
     return moves.map((uci) => game.push(uci));
   }, [startFen, moves]);
-  const black = startFen.split(" ")[1] === "b";
+  const black = turnOf(startFen) === "b";
   const rows: [number, number | null, number | null][] = [];
   const all: (number | null)[] = black ? [null, ...played.keys()] : [...played.keys()];
   for (let i = 0; i < all.length; i += 2) rows.push([i / 2 + 1, all[i] ?? null, all[i + 1] ?? null]);

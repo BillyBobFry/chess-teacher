@@ -17,6 +17,7 @@ import {
   Game,
   classicalVerdict,
   finish,
+  fullmoveOf,
   gameOf,
   lessonMove,
   newSession,
@@ -79,7 +80,7 @@ async function main() {
     let state: SessionState = newSession({ userColour, config: { analysisDepth: Number(args.depth) } });
     for (;;) {
       const game = gameOf(state);
-      if (game.isGameOver() || Number(game.fen.split(" ")[5]) > Number(args["max-moves"])) break;
+      if (game.isGameOver() || fullmoveOf(game.fen) > Number(args["max-moves"])) break;
       if (game.turn === userColour) {
         state = (await startUserTurn(state, engines)).state;
         state = (

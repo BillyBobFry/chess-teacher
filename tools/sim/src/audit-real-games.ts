@@ -28,6 +28,7 @@ import {
   lessonGap,
   newSession,
   startUserTurn,
+  turnOf,
   userMove,
   variationSan,
   verifyLesson,
@@ -209,7 +210,7 @@ async function teacherPass(
     const r = ref[i];
     const next = ref[i + 1];
     const move = moves[i] ?? "";
-    if (!r || !next || r.fen.split(" ")[1] !== userColour) continue;
+    if (!r || !next || turnOf(r.fen) !== userColour) continue;
     const best = r.cands[0];
     if (!best) continue;
     const afterGame = new Game(next.fen);
